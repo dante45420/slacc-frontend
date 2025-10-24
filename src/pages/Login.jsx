@@ -67,9 +67,14 @@ export default function Login() {
 
         <div style={{ textAlign: 'center', marginTop: 24 }}>
           <p style={{ marginBottom: 16 }}>¿No eres miembro?</p>
-          <Link to="/solicitar-membresia" className="btn btn-outline">
-            Solicitar Membresía
-          </Link>
+          <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
+            <Link to="/por-que-ser-socio" className="btn btn-outline">
+              Por qué ser socio
+            </Link>
+            <Link to="/solicitar-membresia" className="btn btn-primary">
+              Solicitar Membresía
+            </Link>
+          </div>
         </div>
       </div>
     </section>

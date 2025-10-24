@@ -6,7 +6,7 @@ import NewsPage from "./pages/NewsPage.jsx";
 import NewsDetail from "./pages/NewsDetail.jsx";
 import EditNews from "./pages/EditNews.jsx";
 import AdminNewsView from "./pages/AdminNewsView.jsx";
-import CoursesList from "./pages/CoursesList.jsx";
+import CoursesPage from "./pages/CoursesPage.jsx";
 import CourseDetail from "./pages/CourseDetail.jsx";
 import Login from "./pages/Login.jsx";
 import JoinMembership from "./pages/JoinMembership.jsx";
@@ -22,6 +22,13 @@ import EventDetail from "./pages/EventDetail.jsx";
 import AdminUserView from "./pages/AdminUserView.jsx";
 import AdminUserEdit from "./pages/AdminUserEdit.jsx";
 import AdminUserNew from "./pages/AdminUserNew.jsx";
+import MembersBenefits from "./pages/MembersBenefits.jsx";
+import MembersDirectory from "./pages/MembersDirectory.jsx";
+import MembersYoung from "./pages/MembersYoung.jsx";
+import MembersAllied from "./pages/MembersAllied.jsx";
+import WhyJoin from "./pages/WhyJoin.jsx";
+import Contact from "./pages/Contact.jsx";
+import UserProfile from "./pages/UserProfile.jsx";
 
 function Placeholder({ title }) {
   return (
@@ -45,7 +52,8 @@ export default function App() {
         <Route path="/noticias/:id" element={<NewsDetail />} />
         <Route path="/admin/news/:id/edit" element={<EditNews />} />
         <Route path="/admin/news/:id/view" element={<AdminNewsView />} />
-        <Route path="/cursos" element={<EventsPage />} />
+        <Route path="/cursos" element={<CoursesPage />} />
+        <Route path="/cursos/:id" element={<CourseDetail />} />
         <Route path="/eventos/proximos" element={<EventsPage />} />
         <Route path="/eventos/webinars" element={<EventsPage />} />
         <Route path="/eventos/pasados" element={<EventsPage />} />
@@ -55,10 +63,14 @@ export default function App() {
         <Route path="/nosotros/historia" element={<Placeholder title="Nosotros - Historia" />} />
         <Route path="/nosotros/mision" element={<Placeholder title="Nosotros - Misión y Visión" />} />
         <Route path="/nosotros/comite" element={<Placeholder title="Nosotros - Comité" />} />
-        <Route path="/miembros" element={<Placeholder title="Miembros" />} />
-        <Route path="/miembros/beneficios" element={<Placeholder title="Miembros - Beneficios" />} />
-        <Route path="/miembros/como-unirse" element={<Placeholder title="Miembros - Cómo unirse" />} />
-        <Route path="/miembros/directorio" element={<Placeholder title="Miembros - Directorio" />} />
+        <Route path="/miembros" element={<MembersBenefits />} />
+        <Route path="/miembros/beneficios" element={<MembersBenefits />} />
+        <Route path="/miembros/como-unirse" element={<WhyJoin />} />
+        <Route path="/miembros/directorio" element={<MembersDirectory />} />
+        <Route path="/miembros/socios-jovenes" element={<MembersYoung />} />
+        <Route path="/miembros/sociedades-afines" element={<MembersAllied />} />
+        <Route path="/por-que-ser-socio" element={<WhyJoin />} />
+        <Route path="/contacto" element={<Contact />} />
         <Route path="/eventos" element={<Placeholder title="Eventos" />} />
         <Route path="/eventos/proximos" element={<Placeholder title="Eventos - Próximos" />} />
         <Route path="/eventos/pasados" element={<Placeholder title="Eventos - Pasados" />} />
@@ -68,6 +80,7 @@ export default function App() {
         <Route path="/educacion/biblioteca" element={<Placeholder title="Educación - Biblioteca" />} />
         <Route path="/educacion/casos" element={<Placeholder title="Educación - Casos" />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/perfil" element={<UserProfile />} />
         <Route path="/solicitar-membresia" element={<JoinMembership />} />
         <Route path="/subir-noticia" element={<SubmitNews />} />
         <Route path="/admin" element={<AdminDashboard />} />

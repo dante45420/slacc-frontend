@@ -6,17 +6,24 @@ export default function Carousel({ items = [], intervalMs = 6000 }) {
   const slides = useMemo(() => items.length ? items : [
     { 
       imageUrl: "/carrusel_1.png", 
-      title: "Bienvenidos a SLACC", 
-      description: "Conectamos especialistas en cadera en Latinoamérica.", 
-      ctaText: "Conoce más", 
-      ctaHref: "/nosotros" 
+      title: "Conócenos", 
+      description: "Sociedad Latinoamericana de Cadera – colaboración para la excelencia clínica.", 
+      ctaText: "Quiénes somos", 
+      ctaHref: "/miembros/beneficios" 
     },
     { 
       imageUrl: "/carrusel_2.png", 
-      title: "Próximos eventos", 
-      description: "Cursos y webinars para especialistas.", 
-      ctaText: "Ver eventos", 
-      ctaHref: "/eventos" 
+      title: "Primer Congreso SLACC", 
+      description: "21–31 de octubre de 2026 · São Paulo, Brasil.", 
+      ctaText: "Ver agenda", 
+      ctaHref: "/eventos/proximos" 
+    },
+    { 
+      imageUrl: "/carrusel_1.png", 
+      title: "Cómo hacerte socio", 
+      description: "Beneficios, categorías y requisitos para unirte a SLACC.", 
+      ctaText: "Solicitar membresía", 
+      ctaHref: "/solicitar-membresia" 
     }
   ], [items]);
 

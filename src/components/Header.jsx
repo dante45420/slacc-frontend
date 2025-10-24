@@ -23,15 +23,13 @@ export default function Header() {
       <nav className="container nav">
         <Link to="/" className="brand">SLACC</Link>
         <ul className="menu">
-          <MenuItem label="Nosotros" to="/nosotros">
-            <SubLink to="/nosotros/historia" label="Historia" />
-            <SubLink to="/nosotros/mision" label="Misión y Visión" />
-            <SubLink to="/nosotros/comite" label="Comité" />
-          </MenuItem>
+          <MenuItem label="Inicio" to="/" />
           <MenuItem label="Miembros" to="/miembros">
-            <SubLink to="/miembros/beneficios" label="Beneficios" />
-            <SubLink to="/miembros/como-unirse" label="Cómo unirse" />
+            <SubLink to="/por-que-ser-socio" label="Beneficios" />
+            <SubLink to="/por-que-ser-socio" label="Hazte socio" />
             <SubLink to="/miembros/directorio" label="Directorio" />
+            <SubLink to="/miembros/socios-jovenes" label="Socios Jóvenes" />
+            <SubLink to="/miembros/sociedades-afines" label="Sociedades afines" />
           </MenuItem>
           <MenuItem label="Cursos" to="/cursos">
             <SubLink to="/cursos" label="Todos" />
@@ -39,21 +37,22 @@ export default function Header() {
             <SubLink to="/eventos/pasados" label="Pasados" />
             <SubLink to="/eventos/webinars" label="Webinars" />
           </MenuItem>
-          <MenuItem label="Educación" to="/educacion">
-            <SubLink to="/educacion/recursos" label="Recursos" />
-            <SubLink to="/educacion/biblioteca" label="Biblioteca" />
-            <SubLink to="/educacion/casos" label="Casos" />
-          </MenuItem>
           <MenuItem label="Noticias" to="/noticias/comunicados">
-            <SubLink to="/noticias/comunicados" label="Comunicados" />
-            <SubLink to="/noticias/prensa" label="Prensa" />
-            <SubLink to="/noticias/blog" label="Blog" />
+            <SubLink to="/noticias/comunicados" label="Comunicado" />
+            <SubLink to="/noticias/blog" label="Artículo científico" />
           </MenuItem>
+          <MenuItem label="Contacto" to="/contacto" />
+          {user?.role === "admin" ? (
+            <MenuItem label="Admin" to="/admin">
+              <SubLink to="/admin/news/new" label="Nueva noticia" />
+              <SubLink to="/admin/eventos" label="Eventos" />
+              <SubLink to="/admin/users/new" label="Usuarios" />
+            </MenuItem>
+          ) : null}
           <MenuItem label="Usuario" to={user ? "/perfil" : "/login"}>
             {user ? (
               <>
                 {/* Subir noticia eliminado del menú de usuario */}
-                {user.role === "admin" ? <SubLink to="/admin" label="Portal admin" /> : null}
                 <a href="#" onClick={(e) => { e.preventDefault(); logout(); }}>Cerrar sesión</a>
               </>
             ) : (

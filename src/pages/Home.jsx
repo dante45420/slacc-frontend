@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
 import Carousel from "../components/Carousel.jsx";
+import CoursesCarousel from "../components/CoursesCarousel.jsx";
+import InstagramFeed from "../components/InstagramFeed.jsx";
 import NewsGrid from "../components/NewsGrid.jsx";
 import { TextImage, TeamGrid } from "../components/ContentBlocks.jsx";
 
@@ -9,12 +11,28 @@ export default function Home() {
       <section>
         <Carousel />
       </section>
+      <section className="section" style={{ background: '#fff' }}>
+        <div className="container">
+          <h2 style={{ marginTop: 0 }}>Instagram</h2>
+          <InstagramFeed />
+        </div>
+      </section>
+      <section className="section" style={{ background: '#f8f9fc' }}>
+        <div className="container">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+            <h2 style={{ margin: 0 }}>Cursos patrocinados por SLACC</h2>
+            <Link to="/eventos/webinars" className="btn btn-outline">Ver todos</Link>
+          </div>
+          <CoursesCarousel />
+        </div>
+      </section>
       <section className="section">
         <div className="container">
           <h2>Noticias destacadas</h2>
           <NewsGrid />
         </div>
       </section>
+      
       <section className="section">
         <div className="container">
           <h2>Nuestro equipo</h2>

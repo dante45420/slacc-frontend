@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
@@ -11,6 +11,8 @@ export default function NewsDetail() {
   const [news, setNews] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [more, setMore] = useState([]);
+  const [prevNext, setPrevNext] = useState({ prev: null, next: null });
 
   useEffect(() => {
     async function loadNews() {
@@ -42,6 +44,19 @@ export default function NewsDetail() {
         const data = await response.json();
         console.log("Noticia cargada:", data);
         setNews(data);
+        // Cargar más noticias y calcular anterior/siguiente
+        try {
+          const listRes = await fetch(`${BASE_URL}/news`);
+          const list = await listRes.json();
+          setMore(list.filter(n => n.id !== data.id).slice(0, 6));
+          const idx = list.findIndex(n => n.id === data.id);
+          setPrevNext({
+            prev: idx > 0 ? list[idx - 1] : null,
+            next: idx >= 0 && idx < list.length - 1 ? list[idx + 1] : null
+          });
+        } catch(e) {
+          // ignorar errores de lista
+        }
       } catch (err) {
         console.error("Error cargando noticia:", err);
         setError(err.message);
@@ -231,6 +246,42 @@ export default function NewsDetail() {
             </div>
           </div>
         </article>
+        {/* Navegación anterior / siguiente */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 'var(--spacing-xl)' }}>
+          <div>
+            {prevNext.prev && (
+              <Link to={`/noticias/${prevNext.prev.id}`} className="btn btn-outline">← {prevNext.prev.title}</Link>
+            )}
+          </div>
+          <div>
+            {prevNext.next && (
+              <Link to={`/noticias/${prevNext.next.id}`} className="btn btn-outline">{prevNext.next.title} →</Link>
+            )}
+          </div>
+        </div>
+
+        {/* Más noticias */}
+        {more.length > 0 && (
+          <div style={{ marginTop: 'var(--spacing-xl)' }}>
+            <h3 style={{ marginBottom: 12 }}>Más noticias</h3>
+            <div className="cards">
+              {more.map(n => (
+                <div key={n.id} className="card">
+                  {n.image_url && (
+                    <img 
+                      src={n.image_url.startsWith('http') ? n.image_url : `${BASE_URL.replace('/api','')}${n.image_url}`} 
+                      alt={n.title}
+                      style={{ width: '100%', height: 160, objectFit: 'cover', borderRadius: 8, marginBottom: 8 }}
+                    />
+                  )}
+                  <h4 style={{ margin: 0 }}>{n.title}</h4>
+                  <p style={{ color: 'var(--color-muted)' }}>{n.excerpt}</p>
+                  <Link to={`/noticias/${n.id}`} className="btn btn-outline">Leer más</Link>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );

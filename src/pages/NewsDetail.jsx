@@ -43,31 +43,22 @@ export default function NewsDetail() {
     async function loadNews() {
       try {
         setLoading(true);
-        console.log("Cargando noticia ID:", id);
-        console.log("Usuario actual:", user);
-
         const token = localStorage.getItem("access_token");
-        console.log("Token encontrado:", token ? "Sí" : "No");
 
         const headers = {};
         if (token) {
           headers["Authorization"] = `Bearer ${token}`;
         }
 
-        console.log("Headers:", headers);
-
         const response = await fetch(`${BASE_URL}/news/${id}`, { headers });
-        console.log("Response status:", response.status);
-        console.log("Response ok:", response.ok);
 
         if (!response.ok) {
           const errorText = await response.text();
-          console.log("Error response:", errorText);
+          console.error("Error response:", errorText);
           throw new Error(`Error ${response.status}: ${errorText}`);
         }
 
         const data = await response.json();
-        console.log("Noticia cargada:", data);
         setNews(data);
         // Cargar más noticias y calcular anterior/siguiente
         try {

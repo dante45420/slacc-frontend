@@ -386,7 +386,8 @@ export default function ApplicationDetail() {
               <strong>
                 {getMembershipTypeLabel(application.membership_type)}
               </strong>
-              . Una vez que la secretaria envíe el link de pago y el usuario
+              {". "}
+              Una vez que la secretaria envíe el link de pago y el usuario
               complete el pago, puedes confirmar aquí para crear las
               credenciales del usuario.
             </p>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import { apiGet } from "../api/client";
 
@@ -663,7 +664,6 @@ function ApplicationsTab() {
               <button
                 className="btn btn-primary"
                 onClick={() => {
-                  console.log("Navegando a:", `/admin/applications/${app.id}`);
                   navigate(`/admin/applications/${app.id}`);
                 }}
                 style={{ fontSize: "0.9em", padding: "6px 12px" }}

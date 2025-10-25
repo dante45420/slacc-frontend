@@ -118,20 +118,17 @@ export default function EventsPage() {
         ) : (
           <div className="cards">
             {events.map(e => (
-              <div
+              <button
                 key={e.id}
                 className="card"
                 onClick={() => navigate(`/eventos/${e.id}`)}
-                onKeyDown={event => {
-                  if (event.key === "Enter" || event.key === " ") {
-                    event.preventDefault();
-                    navigate(`/eventos/${e.id}`);
-                  }
+                style={{
+                  cursor: "pointer",
+                  border: "1px solid #ddd",
+                  background: "white",
+                  textAlign: "left",
+                  width: "100%",
                 }}
-                role="button"
-                tabIndex={0}
-                aria-label={`Ver detalles de ${e.title}`}
-                style={{ cursor: "pointer" }}
               >
                 {e.image_url && (
                   <img
@@ -227,7 +224,7 @@ export default function EventsPage() {
                     </div>
                   </div>
                 </div>
-              </div>
+              </button>
             ))}
           </div>
         )}

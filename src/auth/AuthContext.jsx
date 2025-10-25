@@ -1,5 +1,6 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { apiGet, apiPost } from "../api/client.js";
+import PropTypes from "prop-types";
 
 const AuthCtx = createContext(null);
 
@@ -8,7 +9,11 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const token = localStorage.getItem("access_token");
-    if (token) apiGet("/me").then(setUser).catch(() => logout());
+    if (token)
+      apiGet("/me")
+        .then(setUser)
+        .catch(() => logout());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function login(email, password) {
@@ -23,11 +28,15 @@ export function AuthProvider({ children }) {
     setUser(null);
   }
 
-  return (
-    <AuthCtx.Provider value={{ user, login, logout }}>{children}</AuthCtx.Provider>
-  );
+  const value = useMemo(() => ({ user, login, logout }), [user]);
+
+  return <AuthCtx.Provider value={value}>{children}</AuthCtx.Provider>;
 }
 
-export function useAuth() { return useContext(AuthCtx); }
+AuthProvider.propTypes = {
+  children: PropTypes.node.isRequired,
+};
 
-
+export function useAuth() {
+  return useContext(AuthCtx);
+}

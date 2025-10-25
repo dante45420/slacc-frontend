@@ -2,7 +2,32 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
+const BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
+
+function getImageUrl(imageUrl) {
+  if (!imageUrl) {
+    return "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?auto=format&fit=crop&w=800&q=80";
+  }
+
+  if (imageUrl.startsWith("http")) {
+    return imageUrl;
+  }
+
+  return `${BASE_URL.replace("/api", "")}${imageUrl}`;
+}
+
+function getStatusBadgeColor(status) {
+  if (status === "published") return "var(--color-secondary)";
+  if (status === "pending") return "var(--color-accent)";
+  return "var(--color-muted)";
+}
+
+function getStatusLabel(status) {
+  if (status === "published") return "Publicada";
+  if (status === "pending") return "Pendiente";
+  return "Rechazada";
+}
 
 export default function AdminNewsView() {
   const { id } = useParams();
@@ -18,13 +43,13 @@ export default function AdminNewsView() {
         setLoading(true);
         const token = localStorage.getItem("access_token");
         const response = await fetch(`${BASE_URL}/admin/news/${id}/view`, {
-          headers: { 'Authorization': `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` },
         });
-        
+
         if (!response.ok) {
           throw new Error(`Error ${response.status}: Noticia no encontrada`);
         }
-        
+
         const data = await response.json();
         setNews(data);
       } catch (err) {
@@ -43,15 +68,15 @@ export default function AdminNewsView() {
     try {
       const token = localStorage.getItem("access_token");
       const response = await fetch(`${BASE_URL}/admin/news/${id}/approve`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` }
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
       });
       if (response.ok) {
-        alert('Noticia aprobada correctamente');
-        navigate('/admin');
+        alert("Noticia aprobada correctamente");
+        navigate("/admin");
       }
     } catch (err) {
-      console.error('Error al aprobar:', err);
+      console.error("Error al aprobar:", err);
     }
   }
 
@@ -59,28 +84,16 @@ export default function AdminNewsView() {
     try {
       const token = localStorage.getItem("access_token");
       const response = await fetch(`${BASE_URL}/admin/news/${id}/reject`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` }
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
       });
       if (response.ok) {
-        alert('Noticia rechazada correctamente');
-        navigate('/admin');
+        alert("Noticia rechazada correctamente");
+        navigate("/admin");
       }
     } catch (err) {
-      console.error('Error al rechazar:', err);
+      console.error("Error al rechazar:", err);
     }
-  }
-
-  function getImageUrl(imageUrl) {
-    if (!imageUrl) {
-      return "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?auto=format&fit=crop&w=800&q=80";
-    }
-    
-    if (imageUrl.startsWith('http')) {
-      return imageUrl;
-    }
-    
-    return `${BASE_URL.replace('/api', '')}${imageUrl}`;
   }
 
   if (loading) {
@@ -99,7 +112,10 @@ export default function AdminNewsView() {
         <div className="container">
           <h2>Error</h2>
           <p>{error}</p>
-          <button className="btn btn-outline" onClick={() => navigate('/admin')}>
+          <button
+            className="btn btn-outline"
+            onClick={() => navigate("/admin")}
+          >
             Volver al admin
           </button>
         </div>
@@ -123,35 +139,49 @@ export default function AdminNewsView() {
         <article className="news-detail">
           {/* Header con título y estado */}
           <header className="news-header">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 'var(--spacing-lg)' }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "flex-start",
+                marginBottom: "var(--spacing-lg)",
+              }}
+            >
               <div>
                 <h1 className="news-title">{news.title}</h1>
                 <div className="news-meta">
-                  <span className="news-status" style={{ 
-                    padding: '4px 12px', 
-                    borderRadius: 'var(--radius)', 
-                    fontSize: 'var(--font-size-sm)',
-                    backgroundColor: news.status === 'published' ? 'var(--color-secondary)' : 
-                                  news.status === 'pending' ? 'var(--color-accent)' : 'var(--color-muted)',
-                    color: 'white'
-                  }}>
-                    {news.status === 'published' ? 'Publicada' : 
-                     news.status === 'pending' ? 'Pendiente' : 'Rechazada'}
+                  <span
+                    className="news-status"
+                    style={{
+                      padding: "4px 12px",
+                      borderRadius: "var(--radius)",
+                      fontSize: "var(--font-size-sm)",
+                      backgroundColor: getStatusBadgeColor(news.status),
+                      color: "white",
+                    }}
+                  >
+                    {getStatusLabel(news.status)}
                   </span>
-                  <time dateTime={news.created_at} style={{ marginLeft: 'var(--spacing)', color: 'var(--color-text-light)' }}>
-                    {new Date(news.created_at).toLocaleDateString('es-ES', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
+                  <time
+                    dateTime={news.created_at}
+                    style={{
+                      marginLeft: "var(--spacing)",
+                      color: "var(--color-text-light)",
+                    }}
+                  >
+                    {new Date(news.created_at).toLocaleDateString("es-ES", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
                     })}
                   </time>
                 </div>
               </div>
-              
+
               {/* Botones de admin */}
-              {user?.role === 'admin' && (
-                <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
-                  {news.status === 'pending' && (
+              {user?.role === "admin" && (
+                <div style={{ display: "flex", gap: "var(--spacing-sm)" }}>
+                  {news.status === "pending" && (
                     <>
                       <button className="btn btn-primary" onClick={approveNews}>
                         Aprobar
@@ -161,12 +191,18 @@ export default function AdminNewsView() {
                       </button>
                     </>
                   )}
-                  {news.status === 'published' && (
-                    <button className="btn btn-outline" onClick={() => navigate(`/admin/news/${news.id}/edit`)}>
+                  {news.status === "published" && (
+                    <button
+                      className="btn btn-outline"
+                      onClick={() => navigate(`/admin/news/${news.id}/edit`)}
+                    >
                       Editar
                     </button>
                   )}
-                  <button className="btn btn-outline" onClick={() => navigate('/admin')}>
+                  <button
+                    className="btn btn-outline"
+                    onClick={() => navigate("/admin")}
+                  >
                     Volver al admin
                   </button>
                 </div>
@@ -176,9 +212,12 @@ export default function AdminNewsView() {
 
           {/* Imagen de la noticia */}
           {news.image_url && (
-            <div className="news-image" style={{ marginBottom: 'var(--spacing-xl)' }}>
-              <img 
-                src={getImageUrl(news.image_url)} 
+            <div
+              className="news-image"
+              style={{ marginBottom: "var(--spacing-xl)" }}
+            >
+              <img
+                src={getImageUrl(news.image_url)}
                 alt={news.title}
                 style={{
                   width: "100%",
@@ -194,26 +233,46 @@ export default function AdminNewsView() {
           <div className="news-content">
             {/* Resumen */}
             {news.excerpt && (
-              <div className="news-excerpt" style={{ 
-                marginBottom: 'var(--spacing-xl)',
-                padding: 'var(--spacing-lg)',
-                backgroundColor: 'var(--color-bg-light)',
-                borderRadius: 'var(--radius)',
-                borderLeft: '4px solid var(--color-primary)'
-              }}>
-                <h3 style={{ marginBottom: 'var(--spacing-sm)', color: 'var(--color-primary)' }}>Resumen</h3>
-                <p style={{ fontSize: 'var(--font-size-lg)', lineHeight: 1.6, margin: 0 }}>
+              <div
+                className="news-excerpt"
+                style={{
+                  marginBottom: "var(--spacing-xl)",
+                  padding: "var(--spacing-lg)",
+                  backgroundColor: "var(--color-bg-light)",
+                  borderRadius: "var(--radius)",
+                  borderLeft: "4px solid var(--color-primary)",
+                }}
+              >
+                <h3
+                  style={{
+                    marginBottom: "var(--spacing-sm)",
+                    color: "var(--color-primary)",
+                  }}
+                >
+                  Resumen
+                </h3>
+                <p
+                  style={{
+                    fontSize: "var(--font-size-lg)",
+                    lineHeight: 1.6,
+                    margin: 0,
+                  }}
+                >
                   {news.excerpt}
                 </p>
               </div>
             )}
-            
+
             {/* Contenido completo */}
             <div className="news-body">
-              <h3 style={{ marginBottom: 'var(--spacing-lg)' }}>Contenido completo</h3>
+              <h3 style={{ marginBottom: "var(--spacing-lg)" }}>
+                Contenido completo
+              </h3>
               {news.content ? (
-                <div dangerouslySetInnerHTML={{ __html: news.content }} 
-                     style={{ lineHeight: 1.8, fontSize: 'var(--font-size-base)' }} />
+                <div
+                  dangerouslySetInnerHTML={{ __html: news.content }}
+                  style={{ lineHeight: 1.8, fontSize: "var(--font-size-base)" }}
+                />
               ) : (
                 <p>Contenido de la noticia no disponible.</p>
               )}

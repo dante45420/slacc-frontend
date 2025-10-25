@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext.jsx";
+import PropTypes from "prop-types";
 
 function MenuItem({ label, to, children }) {
   return (
@@ -10,18 +11,29 @@ function MenuItem({ label, to, children }) {
   );
 }
 
+MenuItem.propTypes = {
+  label: PropTypes.string.isRequired,
+  to: PropTypes.string.isRequired,
+  children: PropTypes.node,
+};
+
 function SubLink({ to, label }) {
-  return (
-    <Link to={to}>{label}</Link>
-  );
+  return <Link to={to}>{label}</Link>;
 }
+
+SubLink.propTypes = {
+  to: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
+};
 
 export default function Header() {
   const { user, logout } = useAuth();
   return (
     <header className="site-header">
       <nav className="container nav">
-        <Link to="/" className="brand">SLACC</Link>
+        <Link to="/" className="brand">
+          SLACC
+        </Link>
         <ul className="menu">
           <MenuItem label="Inicio" to="/" />
           <MenuItem label="Miembros" to="/miembros">
@@ -29,7 +41,10 @@ export default function Header() {
             <SubLink to="/por-que-ser-socio" label="Hazte socio" />
             <SubLink to="/miembros/directorio" label="Directorio" />
             <SubLink to="/miembros/socios-jovenes" label="Socios Jóvenes" />
-            <SubLink to="/miembros/sociedades-afines" label="Sociedades afines" />
+            <SubLink
+              to="/miembros/sociedades-afines"
+              label="Sociedades afines"
+            />
           </MenuItem>
           <MenuItem label="Cursos" to="/cursos">
             <SubLink to="/cursos" label="Todos" />
@@ -53,12 +68,30 @@ export default function Header() {
             {user ? (
               <>
                 {/* Subir noticia eliminado del menú de usuario */}
-                <a href="#" onClick={(e) => { e.preventDefault(); logout(); }}>Cerrar sesión</a>
+                <button
+                  onClick={e => {
+                    e.preventDefault();
+                    logout();
+                  }}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    padding: 0,
+                    cursor: "pointer",
+                    color: "inherit",
+                    textDecoration: "none",
+                  }}
+                >
+                  Cerrar sesión
+                </button>
               </>
             ) : (
               <>
                 <SubLink to="/login" label="Iniciar sesión" />
-                <SubLink to="/solicitar-membresia" label="Solicitar membresía" />
+                <SubLink
+                  to="/solicitar-membresia"
+                  label="Solicitar membresía"
+                />
               </>
             )}
           </MenuItem>
@@ -67,4 +100,3 @@ export default function Header() {
     </header>
   );
 }
-

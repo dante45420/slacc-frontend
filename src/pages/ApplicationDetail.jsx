@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { apiGet, apiPost } from "../api/client";
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
+const BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
 
 export default function ApplicationDetail() {
   const { id } = useParams();
@@ -11,7 +12,8 @@ export default function ApplicationDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [msg, setMsg] = useState("");
-  const [selectedMembershipType, setSelectedMembershipType] = useState("normal");
+  const [selectedMembershipType, setSelectedMembershipType] =
+    useState("normal");
   const [resolutionNote, setResolutionNote] = useState("");
 
   useEffect(() => {
@@ -35,13 +37,15 @@ export default function ApplicationDetail() {
 
   async function approveApplication() {
     if (!application) return;
-    
+
     try {
       await apiPost(`/admin/applications/${application.id}/approve`, {
         membership_type: selectedMembershipType,
-        note: resolutionNote
+        note: resolutionNote,
       });
-      setMsg("Postulación aprobada. El usuario quedó en estado de pago pendiente.");
+      setMsg(
+        "Postulación aprobada. El usuario quedó en estado de pago pendiente."
+      );
       setTimeout(() => {
         loadApplication(); // Recargar para ver el nuevo estado
       }, 2000);
@@ -53,10 +57,14 @@ export default function ApplicationDetail() {
 
   async function confirmPayment() {
     if (!application) return;
-    
+
     try {
-      const result = await apiPost(`/admin/applications/${application.id}/confirm-payment`);
-      setMsg(`Pago confirmado. Usuario creado con credenciales: ${result.credentials.email} / ${result.credentials.password}`);
+      const result = await apiPost(
+        `/admin/applications/${application.id}/confirm-payment`
+      );
+      setMsg(
+        `Pago confirmado. Usuario creado con credenciales: ${result.credentials.email} / ${result.credentials.password}`
+      );
       setTimeout(() => {
         navigate("/admin");
       }, 3000);
@@ -68,10 +76,10 @@ export default function ApplicationDetail() {
 
   async function rejectApplication() {
     if (!application) return;
-    
+
     try {
       await apiPost(`/admin/applications/${application.id}/reject`, {
-        note: resolutionNote
+        note: resolutionNote,
       });
       setMsg("Postulación rechazada.");
       setTimeout(() => {
@@ -87,8 +95,10 @@ export default function ApplicationDetail() {
     return (
       <section className="section">
         <div className="container">
-          <div style={{ textAlign: 'center', padding: '48px 0' }}>
-            <div style={{ fontSize: '1.2em', color: 'var(--color-muted)' }}>Cargando...</div>
+          <div style={{ textAlign: "center", padding: "48px 0" }}>
+            <div style={{ fontSize: "1.2em", color: "var(--color-muted)" }}>
+              Cargando...
+            </div>
           </div>
         </div>
       </section>
@@ -99,9 +109,14 @@ export default function ApplicationDetail() {
     return (
       <section className="section">
         <div className="container">
-          <div style={{ textAlign: 'center', padding: '48px 0' }}>
-            <div style={{ color: 'crimson', marginBottom: 16 }}>{error || "Postulación no encontrada"}</div>
-            <button className="btn btn-outline" onClick={() => navigate("/admin")}>
+          <div style={{ textAlign: "center", padding: "48px 0" }}>
+            <div style={{ color: "crimson", marginBottom: 16 }}>
+              {error || "Postulación no encontrada"}
+            </div>
+            <button
+              className="btn btn-outline"
+              onClick={() => navigate("/admin")}
+            >
               Volver al Panel Admin
             </button>
           </div>
@@ -110,33 +125,33 @@ export default function ApplicationDetail() {
     );
   }
 
-  const getMembershipTypeLabel = (type) => {
+  const getMembershipTypeLabel = type => {
     const types = {
       joven: "Socio Joven ($30/año)",
-      normal: "Socio Normal ($100/año)", 
-      gratuito: "Socio Gratuito (Gratis)"
+      normal: "Socio Normal ($100/año)",
+      gratuito: "Socio Gratuito (Gratis)",
     };
     return types[type] || type;
   };
 
-  const getStatusLabel = (status) => {
+  const getStatusLabel = status => {
     const statuses = {
       pending: "Pendiente",
       approved: "Aprobada",
       rejected: "Rechazada",
       payment_pending: "Esperando Pago",
-      paid: "Pagada"
+      paid: "Pagada",
     };
     return statuses[status] || status;
   };
 
-  const getStatusColor = (status) => {
+  const getStatusColor = status => {
     const colors = {
       pending: "var(--color-accent)",
       approved: "var(--color-secondary)",
       rejected: "crimson",
       payment_pending: "orange",
-      paid: "green"
+      paid: "green",
     };
     return colors[status] || "var(--color-muted)";
   };
@@ -145,75 +160,100 @@ export default function ApplicationDetail() {
     <section className="section">
       <div className="container" style={{ maxWidth: 800 }}>
         <div style={{ marginBottom: 32 }}>
-          <button 
-            className="btn btn-outline" 
+          <button
+            className="btn btn-outline"
             onClick={() => navigate("/admin")}
             style={{ marginBottom: 24 }}
           >
             ← Volver al Panel Admin
           </button>
-          
-          <div style={{ 
-            background: '#f8f9fa', 
-            padding: 24, 
-            borderRadius: 12, 
-            border: '1px solid #e9ecef',
-            marginBottom: 24
-          }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+
+          <div
+            style={{
+              background: "#f8f9fa",
+              padding: 24,
+              borderRadius: 12,
+              border: "1px solid #e9ecef",
+              marginBottom: 24,
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: 16,
+              }}
+            >
               <h1 style={{ margin: 0 }}>Postulación de {application.name}</h1>
-              <div style={{ 
-                background: getStatusColor(application.status),
-                color: 'white',
-                padding: '8px 16px',
-                borderRadius: 20,
-                fontSize: '0.9em',
-                fontWeight: 'bold'
-              }}>
+              <div
+                style={{
+                  background: getStatusColor(application.status),
+                  color: "white",
+                  padding: "8px 16px",
+                  borderRadius: 20,
+                  fontSize: "0.9em",
+                  fontWeight: "bold",
+                }}
+              >
                 {getStatusLabel(application.status)}
               </div>
             </div>
-            <p style={{ color: 'var(--color-muted)', margin: 0 }}>
-              Postuló el {new Date(application.created_at).toLocaleDateString('es-ES', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
+            <p style={{ color: "var(--color-muted)", margin: 0 }}>
+              Postuló el{" "}
+              {new Date(application.created_at).toLocaleDateString("es-ES", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
               })}
             </p>
           </div>
         </div>
 
         {msg && (
-          <div style={{ 
-            background: '#d4edda', 
-            color: '#155724', 
-            padding: 16, 
-            borderRadius: 8, 
-            marginBottom: 24,
-            textAlign: 'center'
-          }}>
+          <div
+            style={{
+              background: "#d4edda",
+              color: "#155724",
+              padding: 16,
+              borderRadius: 8,
+              marginBottom: 24,
+              textAlign: "center",
+            }}
+          >
             {msg}
           </div>
         )}
 
         {error && (
-          <div style={{ 
-            background: '#f8d7da', 
-            color: '#721c24', 
-            padding: 16, 
-            borderRadius: 8, 
-            marginBottom: 24,
-            textAlign: 'center'
-          }}>
+          <div
+            style={{
+              background: "#f8d7da",
+              color: "#721c24",
+              padding: 16,
+              borderRadius: 8,
+              marginBottom: 24,
+              textAlign: "center",
+            }}
+          >
             {error}
           </div>
         )}
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginBottom: 32 }}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: 24,
+            marginBottom: 32,
+          }}
+        >
           <div className="card">
-            <h3 style={{ marginBottom: 16, color: 'var(--color-primary)' }}>Información Personal</h3>
+            <h3 style={{ marginBottom: 16, color: "var(--color-primary)" }}>
+              Información Personal
+            </h3>
             <div style={{ marginBottom: 12 }}>
               <strong>Nombre:</strong> {application.name}
             </div>
@@ -221,105 +261,142 @@ export default function ApplicationDetail() {
               <strong>Email:</strong> {application.email}
             </div>
             <div style={{ marginBottom: 12 }}>
-              <strong>Teléfono:</strong> {application.phone || 'No especificado'}
+              <strong>Teléfono:</strong>{" "}
+              {application.phone || "No especificado"}
             </div>
             <div style={{ marginBottom: 12 }}>
-              <strong>Especialización:</strong> {application.specialization || 'No especificada'}
+              <strong>Especialización:</strong>{" "}
+              {application.specialization || "No especificada"}
             </div>
             <div>
-              <strong>Años de experiencia:</strong> {application.experience_years || 'No especificado'}
+              <strong>Años de experiencia:</strong>{" "}
+              {application.experience_years || "No especificado"}
             </div>
           </div>
 
           <div className="card">
-            <h3 style={{ marginBottom: 16, color: 'var(--color-primary)' }}>Motivación</h3>
-            <div style={{ 
-              background: '#f8f9fa', 
-              padding: 16, 
-              borderRadius: 8, 
-              minHeight: 120,
-              border: '1px solid #e9ecef'
-            }}>
-              {application.motivation || 'No especificada'}
+            <h3 style={{ marginBottom: 16, color: "var(--color-primary)" }}>
+              Motivación
+            </h3>
+            <div
+              style={{
+                background: "#f8f9fa",
+                padding: 16,
+                borderRadius: 8,
+                minHeight: 120,
+                border: "1px solid #e9ecef",
+              }}
+            >
+              {application.motivation || "No especificada"}
             </div>
           </div>
         </div>
 
-        {application.status === 'pending' && (
+        {application.status === "pending" && (
           <div className="card" style={{ marginBottom: 32 }}>
-            <h3 style={{ marginBottom: 16, color: 'var(--color-primary)' }}>Decisión</h3>
-            
+            <h3 style={{ marginBottom: 16, color: "var(--color-primary)" }}>
+              Decisión
+            </h3>
+
             <div style={{ marginBottom: 16 }}>
-              <label style={{ display: 'block', marginBottom: 8, fontWeight: '500' }}>
+              <label
+                htmlFor="membership-type-select"
+                style={{ display: "block", marginBottom: 8, fontWeight: "500" }}
+              >
                 Tipo de Membresía a Asignar:
               </label>
-              <select 
-                value={selectedMembershipType} 
+              <select
+                id="membership-type-select"
+                value={selectedMembershipType}
                 onChange={e => setSelectedMembershipType(e.target.value)}
-                style={{ 
-                  width: '100%', 
-                  padding: 12, 
-                  border: '1px solid #ddd', 
+                style={{
+                  width: "100%",
+                  padding: 12,
+                  border: "1px solid #ddd",
                   borderRadius: 6,
-                  fontSize: '1em'
+                  fontSize: "1em",
                 }}
               >
-                <option value="joven">Socio Joven ($30/año) - Recién egresados</option>
-                <option value="normal">Socio Normal ($100/año) - Profesionales con experiencia</option>
-                <option value="gratuito">Socio Gratuito (Gratis) - Alto estatus invitado</option>
+                <option value="joven">
+                  Socio Joven ($30/año) - Recién egresados
+                </option>
+                <option value="normal">
+                  Socio Normal ($100/año) - Profesionales con experiencia
+                </option>
+                <option value="gratuito">
+                  Socio Gratuito (Gratis) - Alto estatus invitado
+                </option>
               </select>
             </div>
 
             <div style={{ marginBottom: 24 }}>
-              <label style={{ display: 'block', marginBottom: 8, fontWeight: '500' }}>
+              <label
+                htmlFor="resolution-note-textarea"
+                style={{ display: "block", marginBottom: 8, fontWeight: "500" }}
+              >
                 Nota de Resolución:
               </label>
-              <textarea 
-                value={resolutionNote} 
+              <textarea
+                id="resolution-note-textarea"
+                value={resolutionNote}
                 onChange={e => setResolutionNote(e.target.value)}
                 placeholder="Nota opcional para el postulante..."
-                style={{ 
-                  width: '100%', 
-                  padding: 12, 
-                  border: '1px solid #ddd', 
+                style={{
+                  width: "100%",
+                  padding: 12,
+                  border: "1px solid #ddd",
                   borderRadius: 6,
                   minHeight: 80,
-                  resize: 'vertical'
+                  resize: "vertical",
                 }}
               />
             </div>
 
-            <div style={{ display: 'flex', gap: 16, justifyContent: 'flex-end' }}>
-              <button 
-                className="btn btn-outline" 
+            <div
+              style={{ display: "flex", gap: 16, justifyContent: "flex-end" }}
+            >
+              <button
+                className="btn btn-outline"
                 onClick={rejectApplication}
-                style={{ background: 'crimson', color: 'white', border: 'none' }}
+                style={{
+                  background: "crimson",
+                  color: "white",
+                  border: "none",
+                }}
               >
                 Rechazar
               </button>
-              <button 
-                className="btn btn-primary" 
-                onClick={approveApplication}
-              >
+              <button className="btn btn-primary" onClick={approveApplication}>
                 Aprobar
               </button>
             </div>
           </div>
         )}
 
-        {application.status === 'payment_pending' && (
-          <div className="card" style={{ marginBottom: 32, border: '2px solid orange' }}>
-            <h3 style={{ marginBottom: 16, color: 'orange' }}>Esperando Pago</h3>
-            <p style={{ marginBottom: 16, color: 'var(--color-muted)' }}>
-              La postulación fue aprobada como <strong>{getMembershipTypeLabel(application.membership_type)}</strong>. 
-              Una vez que la secretaria envíe el link de pago y el usuario complete el pago, 
-              puedes confirmar aquí para crear las credenciales del usuario.
+        {application.status === "payment_pending" && (
+          <div
+            className="card"
+            style={{ marginBottom: 32, border: "2px solid orange" }}
+          >
+            <h3 style={{ marginBottom: 16, color: "orange" }}>
+              Esperando Pago
+            </h3>
+            <p style={{ marginBottom: 16, color: "var(--color-muted)" }}>
+              La postulación fue aprobada como{" "}
+              <strong>
+                {getMembershipTypeLabel(application.membership_type)}
+              </strong>
+              . Una vez que la secretaria envíe el link de pago y el usuario
+              complete el pago, puedes confirmar aquí para crear las
+              credenciales del usuario.
             </p>
-            <div style={{ display: 'flex', gap: 16, justifyContent: 'flex-end' }}>
-              <button 
-                className="btn btn-primary" 
+            <div
+              style={{ display: "flex", gap: 16, justifyContent: "flex-end" }}
+            >
+              <button
+                className="btn btn-primary"
                 onClick={confirmPayment}
-                style={{ background: 'green' }}
+                style={{ background: "green" }}
               >
                 Confirmar Pago y Crear Usuario
               </button>
@@ -329,13 +406,17 @@ export default function ApplicationDetail() {
 
         {application.resolution_note && (
           <div className="card">
-            <h3 style={{ marginBottom: 16, color: 'var(--color-primary)' }}>Nota de Resolución</h3>
-            <div style={{ 
-              background: '#f8f9fa', 
-              padding: 16, 
-              borderRadius: 8,
-              border: '1px solid #e9ecef'
-            }}>
+            <h3 style={{ marginBottom: 16, color: "var(--color-primary)" }}>
+              Nota de Resolución
+            </h3>
+            <div
+              style={{
+                background: "#f8f9fa",
+                padding: 16,
+                borderRadius: 8,
+                border: "1px solid #e9ecef",
+              }}
+            >
               {application.resolution_note}
             </div>
           </div>

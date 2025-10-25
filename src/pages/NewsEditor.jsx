@@ -1,14 +1,21 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { apiGet, apiPost, apiPostForm } from "../api/client";
+import { apiGet, apiPostForm } from "../api/client";
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
+const BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
+
+function getSubmitButtonLabel(loading, isEdit) {
+  if (loading) return "Guardando...";
+  if (isEdit) return "Actualizar Noticia";
+  return "Crear Noticia";
+}
 
 export default function NewsEditor() {
   const { id } = useParams();
   const navigate = useNavigate();
   const isEdit = !!id;
-  
+
   const [formData, setFormData] = useState({
     title: "",
     excerpt: "",
@@ -24,9 +31,9 @@ export default function NewsEditor() {
     video_url: "",
     external_link: "",
     publish_date: "",
-    expiry_date: ""
+    expiry_date: "",
   });
-  
+
   const [imageFile, setImageFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -57,7 +64,7 @@ export default function NewsEditor() {
         video_url: news.video_url || "",
         external_link: news.external_link || "",
         publish_date: news.publish_date || "",
-        expiry_date: news.expiry_date || ""
+        expiry_date: news.expiry_date || "",
       });
     } catch (err) {
       setError("Error al cargar la noticia");
@@ -71,7 +78,7 @@ export default function NewsEditor() {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === "checkbox" ? checked : value,
     }));
   }
 
@@ -81,7 +88,7 @@ export default function NewsEditor() {
       setImageFile(file);
       // Preview de la imagen
       const reader = new FileReader();
-      reader.onload = (e) => {
+      reader.onload = e => {
         setFormData(prev => ({ ...prev, image_url: e.target.result }));
       };
       reader.readAsDataURL(file);
@@ -96,17 +103,17 @@ export default function NewsEditor() {
 
     try {
       const formDataToSend = new FormData();
-      
+
       // Agregar todos los campos del formulario
-      Object.keys(formData).forEach(key => {
+      for (const key of Object.keys(formData)) {
         if (formData[key] !== null && formData[key] !== undefined) {
           formDataToSend.append(key, formData[key]);
         }
-      });
+      }
 
       // Agregar imagen si hay una nueva
       if (imageFile) {
-        formDataToSend.append('image', imageFile);
+        formDataToSend.append("image", imageFile);
       }
 
       if (isEdit) {
@@ -120,7 +127,6 @@ export default function NewsEditor() {
       setTimeout(() => {
         navigate("/admin");
       }, 2000);
-
     } catch (err) {
       setError("Error al guardar la noticia");
       console.error(err);
@@ -133,8 +139,10 @@ export default function NewsEditor() {
     return (
       <section className="section">
         <div className="container">
-          <div style={{ textAlign: 'center', padding: '48px 0' }}>
-            <div style={{ fontSize: '1.2em', color: 'var(--color-muted)' }}>Cargando...</div>
+          <div style={{ textAlign: "center", padding: "48px 0" }}>
+            <div style={{ fontSize: "1.2em", color: "var(--color-muted)" }}>
+              Cargando...
+            </div>
           </div>
         </div>
       </section>
@@ -145,88 +153,138 @@ export default function NewsEditor() {
     <section className="section">
       <div className="container" style={{ maxWidth: 800 }}>
         <div style={{ marginBottom: 32 }}>
-          <button 
-            className="btn btn-outline" 
+          <button
+            className="btn btn-outline"
             onClick={() => navigate("/admin")}
             style={{ marginBottom: 24 }}
           >
             ← Volver al Panel Admin
           </button>
-          
-          <h1>{isEdit ? 'Editar Noticia' : 'Crear Nueva Noticia'}</h1>
-          <p style={{ color: 'var(--color-muted)' }}>
-            {isEdit ? 'Modifica los campos de la noticia' : 'Completa todos los campos para crear una nueva noticia'}
+
+          <h1>{isEdit ? "Editar Noticia" : "Crear Nueva Noticia"}</h1>
+          <p style={{ color: "var(--color-muted)" }}>
+            {isEdit
+              ? "Modifica los campos de la noticia"
+              : "Completa todos los campos para crear una nueva noticia"}
           </p>
         </div>
 
         {error && (
-          <div style={{ 
-            background: '#f8d7da', 
-            color: '#721c24', 
-            padding: 16, 
-            borderRadius: 8, 
-            marginBottom: 24,
-            textAlign: 'center'
-          }}>
+          <div
+            style={{
+              background: "#f8d7da",
+              color: "#721c24",
+              padding: 16,
+              borderRadius: 8,
+              marginBottom: 24,
+              textAlign: "center",
+            }}
+          >
             {error}
           </div>
         )}
 
         {success && (
-          <div style={{ 
-            background: '#d4edda', 
-            color: '#155724', 
-            padding: 16, 
-            borderRadius: 8, 
-            marginBottom: 24,
-            textAlign: 'center'
-          }}>
+          <div
+            style={{
+              background: "#d4edda",
+              color: "#155724",
+              padding: 16,
+              borderRadius: 8,
+              marginBottom: 24,
+              textAlign: "center",
+            }}
+          >
             {success}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} style={{ background: '#f8f9fa', padding: 32, borderRadius: 12 }}>
+        <form
+          onSubmit={handleSubmit}
+          style={{ background: "#f8f9fa", padding: 32, borderRadius: 12 }}
+        >
           {/* Información básica */}
           <div style={{ marginBottom: 32 }}>
-            <h3 style={{ marginBottom: 16, color: 'var(--color-primary)' }}>Información Básica</h3>
-            
+            <h3 style={{ marginBottom: 16, color: "var(--color-primary)" }}>
+              Información Básica
+            </h3>
+
             <div style={{ marginBottom: 16 }}>
-              <label style={{ display: 'block', marginBottom: 8, fontWeight: '500' }}>
+              <label
+                htmlFor="news-editor-title"
+                style={{ display: "block", marginBottom: 8, fontWeight: "500" }}
+              >
                 Título *
               </label>
               <input
+                id="news-editor-title"
                 type="text"
                 name="title"
                 value={formData.title}
                 onChange={handleInputChange}
-                style={{ width: '100%', padding: 12, border: '1px solid #ddd', borderRadius: 6 }}
+                style={{
+                  width: "100%",
+                  padding: 12,
+                  border: "1px solid #ddd",
+                  borderRadius: 6,
+                }}
                 placeholder="Título de la noticia"
               />
             </div>
 
             <div style={{ marginBottom: 16 }}>
-              <label style={{ display: 'block', marginBottom: 8, fontWeight: '500' }}>
+              <label
+                htmlFor="news-editor-excerpt"
+                style={{ display: "block", marginBottom: 8, fontWeight: "500" }}
+              >
                 Resumen *
               </label>
               <textarea
+                id="news-editor-excerpt"
                 name="excerpt"
                 value={formData.excerpt}
                 onChange={handleInputChange}
-                style={{ width: '100%', padding: 12, border: '1px solid #ddd', borderRadius: 6, minHeight: 80 }}
+                style={{
+                  width: "100%",
+                  padding: 12,
+                  border: "1px solid #ddd",
+                  borderRadius: 6,
+                  minHeight: 80,
+                }}
                 placeholder="Resumen breve de la noticia"
               />
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: 16,
+                marginBottom: 16,
+              }}
+            >
               <div>
-                <label style={{ display: 'block', marginBottom: 8, fontWeight: '500' }}>
+                <label
+                  htmlFor="news-editor-category"
+                  style={{
+                    display: "block",
+                    marginBottom: 8,
+                    fontWeight: "500",
+                  }}
+                >
                   Categoría
                 </label>
                 <select
+                  id="news-editor-category"
                   name="category"
                   value={formData.category}
                   onChange={handleInputChange}
-                  style={{ width: '100%', padding: 12, border: '1px solid #ddd', borderRadius: 6 }}
+                  style={{
+                    width: "100%",
+                    padding: 12,
+                    border: "1px solid #ddd",
+                    borderRadius: 6,
+                  }}
                 >
                   <option value="general">General</option>
                   <option value="comunicados">Comunicados</option>
@@ -237,14 +295,27 @@ export default function NewsEditor() {
                 </select>
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: 8, fontWeight: '500' }}>
+                <label
+                  htmlFor="news-editor-priority"
+                  style={{
+                    display: "block",
+                    marginBottom: 8,
+                    fontWeight: "500",
+                  }}
+                >
                   Prioridad
                 </label>
                 <select
+                  id="news-editor-priority"
                   name="priority"
                   value={formData.priority}
                   onChange={handleInputChange}
-                  style={{ width: '100%', padding: 12, border: '1px solid #ddd', borderRadius: 6 }}
+                  style={{
+                    width: "100%",
+                    padding: 12,
+                    border: "1px solid #ddd",
+                    borderRadius: 6,
+                  }}
                 >
                   <option value="low">Baja</option>
                   <option value="normal">Normal</option>
@@ -254,45 +325,87 @@ export default function NewsEditor() {
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: 16,
+                marginBottom: 16,
+              }}
+            >
               <div>
-                <label style={{ display: 'block', marginBottom: 8, fontWeight: '500' }}>
+                <label
+                  htmlFor="news-editor-author"
+                  style={{
+                    display: "block",
+                    marginBottom: 8,
+                    fontWeight: "500",
+                  }}
+                >
                   Autor
                 </label>
                 <input
+                  id="news-editor-author"
                   type="text"
                   name="author"
                   value={formData.author}
                   onChange={handleInputChange}
-                  style={{ width: '100%', padding: 12, border: '1px solid #ddd', borderRadius: 6 }}
+                  style={{
+                    width: "100%",
+                    padding: 12,
+                    border: "1px solid #ddd",
+                    borderRadius: 6,
+                  }}
                   placeholder="Nombre del autor"
                 />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: 8, fontWeight: '500' }}>
+                <label
+                  htmlFor="news-editor-source"
+                  style={{
+                    display: "block",
+                    marginBottom: 8,
+                    fontWeight: "500",
+                  }}
+                >
                   Fuente
                 </label>
                 <input
+                  id="news-editor-source"
                   type="text"
                   name="source"
                   value={formData.source}
                   onChange={handleInputChange}
-                  style={{ width: '100%', padding: 12, border: '1px solid #ddd', borderRadius: 6 }}
+                  style={{
+                    width: "100%",
+                    padding: 12,
+                    border: "1px solid #ddd",
+                    borderRadius: 6,
+                  }}
                   placeholder="Fuente de la noticia"
                 />
               </div>
             </div>
 
             <div style={{ marginBottom: 16 }}>
-              <label style={{ display: 'block', marginBottom: 8, fontWeight: '500' }}>
+              <label
+                htmlFor="news-editor-tags"
+                style={{ display: "block", marginBottom: 8, fontWeight: "500" }}
+              >
                 Tags (separados por comas)
               </label>
               <input
+                id="news-editor-tags"
                 type="text"
                 name="tags"
                 value={formData.tags}
                 onChange={handleInputChange}
-                style={{ width: '100%', padding: 12, border: '1px solid #ddd', borderRadius: 6 }}
+                style={{
+                  width: "100%",
+                  padding: 12,
+                  border: "1px solid #ddd",
+                  borderRadius: 6,
+                }}
                 placeholder="cadera, cirugía, ortopedia, investigación"
               />
             </div>
@@ -300,17 +413,29 @@ export default function NewsEditor() {
 
           {/* Contenido */}
           <div style={{ marginBottom: 32 }}>
-            <h3 style={{ marginBottom: 16, color: 'var(--color-primary)' }}>Contenido</h3>
-            
+            <h3 style={{ marginBottom: 16, color: "var(--color-primary)" }}>
+              Contenido
+            </h3>
+
             <div style={{ marginBottom: 16 }}>
-              <label style={{ display: 'block', marginBottom: 8, fontWeight: '500' }}>
+              <label
+                htmlFor="news-editor-content"
+                style={{ display: "block", marginBottom: 8, fontWeight: "500" }}
+              >
                 Contenido Completo *
               </label>
               <textarea
+                id="news-editor-content"
                 name="content"
                 value={formData.content}
                 onChange={handleInputChange}
-                style={{ width: '100%', padding: 12, border: '1px solid #ddd', borderRadius: 6, minHeight: 200 }}
+                style={{
+                  width: "100%",
+                  padding: 12,
+                  border: "1px solid #ddd",
+                  borderRadius: 6,
+                  minHeight: 200,
+                }}
                 placeholder="Contenido completo de la noticia"
               />
             </div>
@@ -318,67 +443,110 @@ export default function NewsEditor() {
 
           {/* Multimedia */}
           <div style={{ marginBottom: 32 }}>
-            <h3 style={{ marginBottom: 16, color: 'var(--color-primary)' }}>Multimedia</h3>
-            
+            <h3 style={{ marginBottom: 16, color: "var(--color-primary)" }}>
+              Multimedia
+            </h3>
+
             <div style={{ marginBottom: 16 }}>
-              <label style={{ display: 'block', marginBottom: 8, fontWeight: '500' }}>
+              <label
+                htmlFor="news-editor-image"
+                style={{ display: "block", marginBottom: 8, fontWeight: "500" }}
+              >
                 Imagen Principal
               </label>
               <input
+                id="news-editor-image"
                 type="file"
                 accept="image/*"
                 onChange={handleImageChange}
-                style={{ width: '100%', padding: 12, border: '1px solid #ddd', borderRadius: 6 }}
+                style={{
+                  width: "100%",
+                  padding: 12,
+                  border: "1px solid #ddd",
+                  borderRadius: 6,
+                }}
               />
               {formData.image_url && (
                 <div style={{ marginTop: 12 }}>
-                  <img 
-                    src={formData.image_url} 
-                    alt="Preview" 
-                    style={{ maxWidth: '200px', maxHeight: '150px', objectFit: 'cover', borderRadius: 8 }}
+                  <img
+                    src={formData.image_url}
+                    alt="Preview"
+                    style={{
+                      maxWidth: "200px",
+                      maxHeight: "150px",
+                      objectFit: "cover",
+                      borderRadius: 8,
+                    }}
                   />
                 </div>
               )}
             </div>
 
             <div style={{ marginBottom: 16 }}>
-              <label style={{ display: 'block', marginBottom: 8, fontWeight: '500' }}>
+              <label
+                htmlFor="news-editor-image-alt"
+                style={{ display: "block", marginBottom: 8, fontWeight: "500" }}
+              >
                 Texto Alternativo de la Imagen
               </label>
               <input
+                id="news-editor-image-alt"
                 type="text"
                 name="image_alt"
                 value={formData.image_alt}
                 onChange={handleInputChange}
-                style={{ width: '100%', padding: 12, border: '1px solid #ddd', borderRadius: 6 }}
+                style={{
+                  width: "100%",
+                  padding: 12,
+                  border: "1px solid #ddd",
+                  borderRadius: 6,
+                }}
                 placeholder="Descripción de la imagen para accesibilidad"
               />
             </div>
 
             <div style={{ marginBottom: 16 }}>
-              <label style={{ display: 'block', marginBottom: 8, fontWeight: '500' }}>
+              <label
+                htmlFor="news-editor-video-url"
+                style={{ display: "block", marginBottom: 8, fontWeight: "500" }}
+              >
                 URL de Video (opcional)
               </label>
               <input
+                id="news-editor-video-url"
                 type="url"
                 name="video_url"
                 value={formData.video_url}
                 onChange={handleInputChange}
-                style={{ width: '100%', padding: 12, border: '1px solid #ddd', borderRadius: 6 }}
+                style={{
+                  width: "100%",
+                  padding: 12,
+                  border: "1px solid #ddd",
+                  borderRadius: 6,
+                }}
                 placeholder="https://youtube.com/watch?v=..."
               />
             </div>
 
             <div style={{ marginBottom: 16 }}>
-              <label style={{ display: 'block', marginBottom: 8, fontWeight: '500' }}>
+              <label
+                htmlFor="news-editor-external-link"
+                style={{ display: "block", marginBottom: 8, fontWeight: "500" }}
+              >
                 Enlace Externo (opcional)
               </label>
               <input
+                id="news-editor-external-link"
                 type="url"
                 name="external_link"
                 value={formData.external_link}
                 onChange={handleInputChange}
-                style={{ width: '100%', padding: 12, border: '1px solid #ddd', borderRadius: 6 }}
+                style={{
+                  width: "100%",
+                  padding: 12,
+                  border: "1px solid #ddd",
+                  borderRadius: 6,
+                }}
                 placeholder="https://ejemplo.com/articulo"
               />
             </div>
@@ -386,37 +554,72 @@ export default function NewsEditor() {
 
           {/* Configuración */}
           <div style={{ marginBottom: 32 }}>
-            <h3 style={{ marginBottom: 16, color: 'var(--color-primary)' }}>Configuración</h3>
-            
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+            <h3 style={{ marginBottom: 16, color: "var(--color-primary)" }}>
+              Configuración
+            </h3>
+
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: 16,
+                marginBottom: 16,
+              }}
+            >
               <div>
-                <label style={{ display: 'block', marginBottom: 8, fontWeight: '500' }}>
+                <label
+                  htmlFor="news-editor-publish-date"
+                  style={{
+                    display: "block",
+                    marginBottom: 8,
+                    fontWeight: "500",
+                  }}
+                >
                   Fecha de Publicación
                 </label>
                 <input
+                  id="news-editor-publish-date"
                   type="datetime-local"
                   name="publish_date"
                   value={formData.publish_date}
                   onChange={handleInputChange}
-                  style={{ width: '100%', padding: 12, border: '1px solid #ddd', borderRadius: 6 }}
+                  style={{
+                    width: "100%",
+                    padding: 12,
+                    border: "1px solid #ddd",
+                    borderRadius: 6,
+                  }}
                 />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: 8, fontWeight: '500' }}>
+                <label
+                  htmlFor="news-editor-expiry-date"
+                  style={{
+                    display: "block",
+                    marginBottom: 8,
+                    fontWeight: "500",
+                  }}
+                >
                   Fecha de Expiración
                 </label>
                 <input
+                  id="news-editor-expiry-date"
                   type="datetime-local"
                   name="expiry_date"
                   value={formData.expiry_date}
                   onChange={handleInputChange}
-                  style={{ width: '100%', padding: 12, border: '1px solid #ddd', borderRadius: 6 }}
+                  style={{
+                    width: "100%",
+                    padding: 12,
+                    border: "1px solid #ddd",
+                    borderRadius: 6,
+                  }}
                 />
               </div>
             </div>
 
             <div style={{ marginBottom: 16 }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <input
                   type="checkbox"
                   name="featured"
@@ -428,20 +631,20 @@ export default function NewsEditor() {
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: 16, justifyContent: 'flex-end' }}>
-            <button 
-              type="button" 
-              className="btn btn-outline" 
+          <div style={{ display: "flex", gap: 16, justifyContent: "flex-end" }}>
+            <button
+              type="button"
+              className="btn btn-outline"
               onClick={() => navigate("/admin")}
             >
               Cancelar
             </button>
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className="btn btn-primary"
               disabled={loading}
             >
-              {loading ? 'Guardando...' : (isEdit ? 'Actualizar Noticia' : 'Crear Noticia')}
+              {getSubmitButtonLabel(loading, isEdit)}
             </button>
           </div>
         </form>

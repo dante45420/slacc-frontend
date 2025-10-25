@@ -11,17 +11,26 @@ export default function Home() {
       <section>
         <Carousel />
       </section>
-      <section className="section" style={{ background: '#fff' }}>
+      <section className="section" style={{ background: "#fff" }}>
         <div className="container">
           <h2 style={{ marginTop: 0 }}>Instagram</h2>
           <InstagramFeed />
         </div>
       </section>
-      <section className="section" style={{ background: '#f8f9fc' }}>
+      <section className="section" style={{ background: "#f8f9fc" }}>
         <div className="container">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 16,
+            }}
+          >
             <h2 style={{ margin: 0 }}>Cursos patrocinados por SLACC</h2>
-            <Link to="/eventos/webinars" className="btn btn-outline">Ver todos</Link>
+            <Link to="/eventos/webinars" className="btn btn-outline">
+              Ver todos
+            </Link>
           </div>
           <CoursesCarousel />
         </div>
@@ -32,7 +41,7 @@ export default function Home() {
           <NewsGrid />
         </div>
       </section>
-      
+
       <section className="section">
         <div className="container">
           <h2>Nuestro equipo</h2>
@@ -45,12 +54,15 @@ export default function Home() {
             title="Educación y recursos"
             text="Contenido formativo y materiales para especialistas."
             imageUrl="https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=1200&q=60"
-            cta={{ label: "Ver educación", onClick: () => { window.location.href = "/educacion"; } }}
+            cta={{
+              label: "Ver educación",
+              onClick: () => {
+                globalThis.location.href = "/educacion";
+              },
+            }}
           />
         </div>
       </section>
     </>
   );
 }
-
-

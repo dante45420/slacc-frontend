@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import Carousel from "./Carousel.jsx";
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
+const BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
 
 export default function CoursesCarousel() {
   const [courses, setCourses] = useState([]);
@@ -15,6 +16,7 @@ export default function CoursesCarousel() {
         const data = await res.json();
         setCourses(Array.isArray(data) ? data : []);
       } catch (e) {
+        console.error("Error loading courses:", e);
         setCourses([]);
       } finally {
         setLoading(false);
@@ -25,18 +27,32 @@ export default function CoursesCarousel() {
 
   const items = useMemo(() => {
     if (!courses || courses.length === 0) return [];
-    return courses.slice(0, 6).map(c => ({
-      imageUrl: c.image_url?.startsWith('http') ? c.image_url : (c.image_url ? `${BASE_URL.replace('/api','')}${c.image_url}` : "/carrusel_1.png"),
-      title: c.title,
-      description: c.description || "Curso patrocinado por SLACC",
-      ctaText: "Ver curso",
-      ctaHref: `/eventos/${c.id}`
-    }));
+    return courses.slice(0, 6).map(c => {
+      let imageUrl;
+      if (c.image_url?.startsWith("http")) {
+        imageUrl = c.image_url;
+      } else if (c.image_url) {
+        imageUrl = `${BASE_URL.replace("/api", "")}${c.image_url}`;
+      } else {
+        imageUrl = "/carrusel_1.png";
+      }
+
+      return {
+        imageUrl,
+        title: c.title,
+        description: c.description || "Curso patrocinado por SLACC",
+        ctaText: "Ver curso",
+        ctaHref: `/eventos/${c.id}`,
+      };
+    });
   }, [courses]);
 
   if (loading) {
     return (
-      <div className="container" style={{ padding: "24px 0", textAlign: "center" }}>
+      <div
+        className="container"
+        style={{ padding: "24px 0", textAlign: "center" }}
+      >
         Cargando cursos...
       </div>
     );
@@ -48,5 +64,3 @@ export default function CoursesCarousel() {
 
   return <Carousel items={items} intervalMs={7000} />;
 }
-
-

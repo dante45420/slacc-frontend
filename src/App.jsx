@@ -1,4 +1,5 @@
 import { Routes, Route } from "react-router-dom";
+import PropTypes from "prop-types";
 import Header from "./components/Header.jsx";
 import Home from "./pages/Home.jsx";
 import NewsList from "./pages/NewsList.jsx";
@@ -39,6 +40,10 @@ function Placeholder({ title }) {
   );
 }
 
+Placeholder.propTypes = {
+  title: PropTypes.string.isRequired,
+};
+
 export default function App() {
   return (
     <AuthProvider>
@@ -60,9 +65,18 @@ export default function App() {
         <Route path="/eventos/:id" element={<EventDetail />} />
         <Route path="/admin/eventos" element={<AdminEvents />} />
         <Route path="/nosotros" element={<Placeholder title="Nosotros" />} />
-        <Route path="/nosotros/historia" element={<Placeholder title="Nosotros - Historia" />} />
-        <Route path="/nosotros/mision" element={<Placeholder title="Nosotros - Misión y Visión" />} />
-        <Route path="/nosotros/comite" element={<Placeholder title="Nosotros - Comité" />} />
+        <Route
+          path="/nosotros/historia"
+          element={<Placeholder title="Nosotros - Historia" />}
+        />
+        <Route
+          path="/nosotros/mision"
+          element={<Placeholder title="Nosotros - Misión y Visión" />}
+        />
+        <Route
+          path="/nosotros/comite"
+          element={<Placeholder title="Nosotros - Comité" />}
+        />
         <Route path="/miembros" element={<MembersBenefits />} />
         <Route path="/miembros/beneficios" element={<MembersBenefits />} />
         <Route path="/miembros/como-unirse" element={<WhyJoin />} />
@@ -72,13 +86,31 @@ export default function App() {
         <Route path="/por-que-ser-socio" element={<WhyJoin />} />
         <Route path="/contacto" element={<Contact />} />
         <Route path="/eventos" element={<Placeholder title="Eventos" />} />
-        <Route path="/eventos/proximos" element={<Placeholder title="Eventos - Próximos" />} />
-        <Route path="/eventos/pasados" element={<Placeholder title="Eventos - Pasados" />} />
-        <Route path="/eventos/webinars" element={<Placeholder title="Eventos - Webinars" />} />
+        <Route
+          path="/eventos/proximos"
+          element={<Placeholder title="Eventos - Próximos" />}
+        />
+        <Route
+          path="/eventos/pasados"
+          element={<Placeholder title="Eventos - Pasados" />}
+        />
+        <Route
+          path="/eventos/webinars"
+          element={<Placeholder title="Eventos - Webinars" />}
+        />
         <Route path="/educacion" element={<Placeholder title="Educación" />} />
-        <Route path="/educacion/recursos" element={<Placeholder title="Educación - Recursos" />} />
-        <Route path="/educacion/biblioteca" element={<Placeholder title="Educación - Biblioteca" />} />
-        <Route path="/educacion/casos" element={<Placeholder title="Educación - Casos" />} />
+        <Route
+          path="/educacion/recursos"
+          element={<Placeholder title="Educación - Recursos" />}
+        />
+        <Route
+          path="/educacion/biblioteca"
+          element={<Placeholder title="Educación - Biblioteca" />}
+        />
+        <Route
+          path="/educacion/casos"
+          element={<Placeholder title="Educación - Casos" />}
+        />
         <Route path="/login" element={<Login />} />
         <Route path="/perfil" element={<UserProfile />} />
         <Route path="/solicitar-membresia" element={<JoinMembership />} />
@@ -97,5 +129,3 @@ export default function App() {
     </AuthProvider>
   );
 }
-
-

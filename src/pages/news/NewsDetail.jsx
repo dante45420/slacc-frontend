@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { useAuth } from "../auth/AuthContext";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../../auth/AuthContext";
 
 const BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
@@ -17,7 +17,7 @@ function getImageUrl(imageUrl) {
   return `${BASE_URL.replace("/api", "")}${imageUrl}`;
 }
 
-function getStatusBadgeColor(status) {
+function getStatusColor(status) {
   if (status === "published") return "var(--color-secondary)";
   if (status === "pending") return "var(--color-accent)";
   return "var(--color-muted)";
@@ -29,30 +29,52 @@ function getStatusLabel(status) {
   return "Rechazada";
 }
 
-export default function AdminNewsView() {
+export default function NewsDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
   const [news, setNews] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [more, setMore] = useState([]);
+  const [prevNext, setPrevNext] = useState({ prev: null, next: null });
 
   useEffect(() => {
     async function loadNews() {
       try {
         setLoading(true);
         const token = localStorage.getItem("access_token");
-        const response = await fetch(`${BASE_URL}/admin/news/${id}/view`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+
+        const headers = {};
+        if (token) {
+          headers["Authorization"] = `Bearer ${token}`;
+        }
+
+        const response = await fetch(`${BASE_URL}/news/${id}`, { headers });
 
         if (!response.ok) {
-          throw new Error(`Error ${response.status}: Noticia no encontrada`);
+          const errorText = await response.text();
+          console.error("Error response:", errorText);
+          throw new Error(`Error ${response.status}: ${errorText}`);
         }
 
         const data = await response.json();
         setNews(data);
+        // Cargar más noticias y calcular anterior/siguiente
+        try {
+          const listRes = await fetch(`${BASE_URL}/news`);
+          const list = await listRes.json();
+          setMore(list.filter(n => n.id !== data.id).slice(0, 6));
+          const idx = list.findIndex(n => n.id === data.id);
+          setPrevNext({
+            prev: idx > 0 ? list[idx - 1] : null,
+            next: idx >= 0 && idx < list.length - 1 ? list[idx + 1] : null,
+          });
+        } catch (e) {
+          console.error("Error loading news list:", e);
+        }
       } catch (err) {
+        console.error("Error cargando noticia:", err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -62,7 +84,7 @@ export default function AdminNewsView() {
     if (id) {
       loadNews();
     }
-  }, [id]);
+  }, [id, user]);
 
   async function approveNews() {
     try {
@@ -72,8 +94,7 @@ export default function AdminNewsView() {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (response.ok) {
-        alert("Noticia aprobada correctamente");
-        navigate("/admin");
+        loadNews(); // recargar noticia
       }
     } catch (err) {
       console.error("Error al aprobar:", err);
@@ -88,8 +109,7 @@ export default function AdminNewsView() {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (response.ok) {
-        alert("Noticia rechazada correctamente");
-        navigate("/admin");
+        loadNews(); // recargar noticia
       }
     } catch (err) {
       console.error("Error al rechazar:", err);
@@ -114,9 +134,9 @@ export default function AdminNewsView() {
           <p>{error}</p>
           <button
             className="btn btn-outline"
-            onClick={() => navigate("/admin")}
+            onClick={() => globalThis.location.reload()}
           >
-            Volver al admin
+            Reintentar
           </button>
         </div>
       </section>
@@ -156,7 +176,7 @@ export default function AdminNewsView() {
                       padding: "4px 12px",
                       borderRadius: "var(--radius)",
                       fontSize: "var(--font-size-sm)",
-                      backgroundColor: getStatusBadgeColor(news.status),
+                      backgroundColor: getStatusColor(news.status),
                       color: "white",
                     }}
                   >
@@ -199,12 +219,6 @@ export default function AdminNewsView() {
                       Editar
                     </button>
                   )}
-                  <button
-                    className="btn btn-outline"
-                    onClick={() => navigate("/admin")}
-                  >
-                    Volver al admin
-                  </button>
                 </div>
               )}
             </div>
@@ -279,6 +293,70 @@ export default function AdminNewsView() {
             </div>
           </div>
         </article>
+        {/* Navegación anterior / siguiente */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            marginTop: "var(--spacing-xl)",
+          }}
+        >
+          <div>
+            {prevNext.prev && (
+              <Link
+                to={`/noticias/${prevNext.prev.id}`}
+                className="btn btn-outline"
+              >
+                ← {prevNext.prev.title}
+              </Link>
+            )}
+          </div>
+          <div>
+            {prevNext.next && (
+              <Link
+                to={`/noticias/${prevNext.next.id}`}
+                className="btn btn-outline"
+              >
+                {prevNext.next.title} →
+              </Link>
+            )}
+          </div>
+        </div>
+
+        {/* Más noticias */}
+        {more.length > 0 && (
+          <div style={{ marginTop: "var(--spacing-xl)" }}>
+            <h3 style={{ marginBottom: 12 }}>Más noticias</h3>
+            <div className="cards">
+              {more.map(n => (
+                <div key={n.id} className="card">
+                  {n.image_url && (
+                    <img
+                      src={
+                        n.image_url.startsWith("http")
+                          ? n.image_url
+                          : `${BASE_URL.replace("/api", "")}${n.image_url}`
+                      }
+                      alt={n.title}
+                      style={{
+                        width: "100%",
+                        height: 160,
+                        objectFit: "cover",
+                        borderRadius: 8,
+                        marginBottom: 8,
+                      }}
+                    />
+                  )}
+                  <h4 style={{ margin: 0 }}>{n.title}</h4>
+                  <p style={{ color: "var(--color-muted)" }}>{n.excerpt}</p>
+                  <Link to={`/noticias/${n.id}`} className="btn btn-outline">
+                    Leer más
+                  </Link>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );

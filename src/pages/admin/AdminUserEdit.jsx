@@ -9,8 +9,8 @@ import {
   Button,
   Alert,
   Spinner,
-  useToast,
-} from "../components/ui";
+  useToast
+} from "../../components/ui";
 
 const BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
@@ -89,11 +89,7 @@ export default function AdminUserEdit() {
       <Section variant="default">
         <Container size="sm">
           <Alert variant="error">No se pudo cargar el usuario</Alert>
-          <Button
-            variant="outline"
-            onClick={() => navigate("/admin")}
-            className="mt-4"
-          >
+          <Button variant="outline" onClick={() => navigate('/admin')} className="mt-4">
             Volver al panel
           </Button>
         </Container>
@@ -106,11 +102,7 @@ export default function AdminUserEdit() {
       <Container size="sm">
         <h1 className="mb-5">Editar Usuario</h1>
 
-        {error && (
-          <Alert variant="error" className="mb-4">
-            {error}
-          </Alert>
-        )}
+        {error && <Alert variant="error" className="mb-4">{error}</Alert>}
 
         <Card>
           <div className="flex flex-col gap-4">
@@ -121,17 +113,12 @@ export default function AdminUserEdit() {
             />
 
             <div>
-              <label
-                className="flex items-center gap-2"
-                style={{ cursor: "pointer" }}
-              >
+              <label className="flex items-center gap-2" style={{ cursor: 'pointer' }}>
                 <input
                   type="checkbox"
                   checked={user.is_active}
-                  onChange={e =>
-                    setUser({ ...user, is_active: e.target.checked })
-                  }
-                  style={{ width: "auto", cursor: "pointer" }}
+                  onChange={e => setUser({ ...user, is_active: e.target.checked })}
+                  style={{ width: 'auto', cursor: 'pointer' }}
                 />
                 <span className="font-medium">Usuario activo</span>
               </label>
@@ -149,9 +136,9 @@ export default function AdminUserEdit() {
                     setUser({ ...user, membership_type: e.target.value })
                   }
                   options={[
-                    { value: "joven", label: "Miembro Joven" },
-                    { value: "normal", label: "Miembro Normal" },
-                    { value: "gratuito", label: "Membresía Gratuita" },
+                    { value: 'joven', label: 'Miembro Joven' },
+                    { value: 'normal', label: 'Miembro Normal' },
+                    { value: 'gratuito', label: 'Membresía Gratuita' }
                   ]}
                 />
 
@@ -162,19 +149,16 @@ export default function AdminUserEdit() {
                     setUser({ ...user, payment_status: e.target.value })
                   }
                   options={[
-                    { value: "paid", label: "Pagado" },
-                    { value: "due", label: "Pendiente" },
-                    { value: "none", label: "Ninguno" },
+                    { value: 'paid', label: 'Pagado' },
+                    { value: 'due', label: 'Pendiente' },
+                    { value: 'none', label: 'Ninguno' }
                   ]}
                 />
               </>
             )}
           </div>
 
-          <div
-            className="flex gap-3 mt-5 pt-4"
-            style={{ borderTop: "1px solid var(--color-border)" }}
-          >
+          <div className="flex gap-3 mt-5 pt-4" style={{ borderTop: '1px solid var(--color-border)' }}>
             <Button
               variant="outline"
               onClick={() => navigate(-1)}
@@ -182,7 +166,11 @@ export default function AdminUserEdit() {
             >
               Cancelar
             </Button>
-            <Button variant="primary" onClick={save} loading={saving}>
+            <Button 
+              variant="primary" 
+              onClick={save} 
+              loading={saving}
+            >
               Guardar Cambios
             </Button>
           </div>

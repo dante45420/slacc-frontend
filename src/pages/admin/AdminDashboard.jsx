@@ -1,8 +1,14 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
-import { apiGet } from "../api/client";
-import { Section, Container, Tabs, Spinner, Badge } from "../components/ui";
+import { apiGet } from "../../api/client";
+import {
+  Section,
+  Container,
+  Tabs,
+  Spinner,
+  Badge
+} from "../../components/ui";
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("overview");

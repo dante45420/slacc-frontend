@@ -1,36 +1,47 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
+import Card from "./ui/Card.jsx";
+import Badge from "./ui/Badge.jsx";
 
 const BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
 
 function getImageUrl(imageUrl) {
   if (!imageUrl) {
-    // Imagen por defecto relacionada con paper científico
     return "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?auto=format&fit=crop&w=400&q=80";
   }
 
-  // Si es una URL completa, usarla tal como está
   if (imageUrl.startsWith("http")) {
     return imageUrl;
   }
 
-  // Si es un path relativo, construir la URL completa del backend
   return `${BASE_URL.replace("/api", "")}${imageUrl}`;
 }
 
+const categoryLabels = {
+  comunicados: "Comunicado",
+  prensa: "Prensa",
+  blog: "Blog",
+};
+
+const categoryVariants = {
+  comunicados: "primary",
+  prensa: "info",
+  blog: "accent",
+};
+
 export default function NewsGrid({ items = [], category }) {
   const [news, setNews] = useState(items);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Si nos pasan items con contenido, usamos esos y no hacemos fetch
     if (items && items.length > 0) {
       setNews(items);
       return;
     }
 
-    // Hacer fetch solo si no tenemos items
+    setLoading(true);
     const url = category
       ? `${BASE_URL}/news?category=${category}`
       : `${BASE_URL}/news`;
@@ -41,66 +52,71 @@ export default function NewsGrid({ items = [], category }) {
       })
       .catch(() => {
         setNews([]);
+      })
+      .finally(() => {
+        setLoading(false);
       });
-  }, [category, items.length]); // Depender de category y la longitud de items
+  }, [category, items.length]);
+
+  if (loading) {
+    return (
+      <div style={{ textAlign: "center", padding: "var(--spacing-6)" }}>
+        <p style={{ color: "var(--color-muted)" }}>Cargando noticias...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="cards">
       {(news || []).map(n => (
-        <div key={n.id} className="card">
-          {n.image_url && (
-            <img
-              src={getImageUrl(n.image_url)}
-              alt={n.title}
+        <Card
+          key={n.id}
+          image={getImageUrl(n.image_url)}
+          imageAlt={n.title}
+          badge={
+            n.category && (
+              <Badge variant={categoryVariants[n.category] || "neutral"}>
+                {categoryLabels[n.category] || n.category}
+              </Badge>
+            )
+          }
+          hoverable
+          footer={
+            <div
               style={{
-                borderRadius: "8px",
-                marginBottom: 12,
-                width: "100%",
-                height: "200px",
-                objectFit: "cover",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
               }}
-            />
-          )}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <h3 style={{ margin: 0 }}>{n.title}</h3>
-            {n.category && (
+            >
               <span
-                style={{
-                  background: "var(--color-accent)",
-                  color: "white",
-                  padding: "2px 8px",
-                  borderRadius: 12,
-                  fontSize: "0.8em",
-                }}
+                style={{ fontSize: "0.875rem", color: "var(--color-muted)" }}
               >
-                {n.category}
+                {n.created_at
+                  ? new Date(n.created_at).toLocaleDateString("es-ES", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })
+                  : ""}
               </span>
-            )}
-          </div>
-          <p style={{ color: "var(--color-muted)" }}>{n.excerpt}</p>
-          <div
+              <Link to={`/noticias/${n.id}`} className="btn btn-outline btn-sm">
+                Leer más →
+              </Link>
+            </div>
+          }
+        >
+          <h3 style={{ marginBottom: "var(--spacing-2)" }}>{n.title}</h3>
+          <p
             style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
+              color: "var(--color-muted)",
+              marginBottom: 0,
+              lineHeight: 1.6,
             }}
           >
-            <span style={{ fontSize: "0.9em", color: "var(--color-muted)" }}>
-              {n.created_at
-                ? new Date(n.created_at).toLocaleDateString("es-ES")
-                : ""}
-            </span>
-            <Link to={`/noticias/${n.id}`} className="btn btn-outline">
-              Leer más
-            </Link>
-          </div>
-        </div>
+            {n.excerpt}
+          </p>
+        </Card>
       ))}
     </div>
   );

@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom";
-import Carousel from "../components/Carousel.jsx";
-import CoursesCarousel from "../components/CoursesCarousel.jsx";
-import InstagramFeed from "../components/InstagramFeed.jsx";
-import NewsGrid from "../components/NewsGrid.jsx";
-import { TextImage, TeamGrid } from "../components/ContentBlocks.jsx";
-import Section from "../components/ui/Section.jsx";
-import Button from "../components/ui/Button.jsx";
+import Carousel from "../../components/Carousel.jsx";
+import CoursesCarousel from "../../components/CoursesCarousel.jsx";
+import InstagramFeed from "../../components/InstagramFeed.jsx";
+import NewsGrid from "../../components/NewsGrid.jsx";
+import { TextImage, TeamGrid } from "../../components/ContentBlocks.jsx";
+import Section from "../../components/ui/Section.jsx";
+import Button from "../../components/ui/Button.jsx";
 
 export default function Home() {
   return (
@@ -13,12 +13,12 @@ export default function Home() {
       <section>
         <Carousel />
       </section>
-
+      
       <Section variant="default">
         <h2 style={{ marginTop: 0 }}>Instagram</h2>
         <InstagramFeed />
       </Section>
-
+      
       <Section variant="alt">
         <div
           style={{
@@ -27,7 +27,7 @@ export default function Home() {
             alignItems: "center",
             marginBottom: "var(--spacing-4)",
             flexWrap: "wrap",
-            gap: "var(--spacing-3)",
+            gap: "var(--spacing-3)"
           }}
         >
           <h2 style={{ margin: 0 }}>Cursos patrocinados por SLACC</h2>
@@ -37,7 +37,7 @@ export default function Home() {
         </div>
         <CoursesCarousel />
       </Section>
-
+      
       <Section variant="default">
         <h2 style={{ marginTop: 0 }}>Noticias destacadas</h2>
         <NewsGrid />
@@ -47,7 +47,7 @@ export default function Home() {
         <h2 style={{ marginTop: 0 }}>Nuestro equipo</h2>
         <TeamGrid />
       </Section>
-
+      
       <Section variant="primary">
         <TextImage
           title="Educación y recursos"

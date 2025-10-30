@@ -1,15 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
-import {
-  Section,
-  Input,
-  Textarea,
-  Select,
-  Button,
-  Alert,
-  Grid,
-} from "../components/ui";
+import { Section, Input, Textarea, Select, Button, Alert, Grid } from "../../components/ui";
 
 export default function JoinMembership() {
   const [appSent, setAppSent] = useState(false);
@@ -18,52 +10,40 @@ export default function JoinMembership() {
   return (
     <>
       <Section variant="primary" padding="lg">
-        <div
-          style={{ textAlign: "center", maxWidth: "700px", margin: "0 auto" }}
-        >
+        <div style={{ textAlign: "center", maxWidth: "700px", margin: "0 auto" }}>
           <h1 style={{ marginBottom: "var(--spacing-3)" }}>Únete a SLACC</h1>
-          <p
-            style={{
-              fontSize: "18px",
-              color: "var(--color-muted)",
-              lineHeight: 1.7,
-            }}
-          >
-            Conecta con especialistas en cirugía cardiovascular de toda
-            Latinoamérica y accede a beneficios exclusivos
+          <p style={{
+            fontSize: "18px",
+            color: "var(--color-muted)",
+            lineHeight: 1.7
+          }}>
+            Conecta con especialistas en cirugía cardiovascular de toda Latinoamérica y accede a
+            beneficios exclusivos
           </p>
         </div>
       </Section>
 
       <Section variant="default" padding="lg" containerSize="sm">
-        <div
-          style={{
-            background: "var(--color-bg)",
-            padding: "var(--spacing-6)",
-            borderRadius: "var(--radius-lg)",
-            boxShadow: "var(--shadow-md)",
-            border: "1px solid var(--color-border)",
-          }}
-        >
-          <h2
-            style={{
-              textAlign: "center",
-              marginTop: 0,
-              marginBottom: "var(--spacing-5)",
-            }}
-          >
+        <div style={{ 
+          background: "var(--color-bg)",
+          padding: "var(--spacing-6)",
+          borderRadius: "var(--radius-lg)",
+          boxShadow: "var(--shadow-md)",
+          border: "1px solid var(--color-border)"
+        }}>
+          <h2 style={{ textAlign: "center", marginTop: 0, marginBottom: "var(--spacing-5)" }}>
             Solicitar Membresía
           </h2>
-
+          
           <ApplicationForm
             onResult={(ok, msg) => {
               setAppSent(ok);
               setAppMsg(msg);
             }}
           />
-
+          
           {appMsg && (
-            <Alert
+            <Alert 
               variant={appSent ? "success" : "error"}
               style={{ marginTop: "var(--spacing-4)" }}
             >
@@ -73,12 +53,7 @@ export default function JoinMembership() {
         </div>
 
         <div style={{ textAlign: "center", marginTop: "var(--spacing-5)" }}>
-          <p
-            style={{
-              color: "var(--color-muted)",
-              marginBottom: "var(--spacing-3)",
-            }}
-          >
+          <p style={{ color: "var(--color-muted)", marginBottom: "var(--spacing-3)" }}>
             ¿Ya eres socio?
           </p>
           <Link to="/login">
@@ -97,16 +72,15 @@ function ApplicationForm({ onResult }) {
     phone: "",
     specialization: "",
     experience: "",
-    motivation: "",
+    motivation: ""
   });
   const [documentFile, setDocumentFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
-  const BASE_URL =
-    import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
+  const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
 
-  const handleChange = field => e => {
+  const handleChange = (field) => (e) => {
     setFormData(prev => ({ ...prev, [field]: e.target.value }));
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: "" }));
@@ -117,21 +91,18 @@ function ApplicationForm({ onResult }) {
     const newErrors = {};
     if (!formData.name.trim()) newErrors.name = "El nombre es requerido";
     if (!formData.email.trim()) newErrors.email = "El email es requerido";
-    if (!formData.specialization.trim())
-      newErrors.specialization = "La especialización es requerida";
-    if (!formData.experience)
-      newErrors.experience = "Los años de experiencia son requeridos";
-    if (!formData.motivation.trim())
-      newErrors.motivation = "La motivación es requerida";
+    if (!formData.specialization.trim()) newErrors.specialization = "La especialización es requerida";
+    if (!formData.experience) newErrors.experience = "Los años de experiencia son requeridos";
+    if (!formData.motivation.trim()) newErrors.motivation = "La motivación es requerida";
     if (!documentFile) newErrors.document = "El documento PDF es requerido";
-
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   async function send(e) {
     e.preventDefault();
-
+    
     if (!validate()) {
       onResult(false, "Por favor completa todos los campos requeridos");
       return;
@@ -152,16 +123,16 @@ function ApplicationForm({ onResult }) {
         method: "POST",
         body: data,
       });
-
+      
       if (!res.ok) {
         throw new Error("Error al enviar solicitud");
       }
-
+      
       onResult(
         true,
         "¡Solicitud enviada exitosamente! Será revisada por nuestro comité y te contactaremos pronto."
       );
-
+      
       // Reset form
       setFormData({
         name: "",
@@ -169,15 +140,12 @@ function ApplicationForm({ onResult }) {
         phone: "",
         specialization: "",
         experience: "",
-        motivation: "",
+        motivation: ""
       });
       setDocumentFile(null);
       setErrors({});
     } catch (error) {
-      onResult(
-        false,
-        error.message || "Error de red. Por favor intenta nuevamente."
-      );
+      onResult(false, error.message || "Error de red. Por favor intenta nuevamente.");
     } finally {
       setLoading(false);
     }
@@ -247,13 +215,13 @@ function ApplicationForm({ onResult }) {
       />
 
       <div style={{ marginBottom: "var(--spacing-4)" }}>
-        <label
+        <label 
           htmlFor="application-document"
           style={{
             display: "block",
             marginBottom: "var(--spacing-2)",
             fontWeight: "500",
-            fontSize: "14px",
+            fontSize: "14px"
           }}
         >
           Documento (PDF) *
@@ -271,33 +239,27 @@ function ApplicationForm({ onResult }) {
           style={{
             width: "100%",
             padding: "12px",
-            border: `1px solid ${
-              errors.document ? "var(--color-error)" : "var(--color-border)"
-            }`,
+            border: `1px solid ${errors.document ? 'var(--color-error)' : 'var(--color-border)'}`,
             borderRadius: "var(--radius)",
-            fontSize: "14px",
+            fontSize: "14px"
           }}
           required
         />
         {documentFile && (
-          <p
-            style={{
-              margin: "var(--spacing-2) 0 0",
-              fontSize: "13px",
-              color: "var(--color-success)",
-            }}
-          >
+          <p style={{ 
+            margin: "var(--spacing-2) 0 0",
+            fontSize: "13px",
+            color: "var(--color-success)"
+          }}>
             ✓ {documentFile.name}
           </p>
         )}
         {errors.document && (
-          <p
-            style={{
-              margin: "var(--spacing-2) 0 0",
-              fontSize: "13px",
-              color: "var(--color-error)",
-            }}
-          >
+          <p style={{
+            margin: "var(--spacing-2) 0 0",
+            fontSize: "13px",
+            color: "var(--color-error)"
+          }}>
             {errors.document}
           </p>
         )}

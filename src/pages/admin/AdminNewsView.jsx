@@ -1,6 +1,16 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
+import {
+  Section,
+  Container,
+  Card,
+  Badge,
+  Button,
+  Alert,
+  Spinner,
+  useToast,
+} from "../../components/ui";
 
 const BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
@@ -17,10 +27,17 @@ function getImageUrl(imageUrl) {
   return `${BASE_URL.replace("/api", "")}${imageUrl}`;
 }
 
-function getStatusBadgeColor(status) {
-  if (status === "published") return "var(--color-secondary)";
-  if (status === "pending") return "var(--color-accent)";
-  return "var(--color-muted)";
+function getStatusVariant(status) {
+  switch (status) {
+    case "published":
+      return "success";
+    case "pending":
+      return "warning";
+    case "rejected":
+      return "error";
+    default:
+      return "default";
+  }
 }
 
 function getStatusLabel(status) {
@@ -33,6 +50,7 @@ export default function AdminNewsView() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const toast = useToast();
   const [news, setNews] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -72,10 +90,13 @@ export default function AdminNewsView() {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (response.ok) {
-        alert("Noticia aprobada correctamente");
+        toast.success("Noticia aprobada y publicada correctamente");
         navigate("/admin");
+      } else {
+        toast.error("Error al aprobar la noticia");
       }
     } catch (err) {
+      toast.error("Error al aprobar la noticia");
       console.error("Error al aprobar:", err);
     }
   }
@@ -88,134 +109,113 @@ export default function AdminNewsView() {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (response.ok) {
-        alert("Noticia rechazada correctamente");
+        toast.success("Noticia rechazada");
         navigate("/admin");
+      } else {
+        toast.error("Error al rechazar la noticia");
       }
     } catch (err) {
+      toast.error("Error al rechazar la noticia");
       console.error("Error al rechazar:", err);
     }
   }
 
   if (loading) {
     return (
-      <section className="section">
-        <div className="container">
-          <p>Cargando noticia...</p>
-        </div>
-      </section>
+      <Section>
+        <Container>
+          <div className="flex-center" style={{ minHeight: "400px" }}>
+            <Spinner size="large" />
+          </div>
+        </Container>
+      </Section>
     );
   }
 
   if (error) {
     return (
-      <section className="section">
-        <div className="container">
-          <h2>Error</h2>
-          <p>{error}</p>
-          <button
-            className="btn btn-outline"
-            onClick={() => navigate("/admin")}
-          >
-            Volver al admin
-          </button>
-        </div>
-      </section>
+      <Section>
+        <Container>
+          <Alert variant="error" title="Error">
+            {error}
+          </Alert>
+          <div className="flex-center mt-4">
+            <Button variant="outline" onClick={() => navigate("/admin")}>
+              Volver al admin
+            </Button>
+          </div>
+        </Container>
+      </Section>
     );
   }
 
   if (!news) {
     return (
-      <section className="section">
-        <div className="container">
-          <h2>Noticia no encontrada</h2>
-        </div>
-      </section>
+      <Section>
+        <Container>
+          <Alert variant="warning" title="No encontrada">
+            La noticia solicitada no existe.
+          </Alert>
+          <div className="flex-center mt-4">
+            <Button variant="outline" onClick={() => navigate("/admin")}>
+              Volver al admin
+            </Button>
+          </div>
+        </Container>
+      </Section>
     );
   }
 
   return (
-    <section className="section">
-      <div className="container">
-        <article className="news-detail">
-          {/* Header con título y estado */}
-          <header className="news-header">
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "flex-start",
-                marginBottom: "var(--spacing-lg)",
-              }}
-            >
-              <div>
-                <h1 className="news-title">{news.title}</h1>
-                <div className="news-meta">
-                  <span
-                    className="news-status"
-                    style={{
-                      padding: "4px 12px",
-                      borderRadius: "var(--radius)",
-                      fontSize: "var(--font-size-sm)",
-                      backgroundColor: getStatusBadgeColor(news.status),
-                      color: "white",
-                    }}
-                  >
-                    {getStatusLabel(news.status)}
-                  </span>
-                  <time
-                    dateTime={news.created_at}
-                    style={{
-                      marginLeft: "var(--spacing)",
-                      color: "var(--color-text-light)",
-                    }}
-                  >
-                    {new Date(news.created_at).toLocaleDateString("es-ES", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
-                  </time>
-                </div>
+    <Section>
+      <Container>
+        <Card>
+          <div className="flex-between mb-6">
+            <div>
+              <h1 className="mb-2">{news.title}</h1>
+              <div className="flex-start gap-3">
+                <Badge variant={getStatusVariant(news.status)}>
+                  {getStatusLabel(news.status)}
+                </Badge>
+                <span className="text-muted">
+                  {new Date(news.created_at).toLocaleDateString("es-ES", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </span>
               </div>
-
-              {/* Botones de admin */}
-              {user?.role === "admin" && (
-                <div style={{ display: "flex", gap: "var(--spacing-sm)" }}>
-                  {news.status === "pending" && (
-                    <>
-                      <button className="btn btn-primary" onClick={approveNews}>
-                        Aprobar
-                      </button>
-                      <button className="btn btn-outline" onClick={rejectNews}>
-                        Rechazar
-                      </button>
-                    </>
-                  )}
-                  {news.status === "published" && (
-                    <button
-                      className="btn btn-outline"
-                      onClick={() => navigate(`/admin/news/${news.id}/edit`)}
-                    >
-                      Editar
-                    </button>
-                  )}
-                  <button
-                    className="btn btn-outline"
-                    onClick={() => navigate("/admin")}
-                  >
-                    Volver al admin
-                  </button>
-                </div>
-              )}
             </div>
-          </header>
 
-          {/* Imagen de la noticia */}
+            {user?.role === "admin" && (
+              <div className="flex-start gap-2">
+                {news.status === "pending" && (
+                  <>
+                    <Button variant="primary" onClick={approveNews}>
+                      Aprobar
+                    </Button>
+                    <Button variant="outline" onClick={rejectNews}>
+                      Rechazar
+                    </Button>
+                  </>
+                )}
+                {news.status === "published" && (
+                  <Button
+                    variant="outline"
+                    onClick={() => navigate(`/admin/news/${news.id}/edit`)}
+                  >
+                    Editar
+                  </Button>
+                )}
+                <Button variant="outline" onClick={() => navigate("/admin")}>
+                  Volver
+                </Button>
+              </div>
+            )}
+          </div>
+
           {news.image_url && (
-            <div
-              className="news-image"
-              style={{ marginBottom: "var(--spacing-xl)" }}
-            >
+            <div className="mb-6">
               <img
                 src={getImageUrl(news.image_url)}
                 alt={news.title}
@@ -223,63 +223,34 @@ export default function AdminNewsView() {
                   width: "100%",
                   maxHeight: "400px",
                   objectFit: "cover",
-                  borderRadius: "var(--radius)",
+                  borderRadius: "var(--radius-lg)",
                 }}
               />
             </div>
           )}
 
-          {/* Contenido de la noticia */}
-          <div className="news-content">
-            {/* Resumen */}
-            {news.excerpt && (
-              <div
-                className="news-excerpt"
-                style={{
-                  marginBottom: "var(--spacing-xl)",
-                  padding: "var(--spacing-lg)",
-                  backgroundColor: "var(--color-bg-light)",
-                  borderRadius: "var(--radius)",
-                  borderLeft: "4px solid var(--color-primary)",
-                }}
-              >
-                <h3
-                  style={{
-                    marginBottom: "var(--spacing-sm)",
-                    color: "var(--color-primary)",
-                  }}
-                >
-                  Resumen
-                </h3>
-                <p
-                  style={{
-                    fontSize: "var(--font-size-lg)",
-                    lineHeight: 1.6,
-                    margin: 0,
-                  }}
-                >
-                  {news.excerpt}
-                </p>
-              </div>
-            )}
+          {news.excerpt && (
+            <Card variant="outline" className="mb-6 p-4">
+              <h3 className="text-primary mb-2">Resumen</h3>
+              <p className="text-lg">{news.excerpt}</p>
+            </Card>
+          )}
 
-            {/* Contenido completo */}
-            <div className="news-body">
-              <h3 style={{ marginBottom: "var(--spacing-lg)" }}>
-                Contenido completo
-              </h3>
-              {news.content ? (
-                <div
-                  dangerouslySetInnerHTML={{ __html: news.content }}
-                  style={{ lineHeight: 1.8, fontSize: "var(--font-size-base)" }}
-                />
-              ) : (
-                <p>Contenido de la noticia no disponible.</p>
-              )}
-            </div>
+          <div>
+            <h3 className="mb-4">Contenido completo</h3>
+            {news.content ? (
+              <div
+                dangerouslySetInnerHTML={{ __html: news.content }}
+                style={{ lineHeight: 1.8 }}
+              />
+            ) : (
+              <p className="text-muted">
+                Contenido de la noticia no disponible.
+              </p>
+            )}
           </div>
-        </article>
-      </div>
-    </section>
+        </Card>
+      </Container>
+    </Section>
   );
 }

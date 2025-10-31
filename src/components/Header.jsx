@@ -57,13 +57,7 @@ export default function Header() {
             <SubLink to="/noticias/blog" label="Artículo científico" />
           </MenuItem>
           <MenuItem label="Contacto" to="/contacto" />
-          {user?.role === "admin" ? (
-            <MenuItem label="Admin" to="/admin">
-              <SubLink to="/admin/news/new" label="Nueva noticia" />
-              <SubLink to="/admin/eventos" label="Eventos" />
-              <SubLink to="/admin/users/new" label="Usuarios" />
-            </MenuItem>
-          ) : null}
+          {user?.role === "admin" && <MenuItem label="Admin" to="/admin" />}
           <MenuItem label="Usuario" to={user ? "/perfil" : "/login"}>
             {user ? (
               <>

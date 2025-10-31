@@ -1,467 +1,490 @@
 import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
-import Modal from "../../components/ui/Modal";
+import {
+  Section,
+  Container,
+  Card,
+  Input,
+  Select,
+  Button,
+  Badge,
+  Table,
+  Modal,
+  Spinner,
+  Alert,
+  useToast,
+} from "../../components/ui";
 
 const BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
 
+const initialFormState = {
+  title: "",
+  description: "",
+  instructor: "",
+  duration_hours: "",
+  format: "webinar",
+  max_students: "",
+  price_member: "",
+  price_non_member: "",
+  price_joven: "",
+  price_gratuito: "",
+  start_date: "",
+  end_date: "",
+  registration_deadline: "",
+  is_active: true,
+  image_url: "",
+};
+
 export default function AdminEvents() {
+  const toast = useToast();
   const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [enrollmentsModal, setEnrollmentsModal] = useState({
     open: false,
     data: null,
   });
-  const [form, setForm] = useState({
-    title: "",
-    description: "",
-    instructor: "",
-    duration_hours: "",
-    format: "webinar",
-    max_students: "",
-    price_member: "",
-    price_non_member: "",
-    price_joven: "",
-    price_gratuito: "",
-    start_date: "",
-    end_date: "",
-    registration_deadline: "",
-    is_active: true,
-    image_url: "",
-  });
+  const [form, setForm] = useState(initialFormState);
 
   useEffect(() => {
-    load();
+    loadEvents();
   }, []);
 
-  async function load() {
-    const token = localStorage.getItem("access_token");
-    const res = await fetch(`${BASE_URL}/admin/events`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await res.json();
-    setEvents(data);
+  async function loadEvents() {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("access_token");
+      const res = await fetch(`${BASE_URL}/admin/events`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      setEvents(data);
+    } catch (err) {
+      toast.error("Error al cargar eventos");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function createEvent() {
-    const token = localStorage.getItem("access_token");
-    const res = await fetch(`${BASE_URL}/admin/events`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(form),
-    });
-    if (res.ok) {
-      setForm({
-        title: "",
-        description: "",
-        instructor: "",
-        duration_hours: "",
-        format: "webinar",
-        max_students: "",
-        price_member: "",
-        price_non_member: "",
-        price_joven: "",
-        price_gratuito: "",
-        start_date: "",
-        end_date: "",
-        registration_deadline: "",
-        is_active: true,
-        image_url: "",
+    try {
+      const token = localStorage.getItem("access_token");
+      const res = await fetch(`${BASE_URL}/admin/events`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(form),
       });
-      load();
-    } else {
-      const data = await res.json();
-      alert(data.error || "No se pudo crear");
+
+      if (res.ok) {
+        toast.success("Evento creado correctamente");
+        setForm(initialFormState);
+        loadEvents();
+      } else {
+        const data = await res.json();
+        toast.error(data.error || "No se pudo crear el evento");
+      }
+    } catch (err) {
+      toast.error("Error al crear el evento");
+      console.error(err);
+    }
+  }
+
+  async function updateEvent(event) {
+    try {
+      const token = localStorage.getItem("access_token");
+      const res = await fetch(`${BASE_URL}/admin/events/${event.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(event),
+      });
+
+      if (res.ok) {
+        toast.success("Evento actualizado correctamente");
+        loadEvents();
+      } else {
+        const data = await res.json();
+        toast.error(data.error || "No se pudo actualizar");
+      }
+    } catch (err) {
+      toast.error("Error al actualizar el evento");
+      console.error(err);
     }
   }
 
   async function removeEvent(id) {
-    const token = localStorage.getItem("access_token");
-    const res = await fetch(`${BASE_URL}/admin/events/${id}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (!res.ok) {
-      const data = await res.json();
-      alert(data.error || "No se pudo eliminar");
+    if (!confirm("¿Estás seguro de eliminar este evento?")) return;
+
+    try {
+      const token = localStorage.getItem("access_token");
+      const res = await fetch(`${BASE_URL}/admin/events/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (res.ok) {
+        toast.success("Evento eliminado correctamente");
+        loadEvents();
+      } else {
+        const data = await res.json();
+        toast.error(data.error || "No se pudo eliminar");
+      }
+    } catch (err) {
+      toast.error("Error al eliminar el evento");
+      console.error(err);
     }
-    load();
   }
 
   async function viewEnrollments(id) {
-    const token = localStorage.getItem("access_token");
-    const res = await fetch(`${BASE_URL}/admin/events/${id}/enrollments`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await res.json();
-    setEnrollmentsModal({ open: true, data });
+    try {
+      const token = localStorage.getItem("access_token");
+      const res = await fetch(`${BASE_URL}/admin/events/${id}/enrollments`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      setEnrollmentsModal({ open: true, data });
+    } catch (err) {
+      toast.error("Error al cargar inscritos");
+      console.error(err);
+    }
+  }
+
+  async function uploadImage(eventId, file) {
+    try {
+      const token = localStorage.getItem("access_token");
+      const fd = new FormData();
+      fd.append("image", file);
+      const res = await fetch(`${BASE_URL}/admin/events/${eventId}/image`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: fd,
+      });
+
+      if (res.ok) {
+        toast.success("Imagen subida correctamente");
+        loadEvents();
+      } else {
+        const data = await res.json();
+        toast.error(data.error || "Error al subir imagen");
+      }
+    } catch (err) {
+      toast.error("Error al subir la imagen");
+      console.error(err);
+    }
+  }
+
+  function getImageUrl(url) {
+    if (!url) return null;
+    if (url.startsWith("http")) return url;
+    return BASE_URL.replace("/api", "") + url;
+  }
+
+  if (loading) {
+    return (
+      <Section>
+        <Container>
+          <div className="flex-center" style={{ minHeight: "400px" }}>
+            <Spinner size="large" />
+          </div>
+        </Container>
+      </Section>
+    );
   }
 
   return (
-    <div>
-      <h2>Eventos (Cursos en vivo)</h2>
-      <div className="card" style={{ padding: 16, marginBottom: 24 }}>
-        <h3>Crear evento</h3>
-        <div
-          style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}
-        >
-          <input
-            placeholder="Título"
-            value={form.title}
-            onChange={e => setForm({ ...form, title: e.target.value })}
-          />
-          <select
-            value={form.format}
-            onChange={e => setForm({ ...form, format: e.target.value })}
-          >
-            <option value="webinar">Webinar</option>
-            <option value="presencial">Presencial</option>
-          </select>
-          <input
-            placeholder="Instructor"
-            value={form.instructor}
-            onChange={e => setForm({ ...form, instructor: e.target.value })}
-          />
-          <input
-            placeholder="Capacidad"
-            type="number"
-            value={form.max_students}
-            onChange={e =>
-              setForm({ ...form, max_students: Number(e.target.value) })
-            }
-          />
-          <input
-            placeholder="Precio socio"
-            type="number"
-            value={form.price_member}
-            onChange={e =>
-              setForm({ ...form, price_member: Number(e.target.value) })
-            }
-          />
-          <input
-            placeholder="Precio no socio"
-            type="number"
-            value={form.price_non_member}
-            onChange={e =>
-              setForm({ ...form, price_non_member: Number(e.target.value) })
-            }
-          />
-          <input
-            placeholder="Precio joven"
-            type="number"
-            value={form.price_joven}
-            onChange={e =>
-              setForm({ ...form, price_joven: Number(e.target.value) })
-            }
-          />
-          <input
-            placeholder="Precio gratuito"
-            type="number"
-            value={form.price_gratuito}
-            onChange={e =>
-              setForm({ ...form, price_gratuito: Number(e.target.value) })
-            }
-          />
-          <input
-            placeholder="Fecha inicio"
-            type="date"
-            value={form.start_date}
-            onChange={e => setForm({ ...form, start_date: e.target.value })}
-          />
-          <input
-            placeholder="Fecha fin"
-            type="date"
-            value={form.end_date}
-            onChange={e => setForm({ ...form, end_date: e.target.value })}
-          />
-          <input
-            placeholder="Límite inscripción"
-            type="date"
-            value={form.registration_deadline}
-            onChange={e =>
-              setForm({ ...form, registration_deadline: e.target.value })
-            }
-          />
-        </div>
-        <button
-          className="btn btn-primary"
-          style={{ marginTop: 12 }}
-          onClick={createEvent}
-        >
-          Crear
-        </button>
-      </div>
+    <Section>
+      <Container>
+        <h2 className="mb-6">Gestión de Eventos y Cursos</h2>
 
-      <div className="cards">
-        {events.map(e => (
-          <div key={e.id} className="card">
-            <h4>{e.title}</h4>
-            {e.image_url && (
-              <img
-                src={
-                  e.image_url.startsWith("http")
-                    ? e.image_url
-                    : (
-                        import.meta.env.VITE_API_BASE_URL ||
-                        "http://localhost:5000/api"
-                      ).replace("/api", "") + e.image_url
-                }
-                alt={e.title}
-                style={{
-                  width: "100%",
-                  height: 120,
-                  objectFit: "cover",
-                  borderRadius: 8,
-                  marginBottom: 8,
-                }}
-              />
-            )}
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: 8,
-              }}
+        <Card className="mb-8">
+          <h3 className="mb-4">Crear nuevo evento</h3>
+          <div className="grid grid-2 gap-4 mb-4">
+            <Input
+              label="Título"
+              value={form.title}
+              onChange={e => setForm({ ...form, title: e.target.value })}
+              placeholder="Título del evento"
+            />
+            <Select
+              label="Formato"
+              value={form.format}
+              onChange={e => setForm({ ...form, format: e.target.value })}
             >
-              <input
-                value={e.title || ""}
-                onChange={ev =>
-                  setEvents(
-                    events.map(x =>
-                      x.id === e.id ? { ...x, title: ev.target.value } : x
-                    )
-                  )
-                }
-                placeholder="Título"
-              />
-              <select
-                value={e.format || "webinar"}
-                onChange={ev =>
-                  setEvents(
-                    events.map(x =>
-                      x.id === e.id ? { ...x, format: ev.target.value } : x
-                    )
-                  )
-                }
-              >
-                <option value="webinar">Webinar</option>
-                <option value="presencial">Presencial</option>
-              </select>
-              <input
-                value={e.instructor || ""}
-                onChange={ev =>
-                  setEvents(
-                    events.map(x =>
-                      x.id === e.id ? { ...x, instructor: ev.target.value } : x
-                    )
-                  )
-                }
-                placeholder="Instructor"
-              />
-              <input
-                type="number"
-                value={e.max_students || ""}
-                onChange={ev =>
-                  setEvents(
-                    events.map(x =>
-                      x.id === e.id
-                        ? { ...x, max_students: Number(ev.target.value) }
-                        : x
-                    )
-                  )
-                }
-                placeholder="Capacidad"
-              />
-              <input
-                type="number"
-                value={e.price_member || 0}
-                onChange={ev =>
-                  setEvents(
-                    events.map(x =>
-                      x.id === e.id
-                        ? { ...x, price_member: Number(ev.target.value) }
-                        : x
-                    )
-                  )
-                }
-                placeholder="Precio socio"
-              />
-              <input
-                type="number"
-                value={e.price_non_member || 0}
-                onChange={ev =>
-                  setEvents(
-                    events.map(x =>
-                      x.id === e.id
-                        ? { ...x, price_non_member: Number(ev.target.value) }
-                        : x
-                    )
-                  )
-                }
-                placeholder="Precio no socio"
-              />
-              <input
-                type="number"
-                value={e.price_joven || 0}
-                onChange={ev =>
-                  setEvents(
-                    events.map(x =>
-                      x.id === e.id
-                        ? { ...x, price_joven: Number(ev.target.value) }
-                        : x
-                    )
-                  )
-                }
-                placeholder="Precio joven"
-              />
-              <input
-                type="number"
-                value={e.price_gratuito || 0}
-                onChange={ev =>
-                  setEvents(
-                    events.map(x =>
-                      x.id === e.id
-                        ? { ...x, price_gratuito: Number(ev.target.value) }
-                        : x
-                    )
-                  )
-                }
-                placeholder="Precio gratuito"
-              />
-              <input
-                type="date"
-                value={e.start_date ? e.start_date.substring(0, 10) : ""}
-                onChange={ev =>
-                  setEvents(
-                    events.map(x =>
-                      x.id === e.id ? { ...x, start_date: ev.target.value } : x
-                    )
-                  )
-                }
-                placeholder="Fecha inicio"
-              />
-              <input
-                type="date"
-                value={e.end_date ? e.end_date.substring(0, 10) : ""}
-                onChange={ev =>
-                  setEvents(
-                    events.map(x =>
-                      x.id === e.id ? { ...x, end_date: ev.target.value } : x
-                    )
-                  )
-                }
-                placeholder="Fecha fin"
-              />
-              <input
-                type="date"
-                value={
-                  e.registration_deadline
-                    ? e.registration_deadline.substring(0, 10)
-                    : ""
-                }
-                onChange={ev =>
-                  setEvents(
-                    events.map(x =>
-                      x.id === e.id
-                        ? { ...x, registration_deadline: ev.target.value }
-                        : x
-                    )
-                  )
-                }
-                placeholder="Fecha límite"
-              />
-            </div>
-            <div
-              style={{
-                display: "flex",
-                gap: 8,
-                marginTop: 8,
-                flexWrap: "wrap",
-              }}
-            >
-              <button
-                className="btn btn-primary"
-                onClick={async () => {
-                  const token = localStorage.getItem("access_token");
-                  const res = await fetch(
-                    `${
-                      import.meta.env.VITE_API_BASE_URL ||
-                      "http://localhost:5000/api"
-                    }/admin/events/${e.id}`,
-                    {
-                      method: "PUT",
-                      headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                      },
-                      body: JSON.stringify(e),
-                    }
-                  );
-                  const data = await res.json();
-                  if (!res.ok) return alert(data.error || "No se pudo guardar");
-                  load();
-                }}
-              >
-                Guardar
-              </button>
-              <button
-                className="btn btn-outline"
-                onClick={() => viewEnrollments(e.id)}
-              >
-                Ver inscritos
-              </button>
-              <button
-                className="btn btn-outline"
-                onClick={() => removeEvent(e.id)}
-              >
-                Eliminar
-              </button>
-              <label className="btn btn-outline" style={{ cursor: "pointer" }}>
-                Subir imagen{" "}
-                <input
-                  type="file"
-                  accept="image/*"
-                  style={{ display: "none" }}
-                  onChange={async ev => {
-                    const file = ev.target.files?.[0];
-                    if (!file) return;
-                    const token = localStorage.getItem("access_token");
-                    const fd = new FormData();
-                    fd.append("image", file);
-                    const res = await fetch(
-                      `${
-                        import.meta.env.VITE_API_BASE_URL ||
-                        "http://localhost:5000/api"
-                      }/admin/events/${e.id}/image`,
-                      {
-                        method: "POST",
-                        headers: { Authorization: `Bearer ${token}` },
-                        body: fd,
-                      }
-                    );
-                    const data = await res.json();
-                    if (!res.ok) return alert(data.error || "Error al subir");
-                    load();
-                  }}
-                />
-              </label>
-            </div>
+              <option value="webinar">Webinar</option>
+              <option value="presencial">Presencial</option>
+            </Select>
+            <Input
+              label="Instructor"
+              value={form.instructor}
+              onChange={e => setForm({ ...form, instructor: e.target.value })}
+              placeholder="Nombre del instructor"
+            />
+            <Input
+              label="Capacidad máxima"
+              type="number"
+              value={form.max_students}
+              onChange={e =>
+                setForm({ ...form, max_students: Number(e.target.value) })
+              }
+              placeholder="Número de estudiantes"
+            />
+            <Input
+              label="Precio socio"
+              type="number"
+              value={form.price_member}
+              onChange={e =>
+                setForm({ ...form, price_member: Number(e.target.value) })
+              }
+              placeholder="0"
+            />
+            <Input
+              label="Precio no socio"
+              type="number"
+              value={form.price_non_member}
+              onChange={e =>
+                setForm({ ...form, price_non_member: Number(e.target.value) })
+              }
+              placeholder="0"
+            />
+            <Input
+              label="Precio joven"
+              type="number"
+              value={form.price_joven}
+              onChange={e =>
+                setForm({ ...form, price_joven: Number(e.target.value) })
+              }
+              placeholder="0"
+            />
+            <Input
+              label="Precio gratuito"
+              type="number"
+              value={form.price_gratuito}
+              onChange={e =>
+                setForm({ ...form, price_gratuito: Number(e.target.value) })
+              }
+              placeholder="0"
+            />
+            <Input
+              label="Fecha inicio"
+              type="date"
+              value={form.start_date}
+              onChange={e => setForm({ ...form, start_date: e.target.value })}
+            />
+            <Input
+              label="Fecha fin"
+              type="date"
+              value={form.end_date}
+              onChange={e => setForm({ ...form, end_date: e.target.value })}
+            />
+            <Input
+              label="Límite inscripción"
+              type="date"
+              value={form.registration_deadline}
+              onChange={e =>
+                setForm({ ...form, registration_deadline: e.target.value })
+              }
+            />
           </div>
-        ))}
-      </div>
-      <EnrollmentsModal
-        modal={enrollmentsModal}
-        onClose={() => setEnrollmentsModal({ open: false, data: null })}
-      />
-    </div>
+          <Button variant="primary" onClick={createEvent}>
+            Crear evento
+          </Button>
+        </Card>
+
+        <div className="mb-4 flex-between">
+          <h3>Eventos existentes ({events.length})</h3>
+        </div>
+
+        {events.length === 0 ? (
+          <Alert variant="info">No hay eventos creados todavía.</Alert>
+        ) : (
+          <div className="grid gap-6">
+            {events.map(event => (
+              <EventCard
+                key={event.id}
+                event={event}
+                onUpdate={updateEvent}
+                onDelete={removeEvent}
+                onViewEnrollments={viewEnrollments}
+                onUploadImage={uploadImage}
+                getImageUrl={getImageUrl}
+              />
+            ))}
+          </div>
+        )}
+
+        <EnrollmentsModal
+          modal={enrollmentsModal}
+          onClose={() => setEnrollmentsModal({ open: false, data: null })}
+        />
+      </Container>
+    </Section>
   );
 }
+
+function EventCard({
+  event,
+  onUpdate,
+  onDelete,
+  onViewEnrollments,
+  onUploadImage,
+  getImageUrl,
+}) {
+  const [localEvent, setLocalEvent] = useState(event);
+
+  const handleChange = (field, value) => {
+    setLocalEvent({ ...localEvent, [field]: value });
+  };
+
+  return (
+    <Card>
+      <div className="flex-between mb-4">
+        <h4>{localEvent.title || "Sin título"}</h4>
+        <Badge variant={localEvent.format === "webinar" ? "info" : "success"}>
+          {localEvent.format === "webinar" ? "Webinar" : "Presencial"}
+        </Badge>
+      </div>
+
+      {localEvent.image_url && (
+        <img
+          src={getImageUrl(localEvent.image_url)}
+          alt={localEvent.title}
+          className="mb-4"
+          style={{
+            width: "100%",
+            height: "200px",
+            objectFit: "cover",
+            borderRadius: "var(--radius-base)",
+          }}
+        />
+      )}
+
+      <div className="grid grid-2 gap-4 mb-4">
+        <Input
+          label="Título"
+          value={localEvent.title || ""}
+          onChange={e => handleChange("title", e.target.value)}
+        />
+        <Select
+          label="Formato"
+          value={localEvent.format || "webinar"}
+          onChange={e => handleChange("format", e.target.value)}
+        >
+          <option value="webinar">Webinar</option>
+          <option value="presencial">Presencial</option>
+        </Select>
+        <Input
+          label="Instructor"
+          value={localEvent.instructor || ""}
+          onChange={e => handleChange("instructor", e.target.value)}
+        />
+        <Input
+          label="Capacidad"
+          type="number"
+          value={localEvent.max_students || ""}
+          onChange={e => handleChange("max_students", Number(e.target.value))}
+        />
+        <Input
+          label="Precio socio"
+          type="number"
+          value={localEvent.price_member || 0}
+          onChange={e => handleChange("price_member", Number(e.target.value))}
+        />
+        <Input
+          label="Precio no socio"
+          type="number"
+          value={localEvent.price_non_member || 0}
+          onChange={e =>
+            handleChange("price_non_member", Number(e.target.value))
+          }
+        />
+        <Input
+          label="Precio joven"
+          type="number"
+          value={localEvent.price_joven || 0}
+          onChange={e => handleChange("price_joven", Number(e.target.value))}
+        />
+        <Input
+          label="Precio gratuito"
+          type="number"
+          value={localEvent.price_gratuito || 0}
+          onChange={e => handleChange("price_gratuito", Number(e.target.value))}
+        />
+        <Input
+          label="Fecha inicio"
+          type="date"
+          value={
+            localEvent.start_date ? localEvent.start_date.substring(0, 10) : ""
+          }
+          onChange={e => handleChange("start_date", e.target.value)}
+        />
+        <Input
+          label="Fecha fin"
+          type="date"
+          value={
+            localEvent.end_date ? localEvent.end_date.substring(0, 10) : ""
+          }
+          onChange={e => handleChange("end_date", e.target.value)}
+        />
+        <Input
+          label="Límite inscripción"
+          type="date"
+          value={
+            localEvent.registration_deadline
+              ? localEvent.registration_deadline.substring(0, 10)
+              : ""
+          }
+          onChange={e => handleChange("registration_deadline", e.target.value)}
+        />
+      </div>
+
+      <div className="flex-start gap-2 flex-wrap">
+        <Button variant="primary" onClick={() => onUpdate(localEvent)}>
+          Guardar cambios
+        </Button>
+        <Button variant="outline" onClick={() => onViewEnrollments(event.id)}>
+          Ver inscritos
+        </Button>
+        <Button variant="outline" onClick={() => onDelete(event.id)}>
+          Eliminar
+        </Button>
+        <Button variant="outline" asChild>
+          <label style={{ cursor: "pointer", margin: 0 }}>
+            Subir imagen
+            <input
+              type="file"
+              accept="image/*"
+              style={{ display: "none" }}
+              onChange={e => {
+                const file = e.target.files?.[0];
+                if (file) onUploadImage(event.id, file);
+              }}
+            />
+          </label>
+        </Button>
+      </div>
+    </Card>
+  );
+}
+
+EventCard.propTypes = {
+  event: PropTypes.object.isRequired,
+  onUpdate: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
+  onViewEnrollments: PropTypes.func.isRequired,
+  onUploadImage: PropTypes.func.isRequired,
+  getImageUrl: PropTypes.func.isRequired,
+};
 
 function EnrollmentsModal({ modal, onClose }) {
   const open = !!modal?.open;
   const data = modal?.data;
+
   if (!open || !data) return null;
 
   const event = data.event || {};
@@ -474,6 +497,44 @@ function EnrollmentsModal({ modal, onClose }) {
     ? Math.max(0, capacity - validEnrollments.length)
     : null;
 
+  const columns = [
+    {
+      key: "student_name",
+      label: "Nombre",
+    },
+    {
+      key: "student_email",
+      label: "Email",
+    },
+    {
+      key: "student_phone",
+      label: "Teléfono",
+      render: row => row.student_phone || "-",
+    },
+    {
+      key: "payment_status",
+      label: "Estado pago",
+      render: row => (
+        <Badge
+          variant={
+            row.payment_status === "paid"
+              ? "success"
+              : row.payment_status === "pending"
+              ? "warning"
+              : "default"
+          }
+        >
+          {row.payment_status}
+        </Badge>
+      ),
+    },
+    {
+      key: "payment_amount",
+      label: "Monto",
+      render: row => `$${row.payment_amount}`,
+    },
+  ];
+
   return (
     <Modal
       isOpen={open}
@@ -481,127 +542,28 @@ function EnrollmentsModal({ modal, onClose }) {
       title={`Inscritos: ${event.title || ""}`}
       size="large"
     >
-      <div style={{ marginBottom: 12, color: "var(--color-muted)" }}>
+      <div className="mb-4 flex-start gap-4 text-muted">
         <span>
           <strong>Capacidad:</strong> {capacity ?? "Sin límite"}
         </span>
-        <span style={{ marginLeft: 16 }}>
+        <span>
           <strong>Inscritos:</strong> {validEnrollments.length}
         </span>
-        <span style={{ marginLeft: 16 }}>
+        <span>
           <strong>Disponibles:</strong> {seatsLeft ?? "—"}
         </span>
       </div>
+
       {validEnrollments.length === 0 ? (
-        <p style={{ color: "var(--color-muted)" }}>No hay inscritos aún.</p>
+        <Alert variant="info">No hay inscritos aún.</Alert>
       ) : (
-        <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead>
-              <tr>
-                <th
-                  style={{
-                    textAlign: "left",
-                    borderBottom: "1px solid #eee",
-                    padding: "8px",
-                  }}
-                >
-                  Nombre
-                </th>
-                <th
-                  style={{
-                    textAlign: "left",
-                    borderBottom: "1px solid #eee",
-                    padding: "8px",
-                  }}
-                >
-                  Email
-                </th>
-                <th
-                  style={{
-                    textAlign: "left",
-                    borderBottom: "1px solid #eee",
-                    padding: "8px",
-                  }}
-                >
-                  Teléfono
-                </th>
-                <th
-                  style={{
-                    textAlign: "left",
-                    borderBottom: "1px solid #eee",
-                    padding: "8px",
-                  }}
-                >
-                  Estado pago
-                </th>
-                <th
-                  style={{
-                    textAlign: "right",
-                    borderBottom: "1px solid #eee",
-                    padding: "8px",
-                  }}
-                >
-                  Monto
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {validEnrollments.map(e => (
-                <tr key={e.id}>
-                  <td
-                    style={{
-                      padding: "8px",
-                      borderBottom: "1px solid #f1f1f1",
-                    }}
-                  >
-                    {e.student_name}
-                  </td>
-                  <td
-                    style={{
-                      padding: "8px",
-                      borderBottom: "1px solid #f1f1f1",
-                    }}
-                  >
-                    {e.student_email}
-                  </td>
-                  <td
-                    style={{
-                      padding: "8px",
-                      borderBottom: "1px solid #f1f1f1",
-                    }}
-                  >
-                    {e.student_phone || "-"}
-                  </td>
-                  <td
-                    style={{
-                      padding: "8px",
-                      borderBottom: "1px solid #f1f1f1",
-                    }}
-                  >
-                    {e.payment_status}
-                  </td>
-                  <td
-                    style={{
-                      padding: "8px",
-                      borderBottom: "1px solid #f1f1f1",
-                      textAlign: "right",
-                    }}
-                  >
-                    ${e.payment_amount}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <Table columns={columns} data={validEnrollments} striped hoverable />
       )}
-      <div
-        style={{ display: "flex", justifyContent: "flex-end", marginTop: 12 }}
-      >
-        <button className="btn btn-outline" onClick={onClose}>
+
+      <div className="flex-end mt-4">
+        <Button variant="outline" onClick={onClose}>
           Cerrar
-        </button>
+        </Button>
       </div>
     </Modal>
   );

@@ -7,7 +7,14 @@ import {
   Container,
   Tabs,
   Spinner,
-  Badge
+  Badge,
+  Card,
+  Button,
+  Input,
+  Select,
+  Textarea,
+  Alert,
+  useToast,
 } from "../../components/ui";
 
 export default function AdminDashboard() {
@@ -72,11 +79,11 @@ export default function AdminDashboard() {
   }
 
   const tabs = [
-    { id: "overview", label: "📊 Resumen" },
-    { id: "users", label: "👥 Usuarios" },
-    { id: "applications", label: "📝 Postulaciones" },
-    { id: "news", label: "📰 Noticias" },
-    { id: "events", label: "🎟️ Eventos" },
+    { id: "overview", label: "Resumen" },
+    { id: "users", label: "Usuarios" },
+    { id: "applications", label: "Postulaciones" },
+    { id: "news", label: "Noticias" },
+    { id: "events", label: "Eventos" },
   ];
 
   return (
@@ -93,7 +100,7 @@ export default function AdminDashboard() {
           tabs={tabs}
           activeTab={activeTab}
           onChange={setActiveTab}
-          variant="default"
+          variant="segmented"
           className="mb-5"
         />
 
@@ -247,7 +254,6 @@ function OverviewTab({ stats }) {
         }}
       >
         <div className="card" style={{ textAlign: "center" }}>
-          <div style={{ fontSize: "2.5em", marginBottom: 8 }}>📝</div>
           <h3 style={{ marginBottom: 8 }}>Postulaciones</h3>
           <div
             style={{
@@ -266,7 +272,6 @@ function OverviewTab({ stats }) {
         </div>
 
         <div className="card" style={{ textAlign: "center" }}>
-          <div style={{ fontSize: "2.5em", marginBottom: 8 }}>👥</div>
           <h3 style={{ marginBottom: 8 }}>Usuarios</h3>
           <div
             style={{
@@ -285,7 +290,6 @@ function OverviewTab({ stats }) {
         </div>
 
         <div className="card" style={{ textAlign: "center" }}>
-          <div style={{ fontSize: "2.5em", marginBottom: 8 }}>📰</div>
           <h3 style={{ marginBottom: 8 }}>Noticias</h3>
           <div
             style={{
@@ -652,6 +656,7 @@ function ApplicationsTab() {
 
 function NewsTab() {
   const navigate = useNavigate();
+  const toast = useToast();
   const [news, setNews] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -664,19 +669,20 @@ function NewsTab() {
       const data = await apiGet("/admin/news");
       setNews(data);
     } catch (err) {
+      toast.error("Error al cargar noticias");
       console.error("Error loading news:", err);
     } finally {
       setLoading(false);
     }
   }
 
-  const getStatusColor = status => {
-    const colors = {
-      published: "green",
-      pending: "orange",
-      rejected: "crimson",
+  const getStatusVariant = status => {
+    const variants = {
+      published: "success",
+      pending: "warning",
+      rejected: "error",
     };
-    return colors[status] || "var(--color-muted)";
+    return variants[status] || "default";
   };
 
   const getStatusLabel = status => {
@@ -690,167 +696,176 @@ function NewsTab() {
 
   if (loading) {
     return (
-      <div style={{ textAlign: "center", padding: "48px 0" }}>
-        Cargando noticias...
+      <div className="flex-center" style={{ minHeight: "300px" }}>
+        <Spinner size="large" />
       </div>
     );
   }
 
   return (
     <div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 16,
-        }}
-      >
+      <div className="flex-between mb-4">
         <h2>Noticias ({news.length})</h2>
       </div>
 
       <SimpleNewsForm onSuccess={loadNews} />
 
-      <div className="cards">
-        {news.map(article => (
-          <div key={article.id} className="card">
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "flex-start",
-                marginBottom: 12,
-              }}
-            >
-              <div style={{ flex: 1 }}>
-                <h4 style={{ marginBottom: 4 }}>{article.title}</h4>
-                <p style={{ color: "var(--color-muted)", marginBottom: 8 }}>
-                  {article.excerpt || "Sin resumen"}
-                </p>
+      {news.length === 0 ? (
+        <Alert variant="info">No hay noticias creadas todavía.</Alert>
+      ) : (
+        <div className="grid gap-4">
+          {news.map(article => (
+            <Card key={article.id}>
+              <div className="flex-between mb-3">
+                <div className="flex-1">
+                  <h4 className="mb-1">{article.title}</h4>
+                  <p className="text-muted mb-2">
+                    {article.excerpt || "Sin resumen"}
+                  </p>
+                </div>
+                <div className="text-right ml-4">
+                  <Badge
+                    variant={getStatusVariant(article.status)}
+                    className="mb-2"
+                  >
+                    {getStatusLabel(article.status)}
+                  </Badge>
+                  <div className="text-sm text-muted">
+                    Orden: {article.order_index}
+                  </div>
+                </div>
               </div>
-              <div style={{ textAlign: "right" }}>
-                <div
-                  style={{
-                    background: getStatusColor(article.status),
-                    color: "white",
-                    padding: "6px 12px",
-                    borderRadius: 16,
-                    fontSize: "0.8em",
-                    fontWeight: "bold",
-                    marginBottom: 8,
-                  }}
+              <div className="flex-start gap-2">
+                <Button
+                  variant="outline"
+                  size="small"
+                  onClick={() => navigate(`/admin/news/${article.id}/view`)}
                 >
-                  {getStatusLabel(article.status)}
-                </div>
-                <div style={{ fontSize: "0.9em", color: "var(--color-muted)" }}>
-                  Orden: {article.order_index}
-                </div>
+                  Ver
+                </Button>
+                <Button
+                  variant="outline"
+                  size="small"
+                  onClick={() => navigate(`/admin/news/${article.id}/edit`)}
+                >
+                  Editar
+                </Button>
               </div>
-            </div>
-            <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
-              <button
-                className="btn btn-outline"
-                onClick={() => navigate(`/admin/news/${article.id}/view`)}
-                style={{ fontSize: "0.9em", padding: "6px 12px" }}
-              >
-                Ver
-              </button>
-              <button
-                className="btn btn-outline"
-                onClick={() => navigate(`/admin/news/${article.id}/edit`)}
-                style={{ fontSize: "0.9em", padding: "6px 12px" }}
-              >
-                Editar
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
 
 function SimpleNewsForm({ onSuccess }) {
+  const toast = useToast();
   const [title, setTitle] = useState("");
   const [excerpt, setExcerpt] = useState("");
   const [content, setContent] = useState("");
   const [category, setCategory] = useState("comunicados");
-  const [msg, setMsg] = useState("");
+  const [loading, setLoading] = useState(false);
   const BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
 
   async function submit(e) {
     e.preventDefault();
-    setMsg("");
-    const form = new FormData();
-    if (title) form.append("title", title);
-    if (excerpt) form.append("excerpt", excerpt);
-    if (content) form.append("content", content);
-    if (category) form.append("category", category);
-    const file = e.currentTarget.image?.files?.[0];
-    if (file) form.append("image", file);
-    const token = localStorage.getItem("access_token");
-    const res = await fetch(`${BASE}/news`, {
-      method: "POST",
-      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-      body: form,
-    });
-    if (!res.ok) {
-      setMsg("Error al crear la noticia");
-      return;
+    setLoading(true);
+
+    try {
+      const form = new FormData();
+      if (title) form.append("title", title);
+      if (excerpt) form.append("excerpt", excerpt);
+      if (content) form.append("content", content);
+      if (category) form.append("category", category);
+      const file = e.currentTarget.image?.files?.[0];
+      if (file) form.append("image", file);
+
+      const token = localStorage.getItem("access_token");
+      const res = await fetch(`${BASE}/news`, {
+        method: "POST",
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        body: form,
+      });
+
+      if (!res.ok) {
+        toast.error("Error al crear la noticia");
+        return;
+      }
+
+      toast.success("Noticia creada correctamente");
+      setTitle("");
+      setExcerpt("");
+      setContent("");
+      setCategory("comunicados");
+      e.currentTarget.reset();
+      if (onSuccess) onSuccess();
+    } catch (err) {
+      toast.error("Error al crear la noticia");
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
-    setMsg("Noticia creada");
-    setTitle("");
-    setExcerpt("");
-    setContent("");
-    setCategory("comunicados");
-    if (onSuccess) onSuccess();
   }
 
   return (
-    <form
-      onSubmit={submit}
-      className="card"
-      style={{ padding: 16, marginBottom: 24 }}
-    >
-      <h3 style={{ marginBottom: 12 }}>Crear noticia rápida</h3>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-        <input
-          placeholder="Título (opcional)"
-          value={title}
-          onChange={e => setTitle(e.target.value)}
-        />
-        <select value={category} onChange={e => setCategory(e.target.value)}>
-          <option value="comunicados">Comunicados</option>
-          <option value="prensa">Prensa</option>
-          <option value="blog">Blog</option>
-        </select>
-        <input
-          placeholder="Resumen (opcional)"
-          value={excerpt}
-          onChange={e => setExcerpt(e.target.value)}
-        />
-        <input name="image" type="file" accept="image/*" />
-      </div>
-      <textarea
-        placeholder="Contenido (opcional)"
-        value={content}
-        onChange={e => setContent(e.target.value)}
-        style={{ marginTop: 12, minHeight: 100 }}
-      />
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          gap: 8,
-          marginTop: 12,
-        }}
-      >
-        <button className="btn btn-primary" type="submit">
-          Crear
-        </button>
-      </div>
-      {msg ? <div style={{ marginTop: 8, color: "green" }}>{msg}</div> : null}
-    </form>
+    <Card className="mb-6">
+      <h3 className="mb-4">Crear noticia rápida</h3>
+      <form onSubmit={submit}>
+        <div className="grid grid-2 gap-4 mb-4">
+          <Input
+            label="Título"
+            placeholder="Título de la noticia"
+            value={title}
+            onChange={e => setTitle(e.target.value)}
+          />
+          <Select
+            label="Categoría"
+            value={category}
+            onChange={e => setCategory(e.target.value)}
+          >
+            <option value="comunicados">Comunicados</option>
+            <option value="prensa">Prensa</option>
+            <option value="blog">Blog</option>
+          </Select>
+          <Input
+            label="Resumen"
+            placeholder="Resumen breve"
+            value={excerpt}
+            onChange={e => setExcerpt(e.target.value)}
+          />
+          <div>
+            <label
+              htmlFor="news-image-quick"
+              className="block mb-2 font-medium"
+            >
+              Imagen
+            </label>
+            <input
+              id="news-image-quick"
+              name="image"
+              type="file"
+              accept="image/*"
+              className="input"
+            />
+          </div>
+        </div>
+        <div className="mb-4">
+          <Textarea
+            label="Contenido"
+            placeholder="Contenido de la noticia"
+            value={content}
+            onChange={e => setContent(e.target.value)}
+            rows={4}
+          />
+        </div>
+        <div className="flex-end">
+          <Button type="submit" variant="primary" disabled={loading}>
+            {loading ? "Creando..." : "Crear noticia"}
+          </Button>
+        </div>
+      </form>
+    </Card>
   );
 }
 

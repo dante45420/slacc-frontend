@@ -155,7 +155,8 @@ img {
   min-width: 220px;
   display: none;
   padding: var(--spacing-2) 0;
-  margin-top: var(--spacing-2);
+  margin-top: 0;
+  z-index: 1000;
   animation: slideDown 0.2s ease;
 }
 
@@ -171,10 +172,6 @@ img {
 }
 
 .menu > li:hover .submenu {
-  display: block;
-}
-
-.submenu:hover {
   display: block;
 }
 
@@ -511,7 +508,7 @@ img {
 
 .tabs-segmented {
   background: var(--color-background);
-  border-radius: var(--border-radius-base);
+  border-radius: var(--radius-lg);
   padding: var(--spacing-1);
   border: 1px solid var(--color-border);
 }
@@ -521,7 +518,7 @@ img {
   border: 1px solid var(--color-border);
   background: white;
   color: var(--color-text);
-  border-radius: var(--border-radius-base);
+  border-radius: var(--radius-lg);
   cursor: pointer;
   font-weight: 500;
   transition: all var(--transition-base);
@@ -547,14 +544,18 @@ img {
   border: none;
   background: transparent;
   flex: 1;
+  border-radius: var(--radius-lg);
 }
 
 .tabs-segmented .tab-button.active {
-  background: white;
+  background: var(--color-primary);
+  color: white;
   box-shadow: var(--shadow-sm);
+  border-radius: var(--radius-lg);
 }
 
 .tabs-segmented .tab-button:not(.active):hover {
+  background: var(--color-background-alt);
   color: var(--color-primary);
 }
 
@@ -562,7 +563,7 @@ img {
 .table-container {
   width: 100%;
   overflow-x: auto;
-  border-radius: var(--border-radius-base);
+  border-radius: var(--radius-base);
   border: 1px solid var(--color-border);
 }
 
@@ -640,7 +641,7 @@ img {
   gap: var(--spacing-3);
   padding: var(--spacing-3) var(--spacing-4);
   background: white;
-  border-radius: var(--border-radius-base);
+  border-radius: var(--radius-base);
   box-shadow: var(--shadow-lg);
   border-left: 4px solid;
   animation: slideInRight 0.3s ease-out;
@@ -736,7 +737,7 @@ img {
   border: 1px solid var(--color-border);
   background: white;
   color: var(--color-text);
-  border-radius: var(--border-radius-base);
+  border-radius: var(--radius-base);
   cursor: pointer;
   font-weight: 500;
   transition: all var(--transition-base);

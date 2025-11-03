@@ -8,14 +8,36 @@ import {
   Tabs,
   Spinner,
   Badge,
-  Card,
   Button,
   Input,
   Select,
   Textarea,
   Alert,
+  Table,
+  Modal,
   useToast,
 } from "../../components/ui";
+
+// Helper function to format dates safely
+function formatDateHelper(dateString, defaultText = "Sin fecha") {
+  if (!dateString) return defaultText;
+
+  try {
+    const date = new Date(dateString);
+    if (Number.isNaN(date.getTime())) {
+      return "Fecha inválida";
+    }
+
+    return date.toLocaleDateString("es-ES", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  } catch (error) {
+    console.error("Error formatting date:", error);
+    return "Fecha inválida";
+  }
+}
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -129,8 +151,7 @@ EventFormatBadge.propTypes = {
 
 function EventsTab() {
   const navigate = useNavigate();
-  const [upcoming, setUpcoming] = useState([]);
-  const [past, setPast] = useState([]);
+  const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -148,93 +169,120 @@ function EventsTab() {
       }
     );
     const data = await res.json();
-    const now = new Date();
-    const up = data.filter(e => e.start_date && new Date(e.start_date) >= now);
-    const pastItems = data
-      .filter(e => e.start_date && new Date(e.start_date) < now)
-      .slice(0, 5);
-    setUpcoming(up);
-    setPast(pastItems);
+    // Sort by start_date descending (upcoming first)
+    const sorted = data.sort((a, b) => {
+      if (!a.start_date) return 1;
+      if (!b.start_date) return -1;
+      return new Date(b.start_date) - new Date(a.start_date);
+    });
+    setEvents(sorted);
     setLoading(false);
   }
 
+  const isUpcoming = dateString => {
+    if (!dateString) return false;
+    try {
+      return new Date(dateString) >= new Date();
+    } catch {
+      return false;
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex-center" style={{ minHeight: "300px" }}>
+        <Spinner size="lg" />
+      </div>
+    );
+  }
+
+  const columns = [
+    {
+      key: "title",
+      label: "Evento",
+      render: row => {
+        let description = row.description || "Sin descripción";
+        if (description.length > 100) {
+          description = description.substring(0, 100) + "...";
+        }
+
+        return (
+          <div>
+            <div style={{ fontWeight: "600", marginBottom: "4px" }}>
+              {row.title}
+            </div>
+            <div style={{ fontSize: "0.875rem", color: "var(--color-muted)" }}>
+              {description}
+            </div>
+          </div>
+        );
+      },
+    },
+    {
+      key: "format",
+      label: "Formato",
+      render: row => <EventFormatBadge format={row.format} />,
+    },
+    {
+      key: "start_date",
+      label: "Fecha",
+      render: row => (
+        <div>
+          <div style={{ fontSize: "0.875rem", marginBottom: "4px" }}>
+            {formatDateHelper(row.start_date, "Por confirmar")}
+          </div>
+          <Badge
+            variant={isUpcoming(row.start_date) ? "info" : "neutral"}
+            size="sm"
+          >
+            {isUpcoming(row.start_date) ? "Próximo" : "Pasado"}
+          </Badge>
+        </div>
+      ),
+    },
+    {
+      key: "location",
+      label: "Ubicación",
+      render: row => (
+        <span style={{ fontSize: "0.875rem", color: "var(--color-muted)" }}>
+          {row.location || "N/A"}
+        </span>
+      ),
+    },
+    {
+      key: "actions",
+      label: "Acciones",
+      render: row => (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => navigate(`/eventos/${row.id}`)}
+        >
+          Ver
+        </Button>
+      ),
+    },
+  ];
+
   return (
     <div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 24,
-        }}
-      >
-        <h2>Eventos</h2>
-        <button
-          className="btn btn-primary"
-          onClick={() => navigate("/admin/eventos")}
-        >
-          Abrir gestor de eventos
-        </button>
+      <div className="flex justify-between align-center mb-5">
+        <div>
+          <h2 style={{ margin: 0, marginBottom: "4px" }}>Eventos</h2>
+          <p style={{ margin: 0, color: "var(--color-muted)" }}>
+            {events.length} {events.length === 1 ? "evento" : "eventos"} en
+            total
+          </p>
+        </div>
+        <Button variant="primary" onClick={() => navigate("/admin/eventos")}>
+          Gestor de eventos
+        </Button>
       </div>
 
-      {loading ? (
-        <p>Cargando...</p>
+      {events.length === 0 ? (
+        <Alert variant="info">No hay eventos registrados todavía.</Alert>
       ) : (
-        <>
-          <h3>Próximos</h3>
-          {upcoming.length === 0 ? (
-            <p style={{ color: "var(--color-muted)" }}>
-              No hay eventos próximos.
-            </p>
-          ) : (
-            <div className="cards">
-              {upcoming.map(e => (
-                <div key={e.id} className="card">
-                  <div
-                    style={{ display: "flex", justifyContent: "space-between" }}
-                  >
-                    <h4>{e.title}</h4>
-                    <EventFormatBadge format={e.format} />
-                  </div>
-                  <p style={{ color: "var(--color-muted)" }}>{e.description}</p>
-                  <p>
-                    <strong>Fecha:</strong>{" "}
-                    {e.start_date
-                      ? new Date(e.start_date).toLocaleDateString("es-ES")
-                      : "Por confirmar"}
-                  </p>
-                </div>
-              ))}
-            </div>
-          )}
-
-          <h3 style={{ marginTop: 24 }}>Últimos 5 pasados</h3>
-          {past.length === 0 ? (
-            <p style={{ color: "var(--color-muted)" }}>
-              No hay eventos pasados.
-            </p>
-          ) : (
-            <div className="cards">
-              {past.map(e => (
-                <div key={e.id} className="card">
-                  <div
-                    style={{ display: "flex", justifyContent: "space-between" }}
-                  >
-                    <h4>{e.title}</h4>
-                    <EventFormatBadge format={e.format} />
-                  </div>
-                  <p style={{ color: "var(--color-muted)" }}>{e.description}</p>
-                  <p>
-                    <strong>Fecha:</strong>{" "}
-                    {e.start_date
-                      ? new Date(e.start_date).toLocaleDateString("es-ES")
-                      : "Por confirmar"}
-                  </p>
-                </div>
-              ))}
-            </div>
-          )}
-        </>
+        <Table columns={columns} data={events} hoverable />
       )}
     </div>
   );
@@ -413,6 +461,7 @@ function UsersTab() {
   }
 
   const getMembershipTypeLabel = type => {
+    if (!type) return "N/A";
     const types = {
       joven: "Joven",
       normal: "Normal",
@@ -421,115 +470,122 @@ function UsersTab() {
     return types[type] || type;
   };
 
-  const getStatusColor = user => {
-    if (!user.is_active) return "crimson";
-    if (user.payment_status === "paid") return "green";
-    if (user.payment_status === "due") return "orange";
-    return "var(--color-muted)";
+  const getPaymentStatusVariant = status => {
+    if (status === "paid") return "success";
+    if (status === "due") return "warning";
+    return "neutral";
+  };
+
+  const getPaymentStatusLabel = status => {
+    if (!status || status === "none") return "Sin pago";
+    if (status === "paid") return "Pagado";
+    if (status === "due") return "Pendiente";
+    return status;
   };
 
   if (loading) {
     return (
-      <div style={{ textAlign: "center", padding: "48px 0" }}>
-        Cargando usuarios...
+      <div className="flex-center" style={{ minHeight: "300px" }}>
+        <Spinner size="lg" />
       </div>
     );
   }
 
+  const columns = [
+    {
+      key: "name",
+      label: "Usuario",
+      render: row => (
+        <div>
+          <div style={{ fontWeight: "600", marginBottom: "4px" }}>
+            {row.name}
+          </div>
+          <div style={{ fontSize: "0.875rem", color: "var(--color-muted)" }}>
+            {row.email}
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: "role",
+      label: "Rol",
+      render: row => (
+        <Badge variant={row.role === "admin" ? "primary" : "neutral"}>
+          {row.role === "admin" ? "Administrador" : "Miembro"}
+        </Badge>
+      ),
+    },
+    {
+      key: "membership_type",
+      label: "Membresía",
+      render: row => (
+        <span style={{ fontSize: "0.875rem" }}>
+          {getMembershipTypeLabel(row.membership_type)}
+        </span>
+      ),
+    },
+    {
+      key: "payment_status",
+      label: "Estado de Pago",
+      render: row => (
+        <Badge variant={getPaymentStatusVariant(row.payment_status)}>
+          {getPaymentStatusLabel(row.payment_status)}
+        </Badge>
+      ),
+    },
+    {
+      key: "is_active",
+      label: "Estado",
+      render: row => (
+        <Badge variant={row.is_active ? "success" : "error"}>
+          {row.is_active ? "Activo" : "Inactivo"}
+        </Badge>
+      ),
+    },
+    {
+      key: "actions",
+      label: "Acciones",
+      render: row => (
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate(`/admin/users/${row.id}`)}
+          >
+            Ver
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate(`/admin/users/${row.id}/edit`)}
+          >
+            Editar
+          </Button>
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 24,
-        }}
-      >
-        <h2>Usuarios ({users.length})</h2>
-        <button
-          className="btn btn-primary"
-          onClick={() => navigate("/admin/users/new")}
-        >
-          + Nuevo Usuario
-        </button>
+      <div className="flex justify-between align-center mb-5">
+        <div>
+          <h2 style={{ margin: 0, marginBottom: "4px" }}>Usuarios</h2>
+          <p style={{ margin: 0, color: "var(--color-muted)" }}>
+            {users.length} {users.length === 1 ? "usuario" : "usuarios"} en
+            total
+          </p>
+        </div>
+        <Button variant="primary" onClick={() => navigate("/admin/users/new")}>
+          + Crear Usuario
+        </Button>
       </div>
 
-      <div className="cards">
-        {users.map(user => (
-          <div key={user.id} className="card">
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "flex-start",
-                marginBottom: 12,
-              }}
-            >
-              <div>
-                <h4 style={{ marginBottom: 4 }}>{user.name}</h4>
-                <p style={{ color: "var(--color-muted)", marginBottom: 8 }}>
-                  {user.email}
-                </p>
-                <div style={{ display: "flex", gap: 12, fontSize: "0.9em" }}>
-                  <span
-                    style={{
-                      background: getStatusColor(user),
-                      color: "white",
-                      padding: "4px 8px",
-                      borderRadius: 12,
-                      fontSize: "0.8em",
-                    }}
-                  >
-                    {user.role === "admin"
-                      ? "Admin"
-                      : getMembershipTypeLabel(user.membership_type)}
-                  </span>
-                  <span
-                    style={{
-                      background: user.is_active ? "green" : "crimson",
-                      color: "white",
-                      padding: "4px 8px",
-                      borderRadius: 12,
-                      fontSize: "0.8em",
-                    }}
-                  >
-                    {user.is_active ? "Activo" : "Inactivo"}
-                  </span>
-                </div>
-              </div>
-              <div
-                style={{
-                  textAlign: "right",
-                  fontSize: "0.9em",
-                  color: "var(--color-muted)",
-                }}
-              >
-                <div>Pago: {user.payment_status}</div>
-                <div>
-                  {new Date(user.created_at).toLocaleDateString("es-ES")}
-                </div>
-              </div>
-            </div>
-            <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
-              <button
-                className="btn btn-outline"
-                onClick={() => navigate(`/admin/users/${user.id}`)}
-                style={{ fontSize: "0.9em", padding: "6px 12px" }}
-              >
-                Ver Detalles
-              </button>
-              <button
-                className="btn btn-outline"
-                onClick={() => navigate(`/admin/users/${user.id}/edit`)}
-                style={{ fontSize: "0.9em", padding: "6px 12px" }}
-              >
-                Editar
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
+      {users.length === 0 ? (
+        <Alert variant="info">No hay usuarios registrados todavía.</Alert>
+      ) : (
+        <Table columns={columns} data={users} hoverable />
+      )}
     </div>
   );
 }
@@ -554,18 +610,19 @@ function ApplicationsTab() {
     }
   }
 
-  const getStatusColor = status => {
-    const colors = {
-      pending: "var(--color-accent)",
-      approved: "var(--color-secondary)",
-      rejected: "crimson",
-      payment_pending: "orange",
-      paid: "green",
+  const getStatusVariant = status => {
+    const variants = {
+      pending: "warning",
+      approved: "info",
+      rejected: "error",
+      payment_pending: "warning",
+      paid: "success",
     };
-    return colors[status] || "var(--color-muted)";
+    return variants[status] || "neutral";
   };
 
   const getStatusLabel = status => {
+    if (!status) return "Sin estado";
     const labels = {
       pending: "Pendiente",
       approved: "Aprobada",
@@ -578,78 +635,96 @@ function ApplicationsTab() {
 
   if (loading) {
     return (
-      <div style={{ textAlign: "center", padding: "48px 0" }}>
-        Cargando postulaciones...
+      <div className="flex-center" style={{ minHeight: "300px" }}>
+        <Spinner size="lg" />
       </div>
     );
   }
 
+  const columns = [
+    {
+      key: "name",
+      label: "Solicitante",
+      render: row => (
+        <div>
+          <div style={{ fontWeight: "600", marginBottom: "4px" }}>
+            {row.name}
+          </div>
+          <div style={{ fontSize: "0.875rem", color: "var(--color-muted)" }}>
+            {row.email}
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: "specialization",
+      label: "Especialización",
+      render: row => (
+        <span style={{ fontSize: "0.875rem" }}>
+          {row.specialization || "No especificada"}
+        </span>
+      ),
+    },
+    {
+      key: "experience_years",
+      label: "Experiencia",
+      render: row => (
+        <span style={{ fontSize: "0.875rem" }}>
+          {row.experience_years ? `${row.experience_years} años` : "N/A"}
+        </span>
+      ),
+    },
+    {
+      key: "status",
+      label: "Estado",
+      render: row => (
+        <Badge variant={getStatusVariant(row.status)}>
+          {getStatusLabel(row.status)}
+        </Badge>
+      ),
+    },
+    {
+      key: "created_at",
+      label: "Fecha",
+      render: row => (
+        <span style={{ fontSize: "0.875rem", color: "var(--color-muted)" }}>
+          {formatDateHelper(row.created_at, "Sin fecha")}
+        </span>
+      ),
+    },
+    {
+      key: "actions",
+      label: "Acciones",
+      render: row => (
+        <Button
+          variant="primary"
+          size="sm"
+          onClick={() => navigate(`/admin/applications/${row.id}`)}
+        >
+          Ver Detalles
+        </Button>
+      ),
+    },
+  ];
+
   return (
     <div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 24,
-        }}
-      >
-        <h2>Postulaciones ({applications.length})</h2>
+      <div className="flex justify-between align-center mb-5">
+        <div>
+          <h2 style={{ margin: 0, marginBottom: "4px" }}>Postulaciones</h2>
+          <p style={{ margin: 0, color: "var(--color-muted)" }}>
+            {applications.length}{" "}
+            {applications.length === 1 ? "postulación" : "postulaciones"} en
+            total
+          </p>
+        </div>
       </div>
 
-      <div className="cards">
-        {applications.map(app => (
-          <div key={app.id} className="card">
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "flex-start",
-                marginBottom: 12,
-              }}
-            >
-              <div>
-                <h4 style={{ marginBottom: 4 }}>{app.name}</h4>
-                <p style={{ color: "var(--color-muted)", marginBottom: 8 }}>
-                  {app.email}
-                </p>
-                <p style={{ fontSize: "0.9em", marginBottom: 8 }}>
-                  {app.specialization} • {app.experience_years} años exp.
-                </p>
-              </div>
-              <div style={{ textAlign: "right" }}>
-                <div
-                  style={{
-                    background: getStatusColor(app.status),
-                    color: "white",
-                    padding: "6px 12px",
-                    borderRadius: 16,
-                    fontSize: "0.8em",
-                    fontWeight: "bold",
-                    marginBottom: 8,
-                  }}
-                >
-                  {getStatusLabel(app.status)}
-                </div>
-                <div style={{ fontSize: "0.9em", color: "var(--color-muted)" }}>
-                  {new Date(app.created_at).toLocaleDateString("es-ES")}
-                </div>
-              </div>
-            </div>
-            <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
-              <button
-                className="btn btn-primary"
-                onClick={() => {
-                  navigate(`/admin/applications/${app.id}`);
-                }}
-                style={{ fontSize: "0.9em", padding: "6px 12px" }}
-              >
-                Ver Completa
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
+      {applications.length === 0 ? (
+        <Alert variant="info">No hay postulaciones registradas todavía.</Alert>
+      ) : (
+        <Table columns={columns} data={applications} hoverable />
+      )}
     </div>
   );
 }
@@ -659,6 +734,7 @@ function NewsTab() {
   const toast = useToast();
   const [news, setNews] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   useEffect(() => {
     loadNews();
@@ -686,6 +762,8 @@ function NewsTab() {
   };
 
   const getStatusLabel = status => {
+    if (!status) return "Sin estado";
+
     const labels = {
       published: "Publicada",
       pending: "Pendiente",
@@ -694,67 +772,142 @@ function NewsTab() {
     return labels[status] || status;
   };
 
+  const getCategoryLabel = category => {
+    if (!category) return "Sin categoría";
+
+    const labels = {
+      comunicados: "Comunicado",
+      prensa: "Prensa",
+      blog: "Blog",
+    };
+    return labels[category] || category;
+  };
+
+  const handleCreateSuccess = () => {
+    setShowCreateModal(false);
+    loadNews();
+  };
+
   if (loading) {
     return (
       <div className="flex-center" style={{ minHeight: "300px" }}>
-        <Spinner size="large" />
+        <Spinner size="lg" />
       </div>
     );
   }
 
+  const columns = [
+    {
+      key: "title",
+      label: "Título",
+      render: row => {
+        let excerpt = "Sin resumen";
+        if (row.excerpt) {
+          excerpt =
+            row.excerpt.length > 80
+              ? row.excerpt.substring(0, 80) + "..."
+              : row.excerpt;
+        }
+
+        return (
+          <div>
+            <div style={{ fontWeight: "600", marginBottom: "4px" }}>
+              {row.title}
+            </div>
+            <div style={{ fontSize: "0.875rem", color: "var(--color-muted)" }}>
+              {excerpt}
+            </div>
+          </div>
+        );
+      },
+    },
+    {
+      key: "category",
+      label: "Categoría",
+      render: row => (
+        <Badge variant="neutral">{getCategoryLabel(row.category)}</Badge>
+      ),
+    },
+    {
+      key: "status",
+      label: "Estado",
+      render: row => (
+        <Badge variant={getStatusVariant(row.status)}>
+          {getStatusLabel(row.status)}
+        </Badge>
+      ),
+    },
+    {
+      key: "order_index",
+      label: "Orden",
+      render: row => (
+        <span style={{ fontSize: "0.875rem" }}>{row.order_index}</span>
+      ),
+    },
+    {
+      key: "created_at",
+      label: "Fecha",
+      render: row => (
+        <span style={{ fontSize: "0.875rem", color: "var(--color-muted)" }}>
+          {formatDateHelper(row.created_at, "Sin fecha")}
+        </span>
+      ),
+    },
+    {
+      key: "actions",
+      label: "Acciones",
+      render: row => (
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate(`/noticias/${row.id}`)}
+          >
+            Ver
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate(`/admin/news/${row.id}/edit`)}
+          >
+            Editar
+          </Button>
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div>
-      <div className="flex-between mb-4">
-        <h2>Noticias ({news.length})</h2>
+      <div className="flex justify-between align-center mb-5">
+        <div>
+          <h2 style={{ margin: 0, marginBottom: "4px" }}>Noticias</h2>
+          <p style={{ margin: 0, color: "var(--color-muted)" }}>
+            {news.length} {news.length === 1 ? "noticia" : "noticias"} en total
+          </p>
+        </div>
+        <Button variant="primary" onClick={() => setShowCreateModal(true)}>
+          + Crear noticia
+        </Button>
       </div>
 
-      <SimpleNewsForm onSuccess={loadNews} />
-
       {news.length === 0 ? (
-        <Alert variant="info">No hay noticias creadas todavía.</Alert>
+        <Alert variant="info">
+          No hay noticias creadas todavía. Haz clic en "Crear noticia" para
+          empezar.
+        </Alert>
       ) : (
-        <div className="grid gap-4">
-          {news.map(article => (
-            <Card key={article.id}>
-              <div className="flex-between mb-3">
-                <div className="flex-1">
-                  <h4 className="mb-1">{article.title}</h4>
-                  <p className="text-muted mb-2">
-                    {article.excerpt || "Sin resumen"}
-                  </p>
-                </div>
-                <div className="text-right ml-4">
-                  <Badge
-                    variant={getStatusVariant(article.status)}
-                    className="mb-2"
-                  >
-                    {getStatusLabel(article.status)}
-                  </Badge>
-                  <div className="text-sm text-muted">
-                    Orden: {article.order_index}
-                  </div>
-                </div>
-              </div>
-              <div className="flex-start gap-2">
-                <Button
-                  variant="outline"
-                  size="small"
-                  onClick={() => navigate(`/admin/news/${article.id}/view`)}
-                >
-                  Ver
-                </Button>
-                <Button
-                  variant="outline"
-                  size="small"
-                  onClick={() => navigate(`/admin/news/${article.id}/edit`)}
-                >
-                  Editar
-                </Button>
-              </div>
-            </Card>
-          ))}
-        </div>
+        <Table columns={columns} data={news} hoverable />
       )}
+
+      <Modal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        title="Crear nueva noticia"
+        size="lg"
+      >
+        <SimpleNewsForm onSuccess={handleCreateSuccess} />
+      </Modal>
     </div>
   );
 }
@@ -809,63 +962,60 @@ function SimpleNewsForm({ onSuccess }) {
   }
 
   return (
-    <Card className="mb-6">
-      <h3 className="mb-4">Crear noticia rápida</h3>
-      <form onSubmit={submit}>
-        <div className="grid grid-2 gap-4 mb-4">
-          <Input
-            label="Título"
-            placeholder="Título de la noticia"
-            value={title}
-            onChange={e => setTitle(e.target.value)}
-          />
-          <Select
-            label="Categoría"
-            value={category}
-            onChange={e => setCategory(e.target.value)}
-          >
-            <option value="comunicados">Comunicados</option>
-            <option value="prensa">Prensa</option>
-            <option value="blog">Blog</option>
-          </Select>
-          <Input
-            label="Resumen"
-            placeholder="Resumen breve"
-            value={excerpt}
-            onChange={e => setExcerpt(e.target.value)}
-          />
-          <div>
-            <label
-              htmlFor="news-image-quick"
-              className="block mb-2 font-medium"
-            >
-              Imagen
-            </label>
-            <input
-              id="news-image-quick"
-              name="image"
-              type="file"
-              accept="image/*"
-              className="input"
-            />
-          </div>
-        </div>
-        <div className="mb-4">
-          <Textarea
-            label="Contenido"
-            placeholder="Contenido de la noticia"
-            value={content}
-            onChange={e => setContent(e.target.value)}
-            rows={4}
-          />
-        </div>
-        <div className="flex-end">
-          <Button type="submit" variant="primary" disabled={loading}>
-            {loading ? "Creando..." : "Crear noticia"}
-          </Button>
-        </div>
-      </form>
-    </Card>
+    <form onSubmit={submit}>
+      <div className="grid grid-2 gap-4 mb-4">
+        <Input
+          label="Título"
+          placeholder="Título de la noticia"
+          value={title}
+          onChange={e => setTitle(e.target.value)}
+          required
+        />
+        <Select
+          label="Categoría"
+          value={category}
+          onChange={e => setCategory(e.target.value)}
+        >
+          <option value="comunicados">Comunicados</option>
+          <option value="prensa">Prensa</option>
+          <option value="blog">Blog</option>
+        </Select>
+      </div>
+      <div className="mb-4">
+        <Input
+          label="Resumen"
+          placeholder="Resumen breve de la noticia"
+          value={excerpt}
+          onChange={e => setExcerpt(e.target.value)}
+        />
+      </div>
+      <div className="mb-4">
+        <Textarea
+          label="Contenido"
+          placeholder="Contenido completo de la noticia"
+          value={content}
+          onChange={e => setContent(e.target.value)}
+          rows={6}
+        />
+      </div>
+      <div className="mb-4">
+        <label htmlFor="news-image-quick" className="block mb-2 font-medium">
+          Imagen (opcional)
+        </label>
+        <input
+          id="news-image-quick"
+          name="image"
+          type="file"
+          accept="image/*"
+          className="input"
+        />
+      </div>
+      <div className="flex justify-end gap-2">
+        <Button type="submit" variant="primary" disabled={loading}>
+          {loading ? "Creando..." : "Crear noticia"}
+        </Button>
+      </div>
+    </form>
   );
 }
 

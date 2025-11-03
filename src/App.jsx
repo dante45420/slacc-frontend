@@ -35,7 +35,6 @@ import WhyJoin from "./pages/members/WhyJoin.jsx";
 // Admin pages
 import AdminPortal from "./pages/admin/AdminPortal.jsx";
 import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
-import AdminNewsView from "./pages/admin/AdminNewsView.jsx";
 import AdminEvents from "./pages/admin/AdminEvents.jsx";
 import AdminUserView from "./pages/admin/AdminUserView.jsx";
 import AdminUserEdit from "./pages/admin/AdminUserEdit.jsx";
@@ -71,7 +70,7 @@ export default function App() {
           <Route path="/noticias/blog" element={<NewsPage />} />
           <Route path="/noticias/:id" element={<NewsDetail />} />
           <Route path="/admin/news/:id/edit" element={<EditNews />} />
-          <Route path="/admin/news/:id/view" element={<AdminNewsView />} />
+          <Route path="/admin/news/:id/view" element={<NewsDetail />} />
           <Route path="/cursos" element={<CoursesPage />} />
           <Route path="/cursos/:id" element={<CourseDetail />} />
           <Route path="/eventos/proximos" element={<EventsPage />} />
@@ -147,7 +146,7 @@ export default function App() {
           <Route path="/admin/users/:id/edit" element={<AdminUserEdit />} />
           <Route path="/admin/news/new" element={<NewsEditor />} />
           <Route path="/admin/news/:id/edit" element={<NewsEditor />} />
-          <Route path="/admin/news/:id/view" element={<AdminNewsView />} />
+          <Route path="/admin/news/:id/view" element={<NewsDetail />} />
           <Route path="*" element={<Placeholder title="Página" />} />
         </Routes>
       </ToastProvider>

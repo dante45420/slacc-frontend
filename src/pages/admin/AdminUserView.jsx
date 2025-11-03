@@ -91,7 +91,7 @@ export default function AdminUserView() {
       <Container size="sm">
         <div className="flex items-center justify-between mb-5">
           <h1 className="mt-0 mb-0">Detalles del Usuario</h1>
-          <Badge variant={roleVariant} size="lg">
+          <Badge variant={roleVariant} size="md">
             {user.role === 'admin' ? 'Administrador' : 'Miembro'}
           </Badge>
         </div>

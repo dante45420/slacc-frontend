@@ -42,7 +42,7 @@ export default function AdminUserNew() {
   return (
     <section className="section">
       <div className="container">
-        <h2>Nuevo Usuario (Miembro)</h2>
+        <h2>Crear Usuario (Miembro)</h2>
         {error && <p style={{ color: "crimson" }}>{error}</p>}
         <div className="card" style={{ padding: 16, maxWidth: 600 }}>
           <label htmlFor="new-user-email">Email</label>

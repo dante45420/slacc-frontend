@@ -136,9 +136,10 @@ export default function AdminPortal() {
                     }}
                   />
                   <a
-                    href={`/admin/news/${n.id}/view`}
+                    href={`/noticias/${n.id}`}
                     className="btn btn-outline"
                     target="_blank"
+                    rel="noopener noreferrer"
                   >
                     Ver completa
                   </a>
@@ -219,6 +220,7 @@ export default function AdminPortal() {
                     href={`/noticias/${n.id}`}
                     className="btn btn-outline"
                     target="_blank"
+                    rel="noopener noreferrer"
                   >
                     Ver completa
                   </a>
@@ -251,9 +253,10 @@ export default function AdminPortal() {
                     }}
                   />
                   <a
-                    href={`/admin/news/${n.id}/view`}
+                    href={`/noticias/${n.id}`}
                     className="btn btn-outline"
                     target="_blank"
+                    rel="noopener noreferrer"
                   >
                     Ver completa
                   </a>

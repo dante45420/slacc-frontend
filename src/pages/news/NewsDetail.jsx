@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
+import { Section, Container, Button, Badge, Card, Grid, Spinner } from "../../components/ui";
 
 const BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
@@ -27,6 +28,44 @@ function getStatusLabel(status) {
   if (status === "published") return "Publicada";
   if (status === "pending") return "Pendiente";
   return "Rechazada";
+}
+
+function getCategoryBadgeVariant(category) {
+  if (category === "comunicados") return "primary";
+  if (category === "prensa") return "info";
+  return "accent";
+}
+
+function getCategoryLabel(category) {
+  if (category === "comunicados") return "Comunicado";
+  if (category === "prensa") return "Prensa";
+  return "Blog";
+}
+
+function getStatusBadgeVariant(status) {
+  if (status === "published") return "success";
+  if (status === "pending") return "warning";
+  return "error";
+}
+
+function formatDate(dateString) {
+  if (!dateString) return "Fecha no disponible";
+  
+  try {
+    const date = new Date(dateString);
+    if (Number.isNaN(date.getTime())) {
+      return "Fecha no disponible";
+    }
+    
+    return date.toLocaleDateString("es-ES", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  } catch (error) {
+    console.error("Error formatting date:", error);
+    return "Fecha no disponible";
+  }
 }
 
 export default function NewsDetail() {
@@ -118,246 +157,263 @@ export default function NewsDetail() {
 
   if (loading) {
     return (
-      <section className="section">
-        <div className="container">
-          <p>Cargando noticia...</p>
-        </div>
-      </section>
+      <Section variant="default" padding="lg">
+        <Container size="default">
+          <div style={{ textAlign: "center", padding: "var(--spacing-8)" }}>
+            <Spinner size="lg" />
+            <p style={{ marginTop: "var(--spacing-4)", color: "var(--color-muted)" }}>
+              Cargando noticia...
+            </p>
+          </div>
+        </Container>
+      </Section>
     );
   }
 
   if (error) {
     return (
-      <section className="section">
-        <div className="container">
-          <h2>Error</h2>
-          <p>{error}</p>
-          <button
-            className="btn btn-outline"
-            onClick={() => globalThis.location.reload()}
-          >
-            Reintentar
-          </button>
-        </div>
-      </section>
+      <Section variant="default" padding="lg">
+        <Container size="default">
+          <Card>
+            <h2 style={{ color: "var(--color-error)" }}>Error</h2>
+            <p style={{ marginBottom: "var(--spacing-4)" }}>{error}</p>
+            <Button
+              variant="outline"
+              onClick={() => globalThis.location.reload()}
+            >
+              Reintentar
+            </Button>
+          </Card>
+        </Container>
+      </Section>
     );
   }
 
   if (!news) {
     return (
-      <section className="section">
-        <div className="container">
-          <h2>Noticia no encontrada</h2>
-        </div>
-      </section>
+      <Section variant="default" padding="lg">
+        <Container size="default">
+          <Card>
+            <h2>Noticia no encontrada</h2>
+            <p style={{ marginBottom: "var(--spacing-4)" }}>
+              La noticia que buscas no existe o ha sido eliminada.
+            </p>
+            <Link to="/noticias">
+              <Button variant="primary">Volver a noticias</Button>
+            </Link>
+          </Card>
+        </Container>
+      </Section>
     );
   }
 
   return (
-    <section className="section">
-      <div className="container">
-        <article className="news-detail">
-          {/* Header con título y estado */}
-          <header className="news-header">
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "flex-start",
-                marginBottom: "var(--spacing-lg)",
-              }}
-            >
-              <div>
-                <h1 className="news-title">{news.title}</h1>
-                <div className="news-meta">
-                  <span
-                    className="news-status"
-                    style={{
-                      padding: "4px 12px",
-                      borderRadius: "var(--radius)",
-                      fontSize: "var(--font-size-sm)",
-                      backgroundColor: getStatusColor(news.status),
-                      color: "white",
-                    }}
+    <Section variant="default" padding="lg">
+      <Container size="lg">
+        <article style={{ maxWidth: "900px", margin: "0 auto" }}>
+          {/* Header */}
+          <header style={{ marginBottom: "var(--spacing-6)" }}>
+            <div className="flex justify-between align-start gap-4 mb-5" style={{ flexWrap: "wrap" }}>
+              <div style={{ flex: "1 1 auto" }}>
+                {/* Category Badge */}
+                {news.category && (
+                  <Badge 
+                    variant={getCategoryBadgeVariant(news.category)}
+                    style={{ marginBottom: "var(--spacing-3)" }}
                   >
+                    {getCategoryLabel(news.category)}
+                  </Badge>
+                )}
+                
+                {/* Title */}
+                <h1 style={{ 
+                  fontSize: "2.5rem", 
+                  lineHeight: "1.2",
+                  marginBottom: "var(--spacing-3)",
+                  color: "var(--color-text)"
+                }}>
+                  {news.title}
+                </h1>
+                
+                {/* Meta information */}
+                <div className="flex align-center gap-3" style={{ flexWrap: "wrap" }}>
+                  <Badge variant={getStatusBadgeVariant(news.status)}>
                     {getStatusLabel(news.status)}
-                  </span>
-                  <time
+                  </Badge>
+                  <time 
                     dateTime={news.created_at}
-                    style={{
-                      marginLeft: "var(--spacing)",
-                      color: "var(--color-text-light)",
-                    }}
+                    style={{ color: "var(--color-muted)", fontSize: "0.95rem" }}
                   >
-                    {new Date(news.created_at).toLocaleDateString("es-ES", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
+                    {formatDate(news.created_at)}
                   </time>
                 </div>
               </div>
 
-              {/* Botones de admin */}
+              {/* Admin actions */}
               {user?.role === "admin" && (
-                <div style={{ display: "flex", gap: "var(--spacing-sm)" }}>
+                <div className="flex gap-2" style={{ flexShrink: 0 }}>
                   {news.status === "pending" && (
                     <>
-                      <button className="btn btn-primary" onClick={approveNews}>
+                      <Button variant="primary" size="sm" onClick={approveNews}>
                         Aprobar
-                      </button>
-                      <button className="btn btn-outline" onClick={rejectNews}>
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={rejectNews}>
                         Rechazar
-                      </button>
+                      </Button>
                     </>
                   )}
                   {news.status === "published" && (
-                    <button
-                      className="btn btn-outline"
+                    <Button
+                      variant="outline"
+                      size="sm"
                       onClick={() => navigate(`/admin/news/${news.id}/edit`)}
                     >
                       Editar
-                    </button>
+                    </Button>
                   )}
                 </div>
               )}
             </div>
           </header>
 
-          {/* Imagen de la noticia */}
+          {/* Featured image */}
           {news.image_url && (
-            <div
-              className="news-image"
-              style={{ marginBottom: "var(--spacing-xl)" }}
-            >
+            <div style={{ 
+              marginBottom: "var(--spacing-7)",
+              borderRadius: "var(--radius-lg)",
+              overflow: "hidden",
+              boxShadow: "var(--shadow-md)"
+            }}>
               <img
                 src={getImageUrl(news.image_url)}
                 alt={news.title}
                 style={{
                   width: "100%",
-                  maxHeight: "400px",
+                  maxHeight: "500px",
                   objectFit: "cover",
-                  borderRadius: "var(--radius)",
+                  display: "block"
                 }}
               />
             </div>
           )}
 
-          {/* Contenido de la noticia */}
-          <div className="news-content">
-            {/* Resumen */}
-            {news.excerpt && (
-              <div
-                className="news-excerpt"
-                style={{
-                  marginBottom: "var(--spacing-xl)",
-                  padding: "var(--spacing-lg)",
-                  backgroundColor: "var(--color-bg-light)",
-                  borderRadius: "var(--radius)",
-                  borderLeft: "4px solid var(--color-primary)",
-                }}
-              >
-                <h3
-                  style={{
-                    marginBottom: "var(--spacing-sm)",
-                    color: "var(--color-primary)",
-                  }}
-                >
-                  Resumen
-                </h3>
-                <p
-                  style={{
-                    fontSize: "var(--font-size-lg)",
-                    lineHeight: 1.6,
-                    margin: 0,
-                  }}
-                >
-                  {news.excerpt}
-                </p>
-              </div>
-            )}
+          {/* Excerpt */}
+          {news.excerpt && (
+            <div style={{
+              marginBottom: "var(--spacing-7)",
+              padding: "var(--spacing-5)",
+              background: "var(--color-bg-alt)",
+              borderLeft: "4px solid var(--color-primary)",
+              borderRadius: "var(--radius-base)",
+            }}>
+              <p style={{
+                fontSize: "1.25rem",
+                lineHeight: "1.7",
+                margin: 0,
+                color: "var(--color-text)",
+                fontWeight: "500"
+              }}>
+                {news.excerpt}
+              </p>
+            </div>
+          )}
 
-            {/* Contenido completo */}
-            <div className="news-body">
-              <h3 style={{ marginBottom: "var(--spacing-lg)" }}>
-                Contenido completo
-              </h3>
-              {news.content ? (
-                <div
-                  dangerouslySetInnerHTML={{ __html: news.content }}
-                  style={{ lineHeight: 1.8, fontSize: "var(--font-size-base)" }}
-                />
-              ) : (
-                <p>Contenido de la noticia no disponible.</p>
+          {/* Content */}
+          <div 
+            className="news-content-body"
+            style={{
+              fontSize: "1.1rem",
+              lineHeight: "1.8",
+              color: "var(--color-text)",
+              marginBottom: "var(--spacing-7)"
+            }}
+          >
+            {news.content ? (
+              <div dangerouslySetInnerHTML={{ __html: news.content }} />
+            ) : (
+              <p style={{ color: "var(--color-muted)" }}>
+                Contenido de la noticia no disponible.
+              </p>
+            )}
+          </div>
+
+          {/* Navigation */}
+          <div className="flex justify-between gap-4 mb-7" style={{ 
+            paddingTop: "var(--spacing-6)",
+            borderTop: "1px solid var(--color-border)",
+            flexWrap: "wrap"
+          }}>
+            <div>
+              {prevNext.prev && (
+                <Link to={`/noticias/${prevNext.prev.id}`}>
+                  <Button variant="outline" size="sm">
+                    ← {prevNext.prev.title.length > 30 
+                      ? prevNext.prev.title.substring(0, 30) + "..." 
+                      : prevNext.prev.title}
+                  </Button>
+                </Link>
+              )}
+            </div>
+            <div>
+              {prevNext.next && (
+                <Link to={`/noticias/${prevNext.next.id}`}>
+                  <Button variant="outline" size="sm">
+                    {prevNext.next.title.length > 30 
+                      ? prevNext.next.title.substring(0, 30) + "..." 
+                      : prevNext.next.title} →
+                  </Button>
+                </Link>
               )}
             </div>
           </div>
-        </article>
-        {/* Navegación anterior / siguiente */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            marginTop: "var(--spacing-xl)",
-          }}
-        >
-          <div>
-            {prevNext.prev && (
-              <Link
-                to={`/noticias/${prevNext.prev.id}`}
-                className="btn btn-outline"
-              >
-                ← {prevNext.prev.title}
-              </Link>
-            )}
-          </div>
-          <div>
-            {prevNext.next && (
-              <Link
-                to={`/noticias/${prevNext.next.id}`}
-                className="btn btn-outline"
-              >
-                {prevNext.next.title} →
-              </Link>
-            )}
-          </div>
-        </div>
 
-        {/* Más noticias */}
-        {more.length > 0 && (
-          <div style={{ marginTop: "var(--spacing-xl)" }}>
-            <h3 style={{ marginBottom: 12 }}>Más noticias</h3>
-            <div className="cards">
-              {more.map(n => (
-                <div key={n.id} className="card">
-                  {n.image_url && (
-                    <img
-                      src={
-                        n.image_url.startsWith("http")
-                          ? n.image_url
-                          : `${BASE_URL.replace("/api", "")}${n.image_url}`
-                      }
-                      alt={n.title}
-                      style={{
-                        width: "100%",
-                        height: 160,
-                        objectFit: "cover",
-                        borderRadius: 8,
-                        marginBottom: 8,
-                      }}
-                    />
-                  )}
-                  <h4 style={{ margin: 0 }}>{n.title}</h4>
-                  <p style={{ color: "var(--color-muted)" }}>{n.excerpt}</p>
-                  <Link to={`/noticias/${n.id}`} className="btn btn-outline">
-                    Leer más
-                  </Link>
-                </div>
-              ))}
+          {/* Related news */}
+          {more.length > 0 && (
+            <div style={{ 
+              paddingTop: "var(--spacing-6)",
+              borderTop: "1px solid var(--color-border)"
+            }}>
+              <h2 style={{ 
+                marginBottom: "var(--spacing-5)",
+                fontSize: "1.75rem"
+              }}>
+                Más noticias
+              </h2>
+              <Grid cols={3} gap="4">
+                {more.map(n => (
+                  <Card
+                    key={n.id}
+                    image={getImageUrl(n.image_url)}
+                    imageAlt={n.title}
+                    hoverable
+                  >
+                    <h4 style={{ 
+                      marginBottom: "var(--spacing-2)",
+                      fontSize: "1.1rem",
+                      lineHeight: "1.4"
+                    }}>
+                      {n.title}
+                    </h4>
+                    <p style={{ 
+                      color: "var(--color-muted)",
+                      marginBottom: "var(--spacing-3)",
+                      fontSize: "0.95rem",
+                      lineHeight: "1.6"
+                    }}>
+                      {n.excerpt}
+                    </p>
+                    <Link to={`/noticias/${n.id}`}>
+                      <Button variant="outline" size="sm">
+                        Leer más →
+                      </Button>
+                    </Link>
+                  </Card>
+                ))}
+              </Grid>
             </div>
-          </div>
-        )}
-      </div>
-    </section>
+          )}
+        </article>
+      </Container>
+    </Section>
   );
 }

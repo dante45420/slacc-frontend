@@ -1,7 +1,15 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
-import { Section, Container, Button, Badge, Card, Grid, Spinner } from "../../components/ui";
+import {
+  Section,
+  Container,
+  Button,
+  Badge,
+  Card,
+  Grid,
+  Spinner,
+} from "../../components/ui";
 
 const BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
@@ -50,13 +58,13 @@ function getStatusBadgeVariant(status) {
 
 function formatDate(dateString) {
   if (!dateString) return "Fecha no disponible";
-  
+
   try {
     const date = new Date(dateString);
     if (Number.isNaN(date.getTime())) {
       return "Fecha no disponible";
     }
-    
+
     return date.toLocaleDateString("es-ES", {
       year: "numeric",
       month: "long",
@@ -161,7 +169,12 @@ export default function NewsDetail() {
         <Container size="default">
           <div style={{ textAlign: "center", padding: "var(--spacing-8)" }}>
             <Spinner size="lg" />
-            <p style={{ marginTop: "var(--spacing-4)", color: "var(--color-muted)" }}>
+            <p
+              style={{
+                marginTop: "var(--spacing-4)",
+                color: "var(--color-muted)",
+              }}
+            >
               Cargando noticia...
             </p>
           </div>
@@ -213,34 +226,42 @@ export default function NewsDetail() {
         <article style={{ maxWidth: "900px", margin: "0 auto" }}>
           {/* Header */}
           <header style={{ marginBottom: "var(--spacing-6)" }}>
-            <div className="flex justify-between align-start gap-4 mb-5" style={{ flexWrap: "wrap" }}>
+            <div
+              className="flex justify-between align-start gap-4 mb-5"
+              style={{ flexWrap: "wrap" }}
+            >
               <div style={{ flex: "1 1 auto" }}>
                 {/* Category Badge */}
                 {news.category && (
-                  <Badge 
+                  <Badge
                     variant={getCategoryBadgeVariant(news.category)}
                     style={{ marginBottom: "var(--spacing-3)" }}
                   >
                     {getCategoryLabel(news.category)}
                   </Badge>
                 )}
-                
+
                 {/* Title */}
-                <h1 style={{ 
-                  fontSize: "2.5rem", 
-                  lineHeight: "1.2",
-                  marginBottom: "var(--spacing-3)",
-                  color: "var(--color-text)"
-                }}>
+                <h1
+                  style={{
+                    fontSize: "2.5rem",
+                    lineHeight: "1.2",
+                    marginBottom: "var(--spacing-3)",
+                    color: "var(--color-text)",
+                  }}
+                >
                   {news.title}
                 </h1>
-                
+
                 {/* Meta information */}
-                <div className="flex align-center gap-3" style={{ flexWrap: "wrap" }}>
+                <div
+                  className="flex align-center gap-3"
+                  style={{ flexWrap: "wrap" }}
+                >
                   <Badge variant={getStatusBadgeVariant(news.status)}>
                     {getStatusLabel(news.status)}
                   </Badge>
-                  <time 
+                  <time
                     dateTime={news.created_at}
                     style={{ color: "var(--color-muted)", fontSize: "0.95rem" }}
                   >
@@ -278,12 +299,14 @@ export default function NewsDetail() {
 
           {/* Featured image */}
           {news.image_url && (
-            <div style={{ 
-              marginBottom: "var(--spacing-7)",
-              borderRadius: "var(--radius-lg)",
-              overflow: "hidden",
-              boxShadow: "var(--shadow-md)"
-            }}>
+            <div
+              style={{
+                marginBottom: "var(--spacing-7)",
+                borderRadius: "var(--radius-lg)",
+                overflow: "hidden",
+                boxShadow: "var(--shadow-md)",
+              }}
+            >
               <img
                 src={getImageUrl(news.image_url)}
                 alt={news.title}
@@ -291,7 +314,7 @@ export default function NewsDetail() {
                   width: "100%",
                   maxHeight: "500px",
                   objectFit: "cover",
-                  display: "block"
+                  display: "block",
                 }}
               />
             </div>
@@ -299,33 +322,37 @@ export default function NewsDetail() {
 
           {/* Excerpt */}
           {news.excerpt && (
-            <div style={{
-              marginBottom: "var(--spacing-7)",
-              padding: "var(--spacing-5)",
-              background: "var(--color-bg-alt)",
-              borderLeft: "4px solid var(--color-primary)",
-              borderRadius: "var(--radius-base)",
-            }}>
-              <p style={{
-                fontSize: "1.25rem",
-                lineHeight: "1.7",
-                margin: 0,
-                color: "var(--color-text)",
-                fontWeight: "500"
-              }}>
+            <div
+              style={{
+                marginBottom: "var(--spacing-7)",
+                padding: "var(--spacing-5)",
+                background: "var(--color-bg-alt)",
+                borderLeft: "4px solid var(--color-primary)",
+                borderRadius: "var(--radius-base)",
+              }}
+            >
+              <p
+                style={{
+                  fontSize: "1.25rem",
+                  lineHeight: "1.7",
+                  margin: 0,
+                  color: "var(--color-text)",
+                  fontWeight: "500",
+                }}
+              >
                 {news.excerpt}
               </p>
             </div>
           )}
 
           {/* Content */}
-          <div 
+          <div
             className="news-content-body"
             style={{
               fontSize: "1.1rem",
               lineHeight: "1.8",
               color: "var(--color-text)",
-              marginBottom: "var(--spacing-7)"
+              marginBottom: "var(--spacing-7)",
             }}
           >
             {news.content ? (
@@ -338,17 +365,21 @@ export default function NewsDetail() {
           </div>
 
           {/* Navigation */}
-          <div className="flex justify-between gap-4 mb-7" style={{ 
-            paddingTop: "var(--spacing-6)",
-            borderTop: "1px solid var(--color-border)",
-            flexWrap: "wrap"
-          }}>
+          <div
+            className="flex justify-between gap-4 mb-7"
+            style={{
+              paddingTop: "var(--spacing-6)",
+              borderTop: "1px solid var(--color-border)",
+              flexWrap: "wrap",
+            }}
+          >
             <div>
               {prevNext.prev && (
                 <Link to={`/noticias/${prevNext.prev.id}`}>
                   <Button variant="outline" size="sm">
-                    ← {prevNext.prev.title.length > 30 
-                      ? prevNext.prev.title.substring(0, 30) + "..." 
+                    ←{" "}
+                    {prevNext.prev.title.length > 30
+                      ? prevNext.prev.title.substring(0, 30) + "..."
                       : prevNext.prev.title}
                   </Button>
                 </Link>
@@ -358,9 +389,10 @@ export default function NewsDetail() {
               {prevNext.next && (
                 <Link to={`/noticias/${prevNext.next.id}`}>
                   <Button variant="outline" size="sm">
-                    {prevNext.next.title.length > 30 
-                      ? prevNext.next.title.substring(0, 30) + "..." 
-                      : prevNext.next.title} →
+                    {prevNext.next.title.length > 30
+                      ? prevNext.next.title.substring(0, 30) + "..."
+                      : prevNext.next.title}{" "}
+                    →
                   </Button>
                 </Link>
               )}
@@ -369,14 +401,18 @@ export default function NewsDetail() {
 
           {/* Related news */}
           {more.length > 0 && (
-            <div style={{ 
-              paddingTop: "var(--spacing-6)",
-              borderTop: "1px solid var(--color-border)"
-            }}>
-              <h2 style={{ 
-                marginBottom: "var(--spacing-5)",
-                fontSize: "1.75rem"
-              }}>
+            <div
+              style={{
+                paddingTop: "var(--spacing-6)",
+                borderTop: "1px solid var(--color-border)",
+              }}
+            >
+              <h2
+                style={{
+                  marginBottom: "var(--spacing-5)",
+                  fontSize: "1.75rem",
+                }}
+              >
                 Más noticias
               </h2>
               <Grid cols={3} gap="4">
@@ -387,19 +423,23 @@ export default function NewsDetail() {
                     imageAlt={n.title}
                     hoverable
                   >
-                    <h4 style={{ 
-                      marginBottom: "var(--spacing-2)",
-                      fontSize: "1.1rem",
-                      lineHeight: "1.4"
-                    }}>
+                    <h4
+                      style={{
+                        marginBottom: "var(--spacing-2)",
+                        fontSize: "1.1rem",
+                        lineHeight: "1.4",
+                      }}
+                    >
                       {n.title}
                     </h4>
-                    <p style={{ 
-                      color: "var(--color-muted)",
-                      marginBottom: "var(--spacing-3)",
-                      fontSize: "0.95rem",
-                      lineHeight: "1.6"
-                    }}>
+                    <p
+                      style={{
+                        color: "var(--color-muted)",
+                        marginBottom: "var(--spacing-3)",
+                        fontSize: "0.95rem",
+                        lineHeight: "1.6",
+                      }}
+                    >
                       {n.excerpt}
                     </p>
                     <Link to={`/noticias/${n.id}`}>

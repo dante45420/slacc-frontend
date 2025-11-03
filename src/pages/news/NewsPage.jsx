@@ -20,7 +20,7 @@ export default function NewsPage() {
     { id: "blog", label: "Blog" },
   ];
 
-  const handleTabChange = (tabId) => {
+  const handleTabChange = tabId => {
     setActive(tabId);
     navigate(`/noticias/${tabId}`);
   };
@@ -28,19 +28,17 @@ export default function NewsPage() {
   return (
     <Section variant="default" padding="lg">
       <Container size="lg">
-        <h1 style={{ 
-          marginBottom: "var(--spacing-6)",
-          fontSize: "2.5rem",
-          textAlign: "center"
-        }}>
+        <h1
+          style={{
+            marginBottom: "var(--spacing-6)",
+            fontSize: "2.5rem",
+            textAlign: "center",
+          }}
+        >
           Noticias
         </h1>
 
-        <Tabs
-          tabs={tabs}
-          activeTab={active}
-          onChange={handleTabChange}
-        />
+        <Tabs tabs={tabs} activeTab={active} onChange={handleTabChange} />
 
         <div style={{ marginTop: "var(--spacing-6)" }}>
           <NewsGrid category={active} />
@@ -49,4 +47,3 @@ export default function NewsPage() {
     </Section>
   );
 }
-

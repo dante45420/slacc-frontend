@@ -10,12 +10,11 @@ export default function Card({
   footer,
   hoverable = false,
   onClick,
-  style,
   className = "",
   ...props
 }) {
-  const cardClass = `card ${
-    hoverable ? "card-hoverable" : ""
+  const cardClass = `card ${hoverable ? "card-hoverable" : ""} ${
+    onClick ? "card-clickable" : ""
   } ${className}`.trim();
 
   const handleKeyPress = e => {
@@ -36,63 +35,23 @@ export default function Card({
     : {};
 
   return (
-    <Component
-      className={cardClass}
-      {...interactiveProps}
-      style={{
-        cursor: onClick ? "pointer" : undefined,
-        ...style,
-      }}
-      {...props}
-    >
+    <Component className={cardClass} {...interactiveProps} {...props}>
       {image && (
         <img
           src={image}
           alt={imageAlt || title || "Card image"}
-          style={{
-            width: "100%",
-            height: "200px",
-            objectFit: "cover",
-            borderRadius: "8px",
-            marginBottom: "var(--spacing-3)",
-          }}
+          className="card-image"
         />
       )}
       {(title || badge) && (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "flex-start",
-            marginBottom: title ? "var(--spacing-2)" : 0,
-          }}
-        >
-          {title && <h3 style={{ margin: 0, flex: 1 }}>{title}</h3>}
+        <div className="card-header">
+          {title && <h3 className="card-title">{title}</h3>}
           {badge}
         </div>
       )}
-      {description && (
-        <p
-          style={{
-            color: "var(--color-muted)",
-            marginBottom: "var(--spacing-3)",
-          }}
-        >
-          {description}
-        </p>
-      )}
+      {description && <p className="card-description">{description}</p>}
       {children}
-      {footer && (
-        <div
-          style={{
-            marginTop: "var(--spacing-4)",
-            paddingTop: "var(--spacing-3)",
-            borderTop: "1px solid var(--color-border)",
-          }}
-        >
-          {footer}
-        </div>
-      )}
+      {footer && <div className="card-footer">{footer}</div>}
     </Component>
   );
 }
@@ -107,6 +66,5 @@ Card.propTypes = {
   footer: PropTypes.node,
   hoverable: PropTypes.bool,
   onClick: PropTypes.func,
-  style: PropTypes.object,
   className: PropTypes.string,
 };

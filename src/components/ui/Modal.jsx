@@ -1,20 +1,27 @@
 import { useEffect } from "react";
+import PropTypes from "prop-types";
 
-export default function Modal({ isOpen, onClose, title, children, size = "medium" }) {
+export default function Modal({
+  isOpen,
+  onClose,
+  title,
+  children,
+  size = "medium",
+}) {
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     }
-    
+
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     };
   }, [isOpen]);
 
   // Prevenir que se cierre al hacer clic en el contenido del modal
-  const handleContentClick = (e) => {
+  const handleContentClick = e => {
     e.stopPropagation();
   };
 
@@ -22,40 +29,55 @@ export default function Modal({ isOpen, onClose, title, children, size = "medium
 
   const sizeClasses = {
     small: "max-w-md",
-    medium: "max-w-2xl", 
-    large: "max-w-4xl"
+    medium: "max-w-2xl",
+    large: "max-w-4xl",
+    lg: "max-w-4xl",
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-black bg-opacity-50" 
+    <div className="modal-overlay">
+      <div
+        className="modal-backdrop"
         onClick={onClose}
+        role="button"
+        tabIndex={-1}
+        onKeyDown={e => e.key === "Escape" && onClose()}
+        aria-label="Close modal"
       />
-      
-      {/* Modal */}
-      <div 
-        className={`relative bg-white rounded-lg shadow-xl w-full ${sizeClasses[size]} max-h-[90vh] overflow-hidden`}
+
+      <div
+        className={`modal-container ${sizeClasses[size]}`}
         onClick={handleContentClick}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-title"
+        tabIndex={-1}
+        onKeyDown={e => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b">
-          <h3 className="text-lg font-semibold">{title}</h3>
+        <div className="modal-header">
+          <h3 id="modal-title" className="modal-title">
+            {title}
+          </h3>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 text-2xl font-bold leading-none"
+            className="modal-close-btn"
             type="button"
+            aria-label="Close modal"
           >
             ×
           </button>
         </div>
-        
-        {/* Content */}
-        <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
-          {children}
-        </div>
+
+        <div className="modal-content">{children}</div>
       </div>
     </div>
   );
 }
+
+Modal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  title: PropTypes.string.isRequired,
+  children: PropTypes.node.isRequired,
+  size: PropTypes.oneOf(["small", "medium", "large", "lg"]),
+};

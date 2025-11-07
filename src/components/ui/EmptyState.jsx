@@ -5,53 +5,14 @@ export default function EmptyState({
   title,
   description,
   action,
-  style,
+  className,
   ...props
 }) {
   return (
-    <div
-      style={{
-        textAlign: "center",
-        padding: "var(--spacing-8) var(--spacing-5)",
-        ...style,
-      }}
-      {...props}
-    >
-      {icon && (
-        <div
-          style={{
-            fontSize: "48px",
-            marginBottom: "var(--spacing-4)",
-            opacity: 0.4,
-          }}
-        >
-          {icon}
-        </div>
-      )}
-      {title && (
-        <h3
-          style={{
-            margin: "0 0 var(--spacing-2)",
-            color: "var(--color-text)",
-            fontSize: "1.25rem",
-          }}
-        >
-          {title}
-        </h3>
-      )}
-      {description && (
-        <p
-          style={{
-            margin: "0 0 var(--spacing-4)",
-            color: "var(--color-muted)",
-            maxWidth: "400px",
-            marginLeft: "auto",
-            marginRight: "auto",
-          }}
-        >
-          {description}
-        </p>
-      )}
+    <div className={`empty-state ${className || ""}`} {...props}>
+      {icon && <div className="empty-state-icon">{icon}</div>}
+      {title && <h3 className="empty-state-title">{title}</h3>}
+      {description && <p className="empty-state-description">{description}</p>}
       {action && <div>{action}</div>}
     </div>
   );
@@ -62,5 +23,5 @@ EmptyState.propTypes = {
   title: PropTypes.string,
   description: PropTypes.string,
   action: PropTypes.node,
-  style: PropTypes.object,
+  className: PropTypes.string,
 };

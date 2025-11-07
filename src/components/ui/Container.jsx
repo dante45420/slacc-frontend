@@ -3,26 +3,13 @@ import PropTypes from "prop-types";
 export default function Container({
   children,
   size = "default",
-  style,
+  className = "",
   ...props
 }) {
-  const maxWidths = {
-    sm: "720px",
-    default: "1100px",
-    lg: "1280px",
-    full: "100%",
-  };
+  const sizeClass = `container-${size}`;
 
   return (
-    <div
-      style={{
-        maxWidth: maxWidths[size],
-        padding: "0 var(--spacing-5)",
-        margin: "0 auto",
-        ...style,
-      }}
-      {...props}
-    >
+    <div className={`${sizeClass} ${className}`.trim()} {...props}>
       {children}
     </div>
   );
@@ -30,6 +17,6 @@ export default function Container({
 
 Container.propTypes = {
   children: PropTypes.node.isRequired,
-  size: PropTypes.oneOf(["sm", "default", "lg", "full"]),
-  style: PropTypes.object,
+  size: PropTypes.oneOf(["sm", "default", "lg", "xl", "full"]),
+  className: PropTypes.string,
 };

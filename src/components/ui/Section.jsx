@@ -6,36 +6,39 @@ export default function Section({
   variant = "default",
   padding = "default",
   containerSize = "default",
-  style,
-  containerStyle,
+  className,
+  containerClassName,
   ...props
 }) {
-  const backgrounds = {
-    default: "var(--color-bg)",
-    alt: "var(--color-bg-alt)",
-    primary:
-      "linear-gradient(135deg, rgba(0,71,163,0.05) 0%, rgba(10,165,127,0.05) 100%)",
-    transparent: "transparent",
-  };
+  const paddingClass =
+    padding === "none"
+      ? "section-padding-none"
+      : padding === "sm"
+      ? "section-padding-sm"
+      : padding === "lg"
+      ? "section-padding-lg"
+      : padding === "xl"
+      ? "section-padding-xl"
+      : "";
 
-  const paddings = {
-    none: "0",
-    sm: "var(--spacing-5) 0",
-    default: "var(--spacing-6) 0",
-    lg: "calc(var(--spacing-6) * 1.5) 0",
-    xl: "calc(var(--spacing-6) * 2) 0",
-  };
+  const variantClass =
+    variant === "transparent"
+      ? "section-container-transparent"
+      : variant === "alt"
+      ? "section-container-alt"
+      : variant === "primary"
+      ? "section-container-primary"
+      : "section-container";
 
   return (
     <section
-      style={{
-        background: backgrounds[variant],
-        padding: paddings[padding],
-        ...style,
-      }}
+      className={`section ${paddingClass} ${className || ""}`}
       {...props}
     >
-      <Container size={containerSize} style={containerStyle}>
+      <Container
+        size={containerSize}
+        className={`${variantClass} ${containerClassName || ""}`}
+      >
         {children}
       </Container>
     </section>
@@ -46,7 +49,7 @@ Section.propTypes = {
   children: PropTypes.node.isRequired,
   variant: PropTypes.oneOf(["default", "alt", "primary", "transparent"]),
   padding: PropTypes.oneOf(["none", "sm", "default", "lg", "xl"]),
-  containerSize: PropTypes.oneOf(["sm", "default", "lg", "full"]),
-  style: PropTypes.object,
-  containerStyle: PropTypes.object,
+  containerSize: PropTypes.oneOf(["sm", "default", "lg", "xl", "full"]),
+  className: PropTypes.string,
+  containerClassName: PropTypes.string,
 };

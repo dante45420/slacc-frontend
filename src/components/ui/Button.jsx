@@ -7,7 +7,7 @@ export default function Button({
   loading = false,
   disabled = false,
   children,
-  style,
+  className,
   ...props
 }) {
   const baseClass = "btn";
@@ -21,22 +21,18 @@ export default function Button({
   if (size === "sm") sizeClass = "btn-sm";
   else if (size === "lg") sizeClass = "btn-lg";
 
-  const className = `${baseClass} ${variantClass} ${sizeClass}`.trim();
+  const widthClass = fullWidth ? "btn-full-width" : "";
+  const loadingClass = loading ? "btn-loading" : "";
 
-  let cursor = "pointer";
-  if (loading) cursor = "wait";
-  else if (disabled) cursor = "not-allowed";
+  const finalClassName =
+    `${baseClass} ${variantClass} ${sizeClass} ${widthClass} ${loadingClass} ${
+      className || ""
+    }`.trim();
 
   return (
     <button
-      className={className}
+      className={finalClassName}
       disabled={disabled || loading}
-      style={{
-        width: fullWidth ? "100%" : undefined,
-        opacity: loading ? 0.7 : 1,
-        cursor,
-        ...style,
-      }}
       {...props}
     >
       {loading ? "Cargando..." : children}
@@ -51,5 +47,5 @@ Button.propTypes = {
   loading: PropTypes.bool,
   disabled: PropTypes.bool,
   children: PropTypes.node.isRequired,
-  style: PropTypes.object,
+  className: PropTypes.string,
 };

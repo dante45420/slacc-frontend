@@ -414,7 +414,7 @@ function EnrollmentModal({ course, user, onClose, onSuccess }) {
     >
       <div
         style={{
-          background: "white",
+          background: "var(--color-bg)",
           borderRadius: 12,
           padding: 32,
           maxWidth: 500,

@@ -32,7 +32,11 @@ export default function Header() {
     <header className="site-header">
       <nav className="container nav">
         <Link to="/" className="brand">
-          SLACC
+          <img
+            src="/Logo_SLACC_horizontal_azul.png"
+            alt="SLACC Logo"
+            className="logo-image"
+          />
         </Link>
         <ul className="menu">
           <MenuItem label="Inicio" to="/" />
@@ -60,25 +64,14 @@ export default function Header() {
           {user?.role === "admin" && <MenuItem label="Admin" to="/admin" />}
           <MenuItem label="Usuario" to={user ? "/perfil" : "/login"}>
             {user ? (
-              <>
-                {/* Subir noticia eliminado del menú de usuario */}
-                <button
-                  onClick={e => {
-                    e.preventDefault();
-                    logout();
-                  }}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    padding: 0,
-                    cursor: "pointer",
-                    color: "inherit",
-                    textDecoration: "none",
-                  }}
-                >
-                  Cerrar sesión
-                </button>
-              </>
+              <button
+                onClick={e => {
+                  e.preventDefault();
+                  logout();
+                }}
+              >
+                Cerrar sesión
+              </button>
             ) : (
               <>
                 <SubLink to="/login" label="Iniciar sesión" />

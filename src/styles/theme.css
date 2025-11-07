@@ -1,31 +1,46 @@
 :root {
-  /* Primary colors */
-  --color-primary: #0057b7;
-  --color-primary-hover: #004494;
+  /* Gradient Dull Blue Palette */
+  --color-midnight: #003366; /* Dark Midnight Blue - Darkest */
+  --color-cerulean: #174978; /* Dark Cerulean */
+  --color-bdazzled: #2f5f8a; /* B'dazzled Blue */
+  --color-queen: #46769b; /* Queen Blue */
+  --color-rackley: #5e8cad; /* Rackley */
+  --color-air: #75a2bf; /* Air Superiority Blue - Lightest */
+
+  /* Primary blue palette - using gradient dull blue scheme */
+  --color-primary: #2f5f8a; /* B'dazzled Blue */
+  --color-primary-hover: #174978; /* Dark Cerulean */
+  --color-primary-light: #46769b; /* Queen Blue */
+  --color-primary-dark: #003366; /* Dark Midnight Blue */
   --color-primary-contrast: #ffffff;
 
-  /* Secondary colors */
-  --color-secondary: #0aa57f;
-  --color-secondary-hover: #088a69;
+  /* Secondary colors - using lighter shades from palette */
+  --color-secondary: #5e8cad; /* Rackley */
+  --color-secondary-hover: #46769b; /* Queen Blue */
+  --color-secondary-light: #75a2bf; /* Air Superiority Blue */
+  --color-secondary-dark: #2f5f8a; /* B'dazzled Blue */
 
   /* Accent and semantic colors */
-  --color-accent: #e46f2e;
+  --color-accent: #f59e0b;
   --color-success: #10b981;
   --color-warning: #f59e0b;
   --color-error: #ef4444;
-  --color-info: #3b82f6;
+  --color-info: #46769b; /* Queen Blue from palette */
 
-  /* Text colors */
-  --color-text: #1f2937;
-  --color-text-secondary: #374151;
-  --color-muted: #6b7280;
+  /* Text colors - using darker blues from palette */
+  --color-text: #003366; /* Dark Midnight Blue */
+  --color-text-secondary: #174978; /* Dark Cerulean */
+  --color-muted: #5e8cad; /* Rackley */
+  --color-text-light: #75a2bf; /* Air Superiority Blue */
 
-  /* Background colors */
-  --color-bg: #ffffff;
-  --color-bg-alt: #f8fafc;
-  --color-page: #f1f5f9;
-  --color-border: #e2e8f0;
-  --color-border-light: #f1f5f9;
+  /* Background colors - light tints of the palette */
+  --color-bg: #f0f6fa; /* Very light tint of Air Superiority Blue */
+  --color-bg-alt: #e3eef6; /* Light tint of Air Superiority Blue */
+  --color-bg-secondary: #d6e6f2; /* Tint of Rackley */
+  --color-page: #f5f9fc; /* Lightest background */
+  --color-page-dark: #b8d4e6; /* Tint of Air Superiority Blue */
+  --color-border: #5e8cad; /* Rackley */
+  --color-border-light: #d6e6f2; /* Light tint */
 
   /* Typography */
   --font-family-base: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
@@ -39,12 +54,18 @@
   --radius-xl: 18px;
   --section-radius: 16px;
 
-  /* Shadows */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.1), 0 3px 6px rgba(0, 0, 0, 0.05);
-  --shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.06);
-  --shadow-elevated: 0 10px 30px rgba(0, 0, 0, 0.08);
+  /* Shadows - using midnight blue tints */
+  --shadow-sm: 0 1px 3px rgba(0, 51, 102, 0.08),
+    0 1px 2px rgba(0, 51, 102, 0.06);
+  --shadow: 0 4px 12px rgba(0, 51, 102, 0.1), 0 2px 4px rgba(0, 51, 102, 0.06);
+  --shadow-md: 0 8px 20px rgba(0, 51, 102, 0.12),
+    0 3px 6px rgba(0, 51, 102, 0.08);
+  --shadow-lg: 0 12px 28px rgba(0, 51, 102, 0.15),
+    0 4px 8px rgba(0, 51, 102, 0.1);
+  --shadow-elevated: 0 20px 40px rgba(0, 51, 102, 0.12),
+    0 8px 16px rgba(0, 51, 102, 0.08);
+  --shadow-blue: 0 8px 20px rgba(47, 95, 138, 0.15),
+    0 3px 6px rgba(47, 95, 138, 0.1);
 
   /* Spacing */
   --spacing-1: 4px;

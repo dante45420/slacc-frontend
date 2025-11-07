@@ -62,93 +62,98 @@ export default function App() {
     <AuthProvider>
       <ToastProvider>
         <Header />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/noticias" element={<NewsList />} />
-          <Route path="/noticias/comunicados" element={<NewsPage />} />
-          <Route path="/noticias/prensa" element={<NewsPage />} />
-          <Route path="/noticias/blog" element={<NewsPage />} />
-          <Route path="/noticias/:id" element={<NewsDetail />} />
-          <Route path="/admin/news/:id/edit" element={<EditNews />} />
-          <Route path="/admin/news/:id/view" element={<NewsDetail />} />
-          <Route path="/cursos" element={<CoursesPage />} />
-          <Route path="/cursos/:id" element={<CourseDetail />} />
-          <Route path="/eventos/proximos" element={<EventsPage />} />
-          <Route path="/eventos/webinars" element={<EventsPage />} />
-          <Route path="/eventos/pasados" element={<EventsPage />} />
-          <Route path="/eventos/:id" element={<EventDetail />} />
-          <Route path="/admin/eventos" element={<AdminEvents />} />
-          <Route path="/nosotros" element={<Placeholder title="Nosotros" />} />
-          <Route
-            path="/nosotros/historia"
-            element={<Placeholder title="Nosotros - Historia" />}
-          />
-          <Route
-            path="/nosotros/mision"
-            element={<Placeholder title="Nosotros - Misión y Visión" />}
-          />
-          <Route
-            path="/nosotros/comite"
-            element={<Placeholder title="Nosotros - Comité" />}
-          />
-          <Route path="/miembros" element={<MembersBenefits />} />
-          <Route path="/miembros/beneficios" element={<MembersBenefits />} />
-          <Route path="/miembros/como-unirse" element={<WhyJoin />} />
-          <Route path="/miembros/directorio" element={<MembersDirectory />} />
-          <Route path="/miembros/socios-jovenes" element={<MembersYoung />} />
-          <Route
-            path="/miembros/sociedades-afines"
-            element={<MembersAllied />}
-          />
-          <Route path="/por-que-ser-socio" element={<WhyJoin />} />
-          <Route path="/contacto" element={<Contact />} />
-          <Route path="/eventos" element={<Placeholder title="Eventos" />} />
-          <Route
-            path="/eventos/proximos"
-            element={<Placeholder title="Eventos - Próximos" />}
-          />
-          <Route
-            path="/eventos/pasados"
-            element={<Placeholder title="Eventos - Pasados" />}
-          />
-          <Route
-            path="/eventos/webinars"
-            element={<Placeholder title="Eventos - Webinars" />}
-          />
-          <Route
-            path="/educacion"
-            element={<Placeholder title="Educación" />}
-          />
-          <Route
-            path="/educacion/recursos"
-            element={<Placeholder title="Educación - Recursos" />}
-          />
-          <Route
-            path="/educacion/biblioteca"
-            element={<Placeholder title="Educación - Biblioteca" />}
-          />
-          <Route
-            path="/educacion/casos"
-            element={<Placeholder title="Educación - Casos" />}
-          />
-          <Route path="/login" element={<Login />} />
-          <Route path="/perfil" element={<UserProfile />} />
-          <Route path="/solicitar-membresia" element={<JoinMembership />} />
-          <Route path="/subir-noticia" element={<SubmitNews />} />
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/admin/legacy" element={<AdminPortal />} />
-          <Route
-            path="/admin/applications/:id"
-            element={<ApplicationDetail />}
-          />
-          <Route path="/admin/users/new" element={<AdminUserNew />} />
-          <Route path="/admin/users/:id" element={<AdminUserView />} />
-          <Route path="/admin/users/:id/edit" element={<AdminUserEdit />} />
-          <Route path="/admin/news/new" element={<NewsEditor />} />
-          <Route path="/admin/news/:id/edit" element={<NewsEditor />} />
-          <Route path="/admin/news/:id/view" element={<NewsDetail />} />
-          <Route path="*" element={<Placeholder title="Página" />} />
-        </Routes>
+        <main>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/noticias" element={<NewsList />} />
+            <Route path="/noticias/comunicados" element={<NewsPage />} />
+            <Route path="/noticias/prensa" element={<NewsPage />} />
+            <Route path="/noticias/blog" element={<NewsPage />} />
+            <Route path="/noticias/:id" element={<NewsDetail />} />
+            <Route path="/admin/news/:id/edit" element={<EditNews />} />
+            <Route path="/admin/news/:id/view" element={<NewsDetail />} />
+            <Route path="/cursos" element={<CoursesPage />} />
+            <Route path="/cursos/:id" element={<CourseDetail />} />
+            <Route path="/eventos/proximos" element={<EventsPage />} />
+            <Route path="/eventos/webinars" element={<EventsPage />} />
+            <Route path="/eventos/pasados" element={<EventsPage />} />
+            <Route path="/eventos/:id" element={<EventDetail />} />
+            <Route path="/admin/eventos" element={<AdminEvents />} />
+            <Route
+              path="/nosotros"
+              element={<Placeholder title="Nosotros" />}
+            />
+            <Route
+              path="/nosotros/historia"
+              element={<Placeholder title="Nosotros - Historia" />}
+            />
+            <Route
+              path="/nosotros/mision"
+              element={<Placeholder title="Nosotros - Misión y Visión" />}
+            />
+            <Route
+              path="/nosotros/comite"
+              element={<Placeholder title="Nosotros - Comité" />}
+            />
+            <Route path="/miembros" element={<MembersBenefits />} />
+            <Route path="/miembros/beneficios" element={<MembersBenefits />} />
+            <Route path="/miembros/como-unirse" element={<WhyJoin />} />
+            <Route path="/miembros/directorio" element={<MembersDirectory />} />
+            <Route path="/miembros/socios-jovenes" element={<MembersYoung />} />
+            <Route
+              path="/miembros/sociedades-afines"
+              element={<MembersAllied />}
+            />
+            <Route path="/por-que-ser-socio" element={<WhyJoin />} />
+            <Route path="/contacto" element={<Contact />} />
+            <Route path="/eventos" element={<Placeholder title="Eventos" />} />
+            <Route
+              path="/eventos/proximos"
+              element={<Placeholder title="Eventos - Próximos" />}
+            />
+            <Route
+              path="/eventos/pasados"
+              element={<Placeholder title="Eventos - Pasados" />}
+            />
+            <Route
+              path="/eventos/webinars"
+              element={<Placeholder title="Eventos - Webinars" />}
+            />
+            <Route
+              path="/educacion"
+              element={<Placeholder title="Educación" />}
+            />
+            <Route
+              path="/educacion/recursos"
+              element={<Placeholder title="Educación - Recursos" />}
+            />
+            <Route
+              path="/educacion/biblioteca"
+              element={<Placeholder title="Educación - Biblioteca" />}
+            />
+            <Route
+              path="/educacion/casos"
+              element={<Placeholder title="Educación - Casos" />}
+            />
+            <Route path="/login" element={<Login />} />
+            <Route path="/perfil" element={<UserProfile />} />
+            <Route path="/solicitar-membresia" element={<JoinMembership />} />
+            <Route path="/subir-noticia" element={<SubmitNews />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/legacy" element={<AdminPortal />} />
+            <Route
+              path="/admin/applications/:id"
+              element={<ApplicationDetail />}
+            />
+            <Route path="/admin/users/new" element={<AdminUserNew />} />
+            <Route path="/admin/users/:id" element={<AdminUserView />} />
+            <Route path="/admin/users/:id/edit" element={<AdminUserEdit />} />
+            <Route path="/admin/news/new" element={<NewsEditor />} />
+            <Route path="/admin/news/:id/edit" element={<NewsEditor />} />
+            <Route path="/admin/news/:id/view" element={<NewsDetail />} />
+            <Route path="*" element={<Placeholder title="Página" />} />
+          </Routes>
+        </main>
       </ToastProvider>
     </AuthProvider>
   );

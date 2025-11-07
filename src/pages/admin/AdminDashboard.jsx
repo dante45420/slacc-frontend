@@ -951,7 +951,13 @@ function SimpleNewsForm({ onSuccess }) {
       setExcerpt("");
       setContent("");
       setCategory("comunicados");
-      e.currentTarget.reset();
+
+      // Reset file input if form exists
+      if (e.currentTarget) {
+        const fileInput = e.currentTarget.querySelector('input[type="file"]');
+        if (fileInput) fileInput.value = "";
+      }
+
       if (onSuccess) onSuccess();
     } catch (err) {
       toast.error("Error al crear la noticia");

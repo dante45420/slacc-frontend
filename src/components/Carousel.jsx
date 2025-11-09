@@ -79,14 +79,14 @@ export default function Carousel({ items = [], intervalMs = 6000 }) {
           className="carousel-btn"
           onClick={() => go(index - 1)}
         >
-          {"<"}
+          <i className="fa-solid fa-chevron-left"></i>
         </button>
         <button
           aria-label="Siguiente"
           className="carousel-btn"
           onClick={() => go(index + 1)}
         >
-          {">"}
+          <i className="fa-solid fa-chevron-right"></i>
         </button>
       </div>
       <div className="carousel-dots">

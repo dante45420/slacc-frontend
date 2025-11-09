@@ -64,7 +64,7 @@ export default function Modal({
             type="button"
             aria-label="Close modal"
           >
-            ×
+            <i className="fa-solid fa-xmark"></i>
           </button>
         </div>
 

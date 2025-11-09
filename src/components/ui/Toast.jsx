@@ -92,10 +92,10 @@ ToastProvider.propTypes = {
 
 function Toast({ message, variant, onClose }) {
   const icons = {
-    success: "✓",
-    error: "✕",
-    warning: "⚠",
-    info: "ℹ",
+    success: <i className="fa-solid fa-circle-check"></i>,
+    error: <i className="fa-solid fa-circle-xmark"></i>,
+    warning: <i className="fa-solid fa-triangle-exclamation"></i>,
+    info: <i className="fa-solid fa-circle-info"></i>,
   };
 
   return (
@@ -103,7 +103,7 @@ function Toast({ message, variant, onClose }) {
       <span className="toast-icon">{icons[variant]}</span>
       <span className="toast-message">{message}</span>
       <button className="toast-close" onClick={onClose} type="button">
-        ✕
+        <i className="fa-solid fa-xmark"></i>
       </button>
     </div>
   );

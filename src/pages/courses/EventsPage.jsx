@@ -1,18 +1,18 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
-import { 
-  Section, 
-  Container, 
-  Button, 
-  Card, 
-  Badge, 
-  Spinner, 
-  Alert, 
+import {
+  Section,
+  Container,
+  Button,
+  Card,
+  Badge,
+  Spinner,
+  Alert,
   EmptyState,
   Modal,
   Input,
-  Grid
+  Grid,
 } from "../../components/ui";
 
 const BASE_URL =
@@ -64,7 +64,11 @@ export default function EventsPage() {
   }
 
   function getPriceDisplay(e) {
-    if (user?.role === "member" && user?.is_active && user?.payment_status === "paid") {
+    if (
+      user?.role === "member" &&
+      user?.is_active &&
+      user?.payment_status === "paid"
+    ) {
       if (user.membership_type === "joven")
         return e.price_joven || e.price_member;
       if (user.membership_type === "gratuito") return e.price_gratuito || 0;
@@ -95,7 +99,7 @@ export default function EventsPage() {
     <Section variant="default">
       <Container>
         <h1 className="mb-4">Eventos y Webinars</h1>
-        
+
         {/* Tab Navigation */}
         <div className="flex gap-2 mb-5" style={{ flexWrap: "wrap" }}>
           {[
@@ -117,7 +121,11 @@ export default function EventsPage() {
           ))}
         </div>
 
-        {message && <Alert variant="success" className="mb-4">{message}</Alert>}
+        {message && (
+          <Alert variant="success" className="mb-4">
+            {message}
+          </Alert>
+        )}
 
         {loading ? (
           <div className="flex justify-center p-6">
@@ -127,7 +135,7 @@ export default function EventsPage() {
           <>
             {events.length === 0 ? (
               <EmptyState
-                icon="📅"
+                icon={<i className="fa-regular fa-calendar"></i>}
                 title="No hay eventos disponibles"
                 description="No se encontraron eventos en esta categoría. Revisa otras secciones o vuelve más tarde."
               />
@@ -146,7 +154,11 @@ export default function EventsPage() {
                       key={e.id}
                       image={imageUrl}
                       badge={
-                        <Badge variant={e.format === "webinar" ? "accent" : "secondary"}>
+                        <Badge
+                          variant={
+                            e.format === "webinar" ? "accent" : "secondary"
+                          }
+                        >
                           {e.format === "webinar" ? "Webinar" : "Presencial"}
                         </Badge>
                       }
@@ -155,34 +167,44 @@ export default function EventsPage() {
                     >
                       <h3 className="mt-0 mb-3">{e.title}</h3>
                       <p className="text-muted mb-4">{e.description}</p>
-                      
-                      <div style={{ 
-                        display: "grid", 
-                        gridTemplateColumns: "1fr 1fr", 
-                        gap: "var(--spacing-3)",
-                        fontSize: "0.9em"
-                      }}>
+
+                      <div
+                        style={{
+                          display: "grid",
+                          gridTemplateColumns: "1fr 1fr",
+                          gap: "var(--spacing-3)",
+                          fontSize: "0.9em",
+                        }}
+                      >
                         <div>
                           <div className="text-muted mb-1">Fecha</div>
                           <div className="font-medium">
                             {e.start_date
-                              ? new Date(e.start_date).toLocaleDateString("es-ES")
+                              ? new Date(e.start_date).toLocaleDateString(
+                                  "es-ES"
+                                )
                               : "Por confirmar"}
                           </div>
                         </div>
                         <div>
                           <div className="text-muted mb-1">Precio</div>
-                          <div className="font-bold text-primary">${getPriceDisplay(e)}</div>
+                          <div className="font-bold text-primary">
+                            ${getPriceDisplay(e)}
+                          </div>
                         </div>
                         {e.max_students && (
                           <>
                             <div>
                               <div className="text-muted mb-1">Cupos</div>
-                              <div className="font-medium">{e.max_students}</div>
+                              <div className="font-medium">
+                                {e.max_students}
+                              </div>
                             </div>
                             <div>
                               <div className="text-muted mb-1">Disponibles</div>
-                              <div className="font-medium">{e.seats_left ?? "—"}</div>
+                              <div className="font-medium">
+                                {e.seats_left ?? "—"}
+                              </div>
                             </div>
                           </>
                         )}

@@ -158,7 +158,7 @@ export default function NewsEditor() {
             onClick={() => navigate("/admin")}
             className="mb-4"
           >
-            ← Volver al Panel Admin
+            <i className="fa-solid fa-arrow-left"></i> Volver al Panel Admin
           </Button>
 
           <h1 className="mb-2">

@@ -441,7 +441,7 @@ function EnrollmentModal({ course, user, onClose, onSuccess }) {
               cursor: "pointer",
             }}
           >
-            ×
+            <i className="fa-solid fa-xmark"></i>
           </button>
         </div>
 

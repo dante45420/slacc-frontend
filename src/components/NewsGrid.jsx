@@ -204,7 +204,7 @@ export default function NewsGrid({ items = [], category }) {
                 (e.target.style.color = "var(--color-primary)")
               }
             >
-              Leer más <span style={{ fontSize: "1.1em" }}>→</span>
+              Leer más <i className="fa-solid fa-arrow-right"></i>
             </Link>
           </div>
         </Card>

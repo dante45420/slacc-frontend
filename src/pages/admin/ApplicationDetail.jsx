@@ -165,7 +165,7 @@ export default function ApplicationDetail() {
             onClick={() => navigate("/admin")}
             style={{ marginBottom: 24 }}
           >
-            ← Volver al Panel Admin
+            <i className="fa-solid fa-arrow-left"></i> Volver al Panel Admin
           </button>
 
           <div

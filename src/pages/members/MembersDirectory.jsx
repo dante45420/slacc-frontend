@@ -93,38 +93,22 @@ export default function MembersDirectory() {
       <div className="container">
         <h1>Directorio de Miembros</h1>
         {groups.map(g => (
-          <div key={g.name} style={{ marginTop: 16 }}>
-            <h3 style={{ margin: "8px 0 12px" }}>{g.name}</h3>
+          <div key={g.name} className="directory-group">
+            <h3 className="directory-group-title">{g.name}</h3>
             <div className="cards">
               {g.members.map(m => (
-                <div
-                  key={m.email}
-                  className="card"
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "72px 1fr",
-                    gap: 12,
-                    alignItems: "center",
-                  }}
-                >
+                <div key={m.email} className="card directory-member-card">
                   <img
                     src={m.photo}
                     alt={m.name}
-                    style={{
-                      width: 72,
-                      height: 72,
-                      borderRadius: "50%",
-                      objectFit: "cover",
-                    }}
+                    className="directory-member-photo"
                   />
                   <div>
-                    <h4 style={{ margin: 0 }}>{m.name}</h4>
-                    <div
-                      style={{ color: "var(--color-muted)", marginBottom: 6 }}
-                    >
+                    <h4 className="directory-member-name">{m.name}</h4>
+                    <div className="directory-member-location">
                       {m.city}, {m.country}
                     </div>
-                    <div style={{ marginBottom: 8 }}>
+                    <div className="directory-member-specialty">
                       Especialidad: <strong>{m.speciality}</strong>
                     </div>
                     <a href={`mailto:${m.email}`} className="btn btn-outline">

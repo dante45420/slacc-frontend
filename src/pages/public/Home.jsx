@@ -29,7 +29,9 @@ export default function Home() {
                 Cursos patrocinados por SLACC
               </h2>
               <Link to="/eventos/webinars">
-                <Button variant="outline">Ver todos →</Button>
+                <Button variant="outline">
+                  Ver todos <i className="fa-solid fa-arrow-right"></i>
+                </Button>
               </Link>
             </div>
             <CoursesCarousel />

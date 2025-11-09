@@ -377,7 +377,7 @@ export default function NewsDetail() {
               {prevNext.prev && (
                 <Link to={`/noticias/${prevNext.prev.id}`}>
                   <Button variant="outline" size="sm">
-                    ←{" "}
+                    <i className="fa-solid fa-arrow-left"></i>{" "}
                     {prevNext.prev.title.length > 30
                       ? prevNext.prev.title.substring(0, 30) + "..."
                       : prevNext.prev.title}
@@ -392,7 +392,7 @@ export default function NewsDetail() {
                     {prevNext.next.title.length > 30
                       ? prevNext.next.title.substring(0, 30) + "..."
                       : prevNext.next.title}{" "}
-                    →
+                    <i className="fa-solid fa-arrow-right"></i>
                   </Button>
                 </Link>
               )}
@@ -444,7 +444,7 @@ export default function NewsDetail() {
                     </p>
                     <Link to={`/noticias/${n.id}`}>
                       <Button variant="outline" size="sm">
-                        Leer más →
+                        Leer más <i className="fa-solid fa-arrow-right"></i>
                       </Button>
                     </Link>
                   </Card>

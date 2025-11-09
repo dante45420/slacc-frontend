@@ -39,15 +39,15 @@ export default function Contact() {
               <h3 className="contact-section-title">Horarios de Atención</h3>
               <ul className="contact-schedule-list">
                 <li className="contact-schedule-item">
-                  <span className="contact-schedule-icon">🕐</span>
+                  <i className="fa-regular fa-clock contact-schedule-icon"></i>
                   <span>Lun-Vie 9:00–18:00 (GMT-3)</span>
                 </li>
                 <li className="contact-schedule-item">
-                  <span className="contact-schedule-icon">⏱️</span>
+                  <i className="fa-regular fa-hourglass-half contact-schedule-icon"></i>
                   <span>Respuesta en 48 horas</span>
                 </li>
                 <li className="contact-schedule-item">
-                  <span className="contact-schedule-icon">🌎</span>
+                  <i className="fa-solid fa-globe contact-schedule-icon"></i>
                   <span>Español / Portugués</span>
                 </li>
               </ul>

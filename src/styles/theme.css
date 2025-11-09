@@ -33,19 +33,18 @@
   --color-muted: #5e8cad; /* Rackley */
   --color-text-light: #75a2bf; /* Air Superiority Blue */
 
-  /* Background colors - light tints of the palette */
-  --color-bg: #f0f6fa; /* Very light tint of Air Superiority Blue */
-  --color-bg-alt: #e3eef6; /* Light tint of Air Superiority Blue */
-  --color-bg-secondary: #d6e6f2; /* Tint of Rackley */
-  --color-page: #f5f9fc; /* Lightest background */
+  /* Background colors - light blue tints only, no white */
+  --color-bg: #e8f2f7; /* Light blue tint */
+  --color-bg-alt: #d4e7f0; /* Slightly darker light blue */
+  --color-bg-secondary: #c0dce9; /* Medium light blue */
+  --color-page: #f4f9fb; /* Lightest blue background */
   --color-page-dark: #b8d4e6; /* Tint of Air Superiority Blue */
   --color-border: #5e8cad; /* Rackley */
   --color-border-light: #d6e6f2; /* Light tint */
 
-  /* Typography */
-  --font-family-base: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
-    Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-family-heading: "Inter", system-ui, -apple-system, sans-serif;
+  /* Typography - Elegant serif font */
+  --font-family-base: "Merriweather", "Georgia", "Times New Roman", serif;
+  --font-family-heading: "Playfair Display", "Merriweather", "Georgia", serif;
 
   /* Border radius */
   --radius-sm: 6px;

@@ -8,6 +8,21 @@
   padding: 0;
 }
 
+/* Ensure all elements inherit the font */
+input,
+button,
+textarea,
+select,
+optgroup,
+option,
+label,
+table,
+th,
+td {
+  font-family: inherit;
+  font-weight: inherit;
+}
+
 html {
   height: 100%;
   scroll-behavior: smooth;
@@ -757,15 +772,24 @@ img {
   transform: translateX(-50%);
   bottom: var(--spacing-6);
   width: min(100%, var(--max-width));
-  padding: 0 var(--spacing-5);
+  padding: var(--spacing-4) var(--spacing-5);
   color: white;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.75) 0%,
+    rgba(0, 0, 0, 0.5) 50%,
+    transparent 100%
+  );
+  backdrop-filter: blur(4px);
+  border-radius: var(--radius-lg);
 }
 
 .carousel-title {
   margin: 0 0 var(--spacing-2);
   font-size: clamp(24px, 4vw, 36px);
   font-weight: 700;
+  color: white;
 }
 
 .carousel-desc {

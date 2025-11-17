@@ -18,6 +18,14 @@ import {
 const BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
 
+function getImageUrl(url) {
+  const apiBase =
+    import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
+  if (!url) return null;
+  if (url.startsWith("http")) return url;
+  return apiBase.replace("/api", "") + url;
+}
+
 const initialFormState = {
   title: "",
   description: "",
@@ -179,18 +187,12 @@ export default function AdminEvents() {
     }
   }
 
-  function getImageUrl(url) {
-    if (!url) return null;
-    if (url.startsWith("http")) return url;
-    return BASE_URL.replace("/api", "") + url;
-  }
-
   if (loading) {
     return (
-      <Section>
+      <Section variant="default" padding="lg">
         <Container>
           <div className="flex-center" style={{ minHeight: "400px" }}>
-            <Spinner size="large" />
+            <Spinner size="lg" />
           </div>
         </Container>
       </Section>
@@ -198,13 +200,18 @@ export default function AdminEvents() {
   }
 
   return (
-    <Section>
+    <Section variant="default" padding="lg">
       <Container>
-        <h2 className="mb-6">Gestión de Eventos y Cursos</h2>
+        <div className="mb-6">
+          <h1 className="mb-2">Gestión de Eventos y Cursos</h1>
+          <p className="text-muted">
+            Crea, edita y administra los eventos de la plataforma
+          </p>
+        </div>
 
         <Card className="mb-8">
-          <h3 className="mb-4">Crear nuevo evento</h3>
-          <div className="grid grid-2 gap-4 mb-4">
+          <h3 className="mb-5">Crear nuevo evento</h3>
+          <div className="grid grid-2 gap-4 mb-5">
             <Input
               label="Título"
               value={form.title}
@@ -291,13 +298,19 @@ export default function AdminEvents() {
               }
             />
           </div>
-          <Button variant="primary" onClick={createEvent}>
-            Crear evento
-          </Button>
+          <div className="flex justify-end">
+            <Button variant="primary" onClick={createEvent}>
+              Crear evento
+            </Button>
+          </div>
         </Card>
 
-        <div className="mb-4 flex-between">
-          <h3>Eventos existentes ({events.length})</h3>
+        <div className="mb-5">
+          <h2 className="mb-2">Eventos existentes</h2>
+          <p className="text-muted">
+            {events.length} {events.length === 1 ? "evento" : "eventos"} en
+            total
+          </p>
         </div>
 
         {events.length === 0 ? (
@@ -335,139 +348,246 @@ function EventCard({
   onUploadImage,
   getImageUrl,
 }) {
+  const [expanded, setExpanded] = useState(false);
   const [localEvent, setLocalEvent] = useState(event);
 
   const handleChange = (field, value) => {
     setLocalEvent({ ...localEvent, [field]: value });
   };
 
+  const formatDate = dateString => {
+    if (!dateString) return "Por confirmar";
+    try {
+      return new Date(dateString).toLocaleDateString("es-ES", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+    } catch {
+      return "Por confirmar";
+    }
+  };
+
   return (
     <Card>
-      <div className="flex-between mb-4">
-        <h4>{localEvent.title || "Sin título"}</h4>
-        <Badge variant={localEvent.format === "webinar" ? "info" : "success"}>
-          {localEvent.format === "webinar" ? "Webinar" : "Presencial"}
-        </Badge>
-      </div>
-
-      {localEvent.image_url && (
-        <img
-          src={getImageUrl(localEvent.image_url)}
-          alt={localEvent.title}
-          className="mb-4"
+      {/* Collapsed view */}
+      <div className="flex-between align-center">
+        <button
+          type="button"
+          className="flex-1"
+          onClick={() => setExpanded(!expanded)}
+          aria-expanded={expanded}
           style={{
+            background: "none",
+            border: "none",
+            padding: 0,
+            textAlign: "left",
+            cursor: "pointer",
+            font: "inherit",
+            color: "inherit",
             width: "100%",
-            height: "200px",
-            objectFit: "cover",
-            borderRadius: "var(--radius-base)",
           }}
-        />
-      )}
-
-      <div className="grid grid-2 gap-4 mb-4">
-        <Input
-          label="Título"
-          value={localEvent.title || ""}
-          onChange={e => handleChange("title", e.target.value)}
-        />
-        <Select
-          label="Formato"
-          value={localEvent.format || "webinar"}
-          onChange={e => handleChange("format", e.target.value)}
         >
-          <option value="webinar">Webinar</option>
-          <option value="presencial">Presencial</option>
-        </Select>
-        <Input
-          label="Instructor"
-          value={localEvent.instructor || ""}
-          onChange={e => handleChange("instructor", e.target.value)}
-        />
-        <Input
-          label="Capacidad"
-          type="number"
-          value={localEvent.max_students || ""}
-          onChange={e => handleChange("max_students", Number(e.target.value))}
-        />
-        <Input
-          label="Precio socio"
-          type="number"
-          value={localEvent.price_member || 0}
-          onChange={e => handleChange("price_member", Number(e.target.value))}
-        />
-        <Input
-          label="Precio no socio"
-          type="number"
-          value={localEvent.price_non_member || 0}
-          onChange={e =>
-            handleChange("price_non_member", Number(e.target.value))
-          }
-        />
-        <Input
-          label="Precio joven"
-          type="number"
-          value={localEvent.price_joven || 0}
-          onChange={e => handleChange("price_joven", Number(e.target.value))}
-        />
-        <Input
-          label="Precio gratuito"
-          type="number"
-          value={localEvent.price_gratuito || 0}
-          onChange={e => handleChange("price_gratuito", Number(e.target.value))}
-        />
-        <Input
-          label="Fecha inicio"
-          type="date"
-          value={
-            localEvent.start_date ? localEvent.start_date.substring(0, 10) : ""
-          }
-          onChange={e => handleChange("start_date", e.target.value)}
-        />
-        <Input
-          label="Fecha fin"
-          type="date"
-          value={
-            localEvent.end_date ? localEvent.end_date.substring(0, 10) : ""
-          }
-          onChange={e => handleChange("end_date", e.target.value)}
-        />
-        <Input
-          label="Límite inscripción"
-          type="date"
-          value={
-            localEvent.registration_deadline
-              ? localEvent.registration_deadline.substring(0, 10)
-              : ""
-          }
-          onChange={e => handleChange("registration_deadline", e.target.value)}
-        />
+          <div className="flex align-center gap-3 mb-2">
+            <h3 className="mb-0">{localEvent.title || "Sin título"}</h3>
+            <Badge
+              variant={localEvent.format === "webinar" ? "info" : "success"}
+              size="sm"
+            >
+              {localEvent.format === "webinar" ? "Webinar" : "Presencial"}
+            </Badge>
+          </div>
+          <div>
+            <div className="flex-between align-center gap-4 text-sm text-muted">
+              <span>
+                <i className="fa-solid fa-calendar"></i>{" "}
+                {formatDate(localEvent.start_date)}
+              </span>
+              {localEvent.instructor && (
+                <span>
+                  <i className="fa-solid fa-user"></i> {localEvent.instructor}
+                </span>
+              )}
+              {localEvent.max_students && (
+                <span>
+                  <i className="fa-solid fa-users"></i> Capacidad:{" "}
+                  {localEvent.max_students}
+                </span>
+              )}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={e => {
+                  e.stopPropagation();
+                  setExpanded(!expanded);
+                }}
+                aria-label={expanded ? "Contraer" : "Expandir"}
+              >
+                <i
+                  className={`fa-solid fa-chevron-${expanded ? "up" : "down"}`}
+                ></i>
+              </Button>
+            </div>
+          </div>
+        </button>
       </div>
 
-      <div className="flex-start gap-2 flex-wrap">
-        <Button variant="primary" onClick={() => onUpdate(localEvent)}>
-          Guardar cambios
-        </Button>
-        <Button variant="outline" onClick={() => onViewEnrollments(event.id)}>
-          Ver inscritos
-        </Button>
-        <Button variant="outline" onClick={() => onDelete(event.id)}>
-          Eliminar
-        </Button>
-        <Button variant="outline" asChild>
-          <label style={{ cursor: "pointer", margin: 0 }}>
-            Subir imagen
-            <input
-              type="file"
-              accept="image/*"
-              style={{ display: "none" }}
-              onChange={e => {
-                const file = e.target.files?.[0];
-                if (file) onUploadImage(event.id, file);
-              }}
+      {/* Expanded view */}
+      {expanded && (
+        <>
+          <hr
+            style={{
+              margin: "var(--spacing-4) 0",
+              border: "none",
+              borderTop: "1px solid var(--color-border)",
+            }}
+          />
+
+          {localEvent.image_url && (
+            <div className="mb-5">
+              <img
+                src={getImageUrl(localEvent.image_url)}
+                alt={localEvent.title}
+                style={{
+                  width: "100%",
+                  height: "200px",
+                  objectFit: "cover",
+                  borderRadius: "var(--radius-base)",
+                }}
+              />
+            </div>
+          )}
+
+          <div className="grid grid-2 gap-4 mb-5">
+            <Input
+              label="Título"
+              value={localEvent.title || ""}
+              onChange={e => handleChange("title", e.target.value)}
             />
-          </label>
-        </Button>
-      </div>
+            <Select
+              label="Formato"
+              value={localEvent.format || "webinar"}
+              onChange={e => handleChange("format", e.target.value)}
+            >
+              <option value="webinar">Webinar</option>
+              <option value="presencial">Presencial</option>
+            </Select>
+            <Input
+              label="Instructor"
+              value={localEvent.instructor || ""}
+              onChange={e => handleChange("instructor", e.target.value)}
+            />
+            <Input
+              label="Capacidad"
+              type="number"
+              value={localEvent.max_students || ""}
+              onChange={e =>
+                handleChange("max_students", Number(e.target.value))
+              }
+            />
+            <Input
+              label="Precio socio"
+              type="number"
+              value={localEvent.price_member || 0}
+              onChange={e =>
+                handleChange("price_member", Number(e.target.value))
+              }
+            />
+            <Input
+              label="Precio no socio"
+              type="number"
+              value={localEvent.price_non_member || 0}
+              onChange={e =>
+                handleChange("price_non_member", Number(e.target.value))
+              }
+            />
+            <Input
+              label="Precio joven"
+              type="number"
+              value={localEvent.price_joven || 0}
+              onChange={e =>
+                handleChange("price_joven", Number(e.target.value))
+              }
+            />
+            <Input
+              label="Precio gratuito"
+              type="number"
+              value={localEvent.price_gratuito || 0}
+              onChange={e =>
+                handleChange("price_gratuito", Number(e.target.value))
+              }
+            />
+            <Input
+              label="Fecha inicio"
+              type="date"
+              value={
+                localEvent.start_date
+                  ? localEvent.start_date.substring(0, 10)
+                  : ""
+              }
+              onChange={e => handleChange("start_date", e.target.value)}
+            />
+            <Input
+              label="Fecha fin"
+              type="date"
+              value={
+                localEvent.end_date ? localEvent.end_date.substring(0, 10) : ""
+              }
+              onChange={e => handleChange("end_date", e.target.value)}
+            />
+            <Input
+              label="Límite inscripción"
+              type="date"
+              value={
+                localEvent.registration_deadline
+                  ? localEvent.registration_deadline.substring(0, 10)
+                  : ""
+              }
+              onChange={e =>
+                handleChange("registration_deadline", e.target.value)
+              }
+            />
+          </div>
+
+          <div className="flex gap-4 flex-wrap">
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => onUpdate(localEvent)}
+            >
+              Guardar cambios
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onViewEnrollments(event.id)}
+            >
+              Ver inscritos
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onDelete(event.id)}
+            >
+              Eliminar
+            </Button>
+            <Button variant="outline" size="sm" asChild>
+              <label style={{ cursor: "pointer", margin: 0 }}>
+                Subir imagen{" "}
+                <input
+                  type="file"
+                  accept="image/*"
+                  style={{ display: "none" }}
+                  onChange={e => {
+                    const file = e.target.files?.[0];
+                    if (file) onUploadImage(event.id, file);
+                  }}
+                />
+              </label>
+            </Button>
+          </div>
+        </>
+      )}
     </Card>
   );
 }
@@ -514,19 +634,15 @@ function EnrollmentsModal({ modal, onClose }) {
     {
       key: "payment_status",
       label: "Estado pago",
-      render: row => (
-        <Badge
-          variant={
-            row.payment_status === "paid"
-              ? "success"
-              : row.payment_status === "pending"
-              ? "warning"
-              : "default"
-          }
-        >
-          {row.payment_status}
-        </Badge>
-      ),
+      render: row => {
+        let variant = "default";
+        if (row.payment_status === "paid") {
+          variant = "success";
+        } else if (row.payment_status === "pending") {
+          variant = "warning";
+        }
+        return <Badge variant={variant}>{row.payment_status}</Badge>;
+      },
     },
     {
       key: "payment_amount",
@@ -542,7 +658,7 @@ function EnrollmentsModal({ modal, onClose }) {
       title={`Inscritos: ${event.title || ""}`}
       size="large"
     >
-      <div className="mb-4 flex-start gap-4 text-muted">
+      <div className="mb-5 flex-start gap-4 text-muted">
         <span>
           <strong>Capacidad:</strong> {capacity ?? "Sin límite"}
         </span>
@@ -560,7 +676,7 @@ function EnrollmentsModal({ modal, onClose }) {
         <Table columns={columns} data={validEnrollments} striped hoverable />
       )}
 
-      <div className="flex-end mt-4">
+      <div className="flex-end mt-5">
         <Button variant="outline" onClick={onClose}>
           Cerrar
         </Button>

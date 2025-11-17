@@ -139,6 +139,12 @@ img {
   transition: all var(--transition-base);
 }
 
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .nav {
   display: flex;
   align-items: center;
@@ -360,6 +366,12 @@ img {
   gap: var(--spacing-5);
 }
 
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-4);
+}
+
 .grid-cols-1 {
   grid-template-columns: 1fr;
 }
@@ -407,7 +419,6 @@ img {
   background: var(--color-bg);
   box-shadow: var(--shadow);
   transition: all var(--transition-base);
-  /* height: 100%; */
   display: flex;
   flex-direction: column;
   margin: 10px;
@@ -660,22 +671,22 @@ img {
 }
 
 .badge-info {
-  background-color: #3b82f6;
+  background-color: #2563eb;
   color: #fff;
 }
 
 .badge-success {
-  background-color: #10b981;
+  background-color: #059669;
   color: #fff;
 }
 
 .badge-warning {
-  background-color: #f59e0b;
+  background-color: #d97706;
   color: #fff;
 }
 
 .badge-error {
-  background-color: #ef4444;
+  background-color: #dc2626;
   color: #fff;
 }
 
@@ -1289,6 +1300,24 @@ img {
 .flex-wrap {
   flex-wrap: wrap;
 }
+
+/* Flexbox alignment utilities */
+.flex-start {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+.flex-end {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .items-center {
   align-items: center;
 }
@@ -1297,6 +1326,20 @@ img {
 }
 .items-end {
   align-items: flex-end;
+}
+
+.align-center {
+  align-items: center;
+}
+.align-start {
+  align-items: flex-start;
+}
+.align-end {
+  align-items: flex-end;
+}
+
+.justify-start {
+  justify-content: flex-start;
 }
 .justify-center {
   justify-content: center;
@@ -1308,6 +1351,7 @@ img {
   justify-content: flex-end;
 }
 
+/* Gap utilities */
 .gap-1 {
   gap: var(--spacing-1);
 }
@@ -1323,9 +1367,22 @@ img {
 .gap-5 {
   gap: var(--spacing-5);
 }
+.gap-6 {
+  gap: var(--spacing-6);
+}
+.gap-7 {
+  gap: var(--spacing-7);
+}
+.gap-8 {
+  gap: var(--spacing-8);
+}
 
+/* Margin utilities */
 .mt-0 {
   margin-top: 0;
+}
+.mt-1 {
+  margin-top: var(--spacing-1);
 }
 .mt-2 {
   margin-top: var(--spacing-2);
@@ -1339,9 +1396,21 @@ img {
 .mt-5 {
   margin-top: var(--spacing-5);
 }
+.mt-6 {
+  margin-top: var(--spacing-6);
+}
+.mt-7 {
+  margin-top: var(--spacing-7);
+}
+.mt-8 {
+  margin-top: var(--spacing-8);
+}
 
 .mb-0 {
   margin-bottom: 0;
+}
+.mb-1 {
+  margin-bottom: var(--spacing-1);
 }
 .mb-2 {
   margin-bottom: var(--spacing-2);
@@ -1355,7 +1424,26 @@ img {
 .mb-5 {
   margin-bottom: var(--spacing-5);
 }
+.mb-6 {
+  margin-bottom: var(--spacing-6);
+}
+.mb-7 {
+  margin-bottom: var(--spacing-7);
+}
+.mb-8 {
+  margin-bottom: var(--spacing-8);
+}
 
+/* Padding utilities */
+.p-0 {
+  padding: 0;
+}
+.p-1 {
+  padding: var(--spacing-1);
+}
+.p-2 {
+  padding: var(--spacing-2);
+}
 .p-3 {
   padding: var(--spacing-3);
 }
@@ -1368,7 +1456,141 @@ img {
 .p-6 {
   padding: var(--spacing-6);
 }
+.p-7 {
+  padding: var(--spacing-7);
+}
+.p-8 {
+  padding: var(--spacing-8);
+}
 
+.pt-1 {
+  padding-top: var(--spacing-1);
+}
+.pt-2 {
+  padding-top: var(--spacing-2);
+}
+.pt-3 {
+  padding-top: var(--spacing-3);
+}
+.pt-4 {
+  padding-top: var(--spacing-4);
+}
+.pt-5 {
+  padding-top: var(--spacing-5);
+}
+.pt-6 {
+  padding-top: var(--spacing-6);
+}
+.pt-7 {
+  padding-top: var(--spacing-7);
+}
+.pt-8 {
+  padding-top: var(--spacing-8);
+}
+
+.pb-1 {
+  padding-bottom: var(--spacing-1);
+}
+.pb-2 {
+  padding-bottom: var(--spacing-2);
+}
+.pb-3 {
+  padding-bottom: var(--spacing-3);
+}
+.pb-4 {
+  padding-bottom: var(--spacing-4);
+}
+.pb-5 {
+  padding-bottom: var(--spacing-5);
+}
+.pb-6 {
+  padding-bottom: var(--spacing-6);
+}
+.pb-7 {
+  padding-bottom: var(--spacing-7);
+}
+.pb-8 {
+  padding-bottom: var(--spacing-8);
+}
+
+.px-1 {
+  padding-left: var(--spacing-1);
+  padding-right: var(--spacing-1);
+}
+.px-2 {
+  padding-left: var(--spacing-2);
+  padding-right: var(--spacing-2);
+}
+.px-3 {
+  padding-left: var(--spacing-3);
+  padding-right: var(--spacing-3);
+}
+.px-4 {
+  padding-left: var(--spacing-4);
+  padding-right: var(--spacing-4);
+}
+.px-5 {
+  padding-left: var(--spacing-5);
+  padding-right: var(--spacing-5);
+}
+.px-6 {
+  padding-left: var(--spacing-6);
+  padding-right: var(--spacing-6);
+}
+.px-7 {
+  padding-left: var(--spacing-7);
+  padding-right: var(--spacing-7);
+}
+.px-8 {
+  padding-left: var(--spacing-8);
+  padding-right: var(--spacing-8);
+}
+
+.py-1 {
+  padding-top: var(--spacing-1);
+  padding-bottom: var(--spacing-1);
+}
+.py-2 {
+  padding-top: var(--spacing-2);
+  padding-bottom: var(--spacing-2);
+}
+.py-3 {
+  padding-top: var(--spacing-3);
+  padding-bottom: var(--spacing-3);
+}
+.py-4 {
+  padding-top: var(--spacing-4);
+  padding-bottom: var(--spacing-4);
+}
+.py-5 {
+  padding-top: var(--spacing-5);
+  padding-bottom: var(--spacing-5);
+}
+.py-6 {
+  padding-top: var(--spacing-6);
+  padding-bottom: var(--spacing-6);
+}
+.py-7 {
+  padding-top: var(--spacing-7);
+  padding-bottom: var(--spacing-7);
+}
+.py-8 {
+  padding-top: var(--spacing-8);
+  padding-bottom: var(--spacing-8);
+}
+
+/* Display utilities */
+.block {
+  display: block;
+}
+.inline-block {
+  display: inline-block;
+}
+.hidden {
+  display: none;
+}
+
+/* Width and height utilities */
 .w-full {
   width: 100%;
 }
@@ -2318,6 +2540,13 @@ img {
   margin: 0 auto;
 }
 
+/* Centered form wrapper */
+.form-wrapper-centered {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0;
+}
+
 /* Flex utilities - already exist but ensuring coverage */
 .flex-1 {
   flex: 1;
@@ -2559,4 +2788,247 @@ img {
   .instagram-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* Additional utility classes for removing inline styles */
+
+/* Min heights */
+.min-h-300 {
+  min-height: 300px;
+}
+
+.min-h-400 {
+  min-height: 400px;
+}
+
+/* Max widths */
+.max-w-700 {
+  max-width: 700px;
+}
+
+.max-w-720 {
+  max-width: 720px;
+}
+
+.max-w-800 {
+  max-width: 800px;
+}
+
+.max-w-900 {
+  max-width: 900px;
+}
+
+/* Margins (specific sizes) */
+.m-0 {
+  margin: 0;
+}
+
+.mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.mb-12 {
+  margin-bottom: 12px;
+}
+
+.mb-16 {
+  margin-bottom: 16px;
+}
+
+.mb-24 {
+  margin-bottom: 24px;
+}
+
+.mb-32 {
+  margin-bottom: 32px;
+}
+
+.mb-48 {
+  margin-bottom: 48px;
+}
+
+.mt-16 {
+  margin-top: 16px;
+}
+
+.mt-32 {
+  margin-top: 32px;
+}
+
+.ml-16 {
+  margin-left: 16px;
+}
+
+/* Padding (specific sizes) */
+.p-16 {
+  padding: 16px;
+}
+
+.p-48-0 {
+  padding: 48px 0;
+}
+
+.py-48 {
+  padding-top: 48px;
+  padding-bottom: 48px;
+}
+
+/* Font sizes (additional) */
+.text-xs {
+  font-size: 0.75rem;
+}
+
+/* Colors (additional) */
+.text-warning {
+  color: #ff9500;
+}
+
+.text-orange {
+  color: orange;
+}
+
+.text-green {
+  color: green;
+}
+
+.text-crimson {
+  color: crimson;
+}
+
+.bg-green {
+  background: green;
+}
+
+/* Flex utilities (additional) */
+.flex-1-1-auto {
+  flex: 1 1 auto;
+}
+
+.flex-shrink-0 {
+  flex-shrink: 0;
+}
+
+/* Positioning */
+.relative {
+  position: relative;
+}
+
+.self-start {
+  align-self: flex-start;
+}
+
+/* Borders (additional) */
+.border-2-orange {
+  border: 2px solid orange;
+}
+
+/* Cursor */
+.cursor-pointer {
+  cursor: pointer;
+}
+
+/* Object fit */
+.object-cover {
+  object-fit: cover;
+}
+
+/* Display none (hidden file input) */
+.display-none {
+  display: none;
+}
+
+/* Width utilities */
+.w-auto {
+  width: auto;
+}
+
+/* Flex column with gap */
+.flex-column-gap-8 {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Grid with specific values */
+.grid-1fr-1fr {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* Common patterns for admin tables */
+.table-title {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.table-subtitle {
+  font-size: 0.875rem;
+  color: var(--color-muted);
+}
+
+.table-date {
+  font-size: 0.875rem;
+  margin-bottom: 4px;
+}
+
+.card-centered {
+  text-align: center;
+}
+
+.card-title-no-margin {
+  margin: 0;
+  margin-bottom: 4px;
+}
+
+.card-subtitle-muted {
+  margin: 0;
+  color: var(--color-muted);
+}
+
+.large-number {
+  font-size: 2.5em;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: 8px;
+}
+
+.large-number-secondary {
+  font-size: 2em;
+  font-weight: bold;
+  color: var(--color-secondary);
+  margin-bottom: 8px;
+}
+
+.large-number-accent {
+  font-size: 2em;
+  font-weight: bold;
+  color: var(--color-accent);
+  margin-bottom: 8px;
+}
+
+.small-muted-text {
+  font-size: 0.9em;
+  color: var(--color-muted);
+}
+
+.grid-auto-fit {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.status-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.status-row-last {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
 }

@@ -66,7 +66,7 @@ export default function ApplicationDetail() {
         `Pago confirmado. Usuario creado con credenciales: ${result.credentials.email} / ${result.credentials.password}`
       );
       setTimeout(() => {
-        navigate("/admin");
+        navigate("/admin?tab=applications");
       }, 3000);
     } catch (err) {
       setError("Error al confirmar el pago");
@@ -83,7 +83,7 @@ export default function ApplicationDetail() {
       });
       setMsg("Postulación rechazada.");
       setTimeout(() => {
-        navigate("/admin");
+        navigate("/admin?tab=applications");
       }, 2000);
     } catch (err) {
       setError("Error al rechazar la postulación");
@@ -115,7 +115,7 @@ export default function ApplicationDetail() {
             </div>
             <button
               className="btn btn-outline"
-              onClick={() => navigate("/admin")}
+              onClick={() => navigate("/admin?tab=applications")}
             >
               Volver al Panel Admin
             </button>
@@ -162,7 +162,7 @@ export default function ApplicationDetail() {
         <div style={{ marginBottom: 32 }}>
           <button
             className="btn btn-outline"
-            onClick={() => navigate("/admin")}
+            onClick={() => navigate("/admin?tab=applications")}
             style={{ marginBottom: 24 }}
           >
             <i className="fa-solid fa-arrow-left"></i> Volver al Panel Admin

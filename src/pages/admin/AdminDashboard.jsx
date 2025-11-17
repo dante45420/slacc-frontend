@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import PropTypes from "prop-types";
 import { apiGet } from "../../api/client";
 import {
@@ -40,13 +40,22 @@ function formatDateHelper(dateString, defaultText = "Sin fecha") {
 }
 
 export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState("overview");
+  const [searchParams] = useSearchParams();
+  const tabFromUrl = searchParams.get("tab");
+  const [activeTab, setActiveTab] = useState(tabFromUrl || "overview");
   const [stats, setStats] = useState({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadStats();
   }, []);
+
+  // Update active tab when URL changes
+  useEffect(() => {
+    if (tabFromUrl) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [tabFromUrl]);
 
   async function loadStats() {
     try {
@@ -190,7 +199,7 @@ function EventsTab() {
 
   if (loading) {
     return (
-      <div className="flex-center" style={{ minHeight: "300px" }}>
+      <div className="flex-center min-h-300">
         <Spinner size="lg" />
       </div>
     );
@@ -208,12 +217,8 @@ function EventsTab() {
 
         return (
           <div>
-            <div style={{ fontWeight: "600", marginBottom: "4px" }}>
-              {row.title}
-            </div>
-            <div style={{ fontSize: "0.875rem", color: "var(--color-muted)" }}>
-              {description}
-            </div>
+            <div className="table-title">{row.title}</div>
+            <div className="table-subtitle">{description}</div>
           </div>
         );
       },
@@ -228,7 +233,7 @@ function EventsTab() {
       label: "Fecha",
       render: row => (
         <div>
-          <div style={{ fontSize: "0.875rem", marginBottom: "4px" }}>
+          <div className="table-date">
             {formatDateHelper(row.start_date, "Por confirmar")}
           </div>
           <Badge
@@ -244,9 +249,7 @@ function EventsTab() {
       key: "location",
       label: "Ubicación",
       render: row => (
-        <span style={{ fontSize: "0.875rem", color: "var(--color-muted)" }}>
-          {row.location || "N/A"}
-        </span>
+        <span className="text-sm text-muted">{row.location || "N/A"}</span>
       ),
     },
     {
@@ -268,8 +271,8 @@ function EventsTab() {
     <div>
       <div className="flex justify-between align-center mb-5">
         <div>
-          <h2 style={{ margin: 0, marginBottom: "4px" }}>Eventos</h2>
-          <p style={{ margin: 0, color: "var(--color-muted)" }}>
+          <h2 className="card-title-no-margin">Eventos</h2>
+          <p className="card-subtitle-muted">
             {events.length} {events.length === 1 ? "evento" : "eventos"} en
             total
           </p>
@@ -291,65 +294,35 @@ function EventsTab() {
 function OverviewTab({ stats }) {
   return (
     <div>
-      <h2 style={{ marginBottom: 24 }}>Resumen General</h2>
+      <h2 className="mb-24">Resumen General</h2>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-          gap: 24,
-          marginBottom: 32,
-        }}
-      >
-        <div className="card" style={{ textAlign: "center" }}>
-          <h3 style={{ marginBottom: 8 }}>Postulaciones</h3>
-          <div
-            style={{
-              fontSize: "2em",
-              fontWeight: "bold",
-              color: "var(--color-primary)",
-              marginBottom: 8,
-            }}
-          >
+      <div className="grid-auto-fit">
+        <div className="card card-centered">
+          <h3>Postulaciones</h3>
+          <div className="large-number-accent">
             {stats.applications?.total || 0}
           </div>
-          <div style={{ fontSize: "0.9em", color: "var(--color-muted)" }}>
+          <div className="small-muted-text">
             {stats.applications?.pending || 0} pendientes •{" "}
             {stats.applications?.payment_pending || 0} esperando pago
           </div>
         </div>
 
-        <div className="card" style={{ textAlign: "center" }}>
-          <h3 style={{ marginBottom: 8 }}>Usuarios</h3>
-          <div
-            style={{
-              fontSize: "2em",
-              fontWeight: "bold",
-              color: "var(--color-secondary)",
-              marginBottom: 8,
-            }}
-          >
+        <div className="card card-centered">
+          <h3>Usuarios</h3>
+          <div className="large-number-secondary">
             {stats.users?.total || 0}
           </div>
-          <div style={{ fontSize: "0.9em", color: "var(--color-muted)" }}>
+          <div className="small-muted-text">
             {stats.users?.members || 0} socios • {stats.users?.admins || 0}{" "}
             admins
           </div>
         </div>
 
-        <div className="card" style={{ textAlign: "center" }}>
-          <h3 style={{ marginBottom: 8 }}>Noticias</h3>
-          <div
-            style={{
-              fontSize: "2em",
-              fontWeight: "bold",
-              color: "var(--color-accent)",
-              marginBottom: 8,
-            }}
-          >
-            {stats.news?.total || 0}
-          </div>
-          <div style={{ fontSize: "0.9em", color: "var(--color-muted)" }}>
+        <div className="card card-centered">
+          <h3>Noticias</h3>
+          <div className="large-number-accent">{stats.news?.total || 0}</div>
+          <div className="small-muted-text">
             {stats.news?.published || 0} publicadas • {stats.news?.pending || 0}{" "}
             pendientes
           </div>
@@ -357,8 +330,8 @@ function OverviewTab({ stats }) {
       </div>
 
       <div className="card">
-        <h3 style={{ marginBottom: 16 }}>Estados de Postulaciones</h3>
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        <h3 className="mb-16">Estados de Postulaciones</h3>
+        <div className="flex-column-gap-8">
           <div
             style={{
               display: "flex",
@@ -1013,10 +986,14 @@ function SimpleNewsForm({ onSuccess }) {
           name="image"
           type="file"
           accept="image/*"
-          className="input"
+          className="w-full p-2"
+          style={{
+            border: "1px solid var(--color-border)",
+            borderRadius: "var(--radius-base)",
+          }}
         />
       </div>
-      <div className="flex justify-end gap-2">
+      <div className="flex justify-center gap-2">
         <Button type="submit" variant="primary" disabled={loading}>
           {loading ? "Creando..." : "Crear noticia"}
         </Button>

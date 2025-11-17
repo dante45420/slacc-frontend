@@ -1,6 +1,16 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
+import {
+  Section,
+  Container,
+  Card,
+  Input,
+  Textarea,
+  Button,
+  Spinner,
+  useToast,
+} from "../../components/ui";
 
 const BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
@@ -21,6 +31,7 @@ export default function EditNews() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const toast = useToast();
   const [news, setNews] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -89,212 +100,149 @@ export default function EditNews() {
         throw new Error("Error al actualizar la noticia");
       }
 
-      setMsg("Noticia actualizada correctamente");
+      toast.success("Noticia actualizada correctamente");
       navigate(`/noticias/${id}`);
     } catch (err) {
-      setError(err.message);
+      toast.error(err.message);
     } finally {
       setSaving(false);
     }
   }
 
-  if (loading) {
+  if (loading && !title) {
     return (
-      <section className="section">
-        <div className="container">
-          <p>Cargando...</p>
-        </div>
-      </section>
+      <Section variant="default" padding="lg">
+        <Container size="lg">
+          <div className="flex-center min-h-400">
+            <Spinner size="lg" />
+          </div>
+        </Container>
+      </Section>
     );
   }
 
   if (error) {
     return (
-      <section className="section">
-        <div className="container">
+      <Section variant="default" padding="lg">
+        <Container>
           <h2>Error</h2>
           <p>{error}</p>
-        </div>
-      </section>
+        </Container>
+      </Section>
     );
   }
 
   if (!news) {
     return (
-      <section className="section">
-        <div className="container">
+      <Section variant="default" padding="lg">
+        <Container>
           <h2>Noticia no encontrada</h2>
-        </div>
-      </section>
+        </Container>
+      </Section>
     );
   }
 
   return (
-    <section className="section">
-      <div className="container">
-        <h2>Editar noticia</h2>
-
-        <form onSubmit={handleSubmit} style={{ maxWidth: "800px" }}>
-          <div style={{ marginBottom: "var(--spacing-lg)" }}>
-            <label
-              htmlFor="title"
-              style={{
-                display: "block",
-                marginBottom: "8px",
-                fontWeight: "bold",
-              }}
+    <Section variant="default" padding="lg">
+      <Container size="lg">
+        <div className="form-wrapper-centered">
+          <div className="mb-6">
+            <Button
+              variant="outline"
+              onClick={() => navigate(`/noticias/${id}`)}
+              className="mb-4"
             >
-              Título *
-            </label>
-            <input
-              id="title"
-              type="text"
-              value={title}
-              onChange={e => setTitle(e.target.value)}
-              required
-              style={{
-                width: "100%",
-                padding: "12px",
-                border: "1px solid var(--color-border)",
-                borderRadius: "var(--radius)",
-                fontSize: "16px",
-              }}
-            />
+              <i className="fa-solid fa-arrow-left"></i> Volver a la noticia
+            </Button>
+            <h1 className="mb-2">Editar noticia</h1>
           </div>
 
-          <div style={{ marginBottom: "var(--spacing-lg)" }}>
-            <label
-              htmlFor="excerpt"
-              style={{
-                display: "block",
-                marginBottom: "8px",
-                fontWeight: "bold",
-              }}
-            >
-              Resumen *
-            </label>
-            <textarea
-              id="excerpt"
-              value={excerpt}
-              onChange={e => setExcerpt(e.target.value)}
-              required
-              rows={3}
-              style={{
-                width: "100%",
-                padding: "12px",
-                border: "1px solid var(--color-border)",
-                borderRadius: "var(--radius)",
-                fontSize: "16px",
-                resize: "vertical",
-              }}
-            />
-          </div>
+          <form onSubmit={handleSubmit}>
+            <Card className="mb-6">
+              <Input
+                label="Título *"
+                type="text"
+                value={title}
+                onChange={e => setTitle(e.target.value)}
+                required
+                className="mb-4"
+              />
 
-          <div style={{ marginBottom: "var(--spacing-lg)" }}>
-            <label
-              htmlFor="content"
-              style={{
-                display: "block",
-                marginBottom: "8px",
-                fontWeight: "bold",
-              }}
-            >
-              Contenido completo *
-            </label>
-            <textarea
-              id="content"
-              value={content}
-              onChange={e => setContent(e.target.value)}
-              required
-              rows={10}
-              style={{
-                width: "100%",
-                padding: "12px",
-                border: "1px solid var(--color-border)",
-                fontSize: "16px",
-                resize: "vertical",
-              }}
-            />
-          </div>
+              <Textarea
+                label="Resumen *"
+                value={excerpt}
+                onChange={e => setExcerpt(e.target.value)}
+                required
+                rows={3}
+                className="mb-4"
+              />
 
-          <div style={{ marginBottom: "var(--spacing-lg)" }}>
-            <label
-              htmlFor="edit-news-image"
-              style={{
-                display: "block",
-                marginBottom: "8px",
-                fontWeight: "bold",
-              }}
-            >
-              Imagen
-            </label>
+              <Textarea
+                label="Contenido completo *"
+                value={content}
+                onChange={e => setContent(e.target.value)}
+                required
+                rows={10}
+                className="mb-4"
+              />
 
-            {/* Imagen actual */}
-            {currentImage && (
-              <div style={{ marginBottom: "16px" }}>
-                <p
-                  style={{
-                    fontSize: "14px",
-                    color: "var(--color-text-light)",
-                    marginBottom: "8px",
-                  }}
+              <div className="mb-0">
+                <label
+                  htmlFor="edit-news-image"
+                  className="block mb-2 font-medium"
                 >
-                  Imagen actual:
-                </p>
-                <img
-                  src={getImageUrl(currentImage)}
-                  alt="Imagen actual"
+                  Imagen
+                </label>
+
+                {currentImage && (
+                  <div className="mb-4">
+                    <p className="text-sm text-muted mb-2">Imagen actual:</p>
+                    <img
+                      src={getImageUrl(currentImage)}
+                      alt="Imagen actual"
+                      className="rounded"
+                      style={{
+                        maxWidth: "300px",
+                        maxHeight: "200px",
+                        objectFit: "cover",
+                        border: "1px solid var(--color-border)",
+                      }}
+                    />
+                  </div>
+                )}
+
+                <input
+                  id="edit-news-image"
+                  type="file"
+                  accept="image/*"
+                  onChange={e => setImageFile(e.target.files[0])}
+                  className="w-full p-2"
                   style={{
-                    maxWidth: "200px",
-                    maxHeight: "150px",
-                    objectFit: "cover",
-                    borderRadius: "var(--radius)",
                     border: "1px solid var(--color-border)",
+                    borderRadius: "var(--radius-base)",
                   }}
                 />
+                <p className="text-sm text-muted mt-2">
+                  Deja vacío para mantener la imagen actual
+                </p>
               </div>
-            )}
+            </Card>
 
-            {/* Input para nueva imagen */}
-            <input
-              id="edit-news-image"
-              type="file"
-              accept="image/*"
-              onChange={e => setImageFile(e.target.files[0])}
-              style={{
-                width: "100%",
-                padding: "8px",
-                border: "1px solid var(--color-border)",
-                borderRadius: "var(--radius)",
-              }}
-            />
-            <p
-              style={{
-                fontSize: "14px",
-                color: "var(--color-text-light)",
-                marginTop: "8px",
-              }}
-            >
-              Deja vacío para mantener la imagen actual
-            </p>
-          </div>
-
-          <div
-            style={{ display: "flex", gap: "16px", justifyContent: "flex-end" }}
-          >
-            <button
-              type="button"
-              className="btn btn-outline"
-              onClick={() => navigate(`/noticias/${id}`)}
-            >
-              Cancelar
-            </button>
-            <button type="submit" className="btn btn-primary" disabled={saving}>
-              {saving ? "Guardando..." : "Guardar cambios"}
-            </button>
-          </div>
-        </form>
-      </div>
-    </section>
+            <div className="flex justify-center gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => navigate(`/noticias/${id}`)}
+              >
+                Cancelar
+              </Button>
+              <Button type="submit" variant="primary" disabled={saving}>
+                {saving ? "Guardando..." : "Guardar cambios"}
+              </Button>
+            </div>
+          </form>
+        </div>
+      </Container>
+    </Section>
   );
 }

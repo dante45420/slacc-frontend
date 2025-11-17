@@ -9,6 +9,7 @@ import {
   Card,
   Grid,
   Spinner,
+  useToast,
 } from "../../components/ui";
 
 const BASE_URL =
@@ -80,54 +81,55 @@ export default function NewsDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const toast = useToast();
   const [news, setNews] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [more, setMore] = useState([]);
   const [prevNext, setPrevNext] = useState({ prev: null, next: null });
 
-  useEffect(() => {
-    async function loadNews() {
-      try {
-        setLoading(true);
-        const token = localStorage.getItem("access_token");
+  async function loadNews() {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("access_token");
 
-        const headers = {};
-        if (token) {
-          headers["Authorization"] = `Bearer ${token}`;
-        }
-
-        const response = await fetch(`${BASE_URL}/news/${id}`, { headers });
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error("Error response:", errorText);
-          throw new Error(`Error ${response.status}: ${errorText}`);
-        }
-
-        const data = await response.json();
-        setNews(data);
-        // Cargar más noticias y calcular anterior/siguiente
-        try {
-          const listRes = await fetch(`${BASE_URL}/news`);
-          const list = await listRes.json();
-          setMore(list.filter(n => n.id !== data.id).slice(0, 6));
-          const idx = list.findIndex(n => n.id === data.id);
-          setPrevNext({
-            prev: idx > 0 ? list[idx - 1] : null,
-            next: idx >= 0 && idx < list.length - 1 ? list[idx + 1] : null,
-          });
-        } catch (e) {
-          console.error("Error loading news list:", e);
-        }
-      } catch (err) {
-        console.error("Error cargando noticia:", err);
-        setError(err.message);
-      } finally {
-        setLoading(false);
+      const headers = {};
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
       }
-    }
 
+      const response = await fetch(`${BASE_URL}/news/${id}`, { headers });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Error response:", errorText);
+        throw new Error(`Error ${response.status}: ${errorText}`);
+      }
+
+      const data = await response.json();
+      setNews(data);
+      // Cargar más noticias y calcular anterior/siguiente
+      try {
+        const listRes = await fetch(`${BASE_URL}/news`);
+        const list = await listRes.json();
+        setMore(list.filter(n => n.id !== data.id).slice(0, 6));
+        const idx = list.findIndex(n => n.id === data.id);
+        setPrevNext({
+          prev: idx > 0 ? list[idx - 1] : null,
+          next: idx >= 0 && idx < list.length - 1 ? list[idx + 1] : null,
+        });
+      } catch (e) {
+        console.error("Error loading news list:", e);
+      }
+    } catch (err) {
+      console.error("Error cargando noticia:", err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
     if (id) {
       loadNews();
     }
@@ -141,10 +143,14 @@ export default function NewsDetail() {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (response.ok) {
-        loadNews(); // recargar noticia
+        toast.success("Noticia aprobada correctamente");
+        await loadNews(); // recargar noticia
+      } else {
+        toast.error("Error al aprobar la noticia");
       }
     } catch (err) {
       console.error("Error al aprobar:", err);
+      toast.error("Error al aprobar la noticia");
     }
   }
 
@@ -156,10 +162,14 @@ export default function NewsDetail() {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (response.ok) {
-        loadNews(); // recargar noticia
+        toast.success("Noticia rechazada");
+        await loadNews(); // recargar noticia
+      } else {
+        toast.error("Error al rechazar la noticia");
       }
     } catch (err) {
       console.error("Error al rechazar:", err);
+      toast.error("Error al rechazar la noticia");
     }
   }
 
@@ -272,7 +282,10 @@ export default function NewsDetail() {
 
               {/* Admin actions */}
               {user?.role === "admin" && (
-                <div className="flex gap-2" style={{ flexShrink: 0 }}>
+                <div
+                  className="flex gap-2"
+                  style={{ flexShrink: 0, alignSelf: "flex-start" }}
+                >
                   {news.status === "pending" && (
                     <>
                       <Button variant="primary" size="sm" onClick={approveNews}>

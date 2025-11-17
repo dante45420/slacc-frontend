@@ -1,6 +1,21 @@
 import PropTypes from "prop-types";
 import Container from "./Container";
 
+const PADDING_CLASSES = {
+  none: "section-padding-none",
+  sm: "section-padding-sm",
+  default: "",
+  lg: "section-padding-lg",
+  xl: "section-padding-xl",
+};
+
+const VARIANT_CLASSES = {
+  default: "section-container",
+  alt: "section-container-alt",
+  primary: "section-container-primary",
+  transparent: "section-container-transparent",
+};
+
 export default function Section({
   children,
   variant = "default",
@@ -10,25 +25,8 @@ export default function Section({
   containerClassName,
   ...props
 }) {
-  const paddingClass =
-    padding === "none"
-      ? "section-padding-none"
-      : padding === "sm"
-      ? "section-padding-sm"
-      : padding === "lg"
-      ? "section-padding-lg"
-      : padding === "xl"
-      ? "section-padding-xl"
-      : "";
-
-  const variantClass =
-    variant === "transparent"
-      ? "section-container-transparent"
-      : variant === "alt"
-      ? "section-container-alt"
-      : variant === "primary"
-      ? "section-container-primary"
-      : "section-container";
+  const paddingClass = PADDING_CLASSES[padding] || "";
+  const variantClass = VARIANT_CLASSES[variant] || "section-container";
 
   return (
     <section

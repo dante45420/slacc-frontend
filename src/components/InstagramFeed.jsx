@@ -3,19 +3,17 @@ export default function InstagramFeed() {
   // Right-click on Instagram image in browser > "Open image in new tab" > Copy URL
   const posts = [
     {
-      id: "DQto7Knkd1Q",
-      url: "https://www.instagram.com/p/DQto7Knkd1Q/",
-      // Replace with actual image URL after opening in browser
+      id: "DQ21nDokegk",
+      url: "https://www.instagram.com/p/DQ21nDokegk/",
       image:
-        "https://scontent.cdninstagram.com/v/t51.82787-15/572098534_17850428751584355_2981966545568209914_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=105&ig_cache_key=Mzc1OTg0MTI0NjI0MTE5ODQ2Mw%3D%3D.3-ccb1-7&ccb=1-7&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6InhwaWRzLjE0NDB4MTkyMC5zZHIuQzMifQ%3D%3D&_nc_ohc=KQgs8onPBhkQ7kNvwGhXagx&_nc_oc=AdkOAWGLV7TbH9eVQQAyLeaMzTweV4MiJnlGJx4EKxzC6JZO3e_LoUTvYe-JCFgga6A&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&_nc_gid=UqPO25uPjzWYjrmw8C_dzw&oh=00_Afgfl7xT0LT9vIJqAuuAUrUY64fhoBRZMCKSV3SiHdbBvg&oe=6914114C",
+        "https://scontent.cdninstagram.com/v/t51.82787-15/579388617_17850907902584355_656091812733746632_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=105&ig_cache_key=Mzc2MjQzMDMwOTY5NTU5MTQ3OA%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6InhwaWRzLjE0NDB4MTc5OC5zZHIuQzMifQ%3D%3D&_nc_ohc=cJu_qFEdid8Q7kNvwG83iSw&_nc_oc=AdkGuyRZhiUBFIJAUiBL0rkvbu1iJHaVI7moP5i05MlfNgjMPWmxCdNFznuCZWUMpOc&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&_nc_gid=f3xL6XKvDiMC1SEsBSQpIQ&oh=00_AfgpwqDk231LwvdfBUwsLjDVopjsBzXxG9SiuVdNIel4Cg&oe=692569BD",
       caption: "Recent post from SLACC",
     },
     {
-      id: "DPCP558ivga",
-      url: "https://www.instagram.com/p/DPCP558ivga/",
-      // Replace with actual image URL after opening in browser
+      id: "DQto7Knkd1Q",
+      url: "https://www.instagram.com/p/DQto7Knkd1Q/",
       image:
-        "https://scontent.cdninstagram.com/v/t51.82787-15/553502192_17842890909584355_762588276760088701_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=108&ig_cache_key=MzcyOTYxMzM5MTM0MzA1NjkyMg%3D%3D.3-ccb1-7&ccb=1-7&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6InhwaWRzLjExMjJ4MTEyMi5zZHIuQzMifQ%3D%3D&_nc_ohc=ekSWDyKJ_cUQ7kNvwHcTML1&_nc_oc=AdkxZcKcqHvig-HAsFQRbrDdX2So2FfBeON-0STuZ2QL0jDA7L2S6rKwFpjhSkU8_OQ&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&_nc_gid=UqPO25uPjzWYjrmw8C_dzw&oh=00_AfiPBsCtuOY5q0OCH2f3aSmR3SrdXGoorviulpoQzYjd2Q&oe=6913EE74",
+        "https://scontent.cdninstagram.com/v/t51.82787-15/572098534_17850428751584355_2981966545568209914_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=105&ig_cache_key=Mzc1OTg0MTI0NjI0MTE5ODQ2Mw%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6InhwaWRzLjE0NDB4MTkyMC5zZHIuQzMifQ%3D%3D&_nc_ohc=ve7DCcR5XNEQ7kNvwEjFRmN&_nc_oc=AdnTTQgmFD0ZBao2oKq8OzyK0NhWROognxsIAMHRLOKwwKGVOKAes96rNzIPpowcw5E&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&_nc_gid=f3xL6XKvDiMC1SEsBSQpIQ&oh=00_AfjhGQ-EPuAkXbx51KVOSRxvx6iDiNc2KH9E0M5qlAXnhg&oe=69256D0C",
       caption: "Latest update from SLACC",
     },
   ];

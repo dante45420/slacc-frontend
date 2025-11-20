@@ -8,6 +8,7 @@ export default defineConfig({
 
     allowedHosts: [
       "slacc-frontend-1vz6.onrender.com",
+      "slacc.info",
       "localhost",
       "127.0.0.1",
     ],

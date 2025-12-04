@@ -159,9 +159,11 @@ EventFormatBadge.propTypes = {
 };
 
 function EventsTab() {
-  const navigate = useNavigate();
+  const toast = useToast();
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [editingEvent, setEditingEvent] = useState(null);
 
   useEffect(() => {
     load();
@@ -187,6 +189,54 @@ function EventsTab() {
     setEvents(sorted);
     setLoading(false);
   }
+
+  const handleCreateSuccess = () => {
+    setShowCreateModal(false);
+    load();
+  };
+
+  const handleEditClick = event => {
+    setEditingEvent(event);
+    setShowCreateModal(true);
+  };
+
+  const handleEditSuccess = () => {
+    setShowCreateModal(false);
+    setEditingEvent(null);
+    load();
+  };
+
+  const handleModalClose = () => {
+    setShowCreateModal(false);
+    setEditingEvent(null);
+  };
+
+  const handleDelete = async eventId => {
+    if (!confirm("¿Estás seguro de que deseas eliminar este evento?")) return;
+
+    try {
+      const token = localStorage.getItem("access_token");
+      const res = await fetch(
+        `${
+          import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api"
+        }/admin/events/${eventId}`,
+        {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (res.ok) {
+        toast.success("Evento eliminado correctamente");
+        load();
+      } else {
+        toast.error("Error al eliminar el evento");
+      }
+    } catch (err) {
+      toast.error("Error al eliminar el evento");
+      console.error(err);
+    }
+  };
 
   const isUpcoming = dateString => {
     if (!dateString) return false;
@@ -256,13 +306,22 @@ function EventsTab() {
       key: "actions",
       label: "Acciones",
       render: row => (
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => navigate(`/eventos/${row.id}`)}
-        >
-          Ver
-        </Button>
+        <div style={{ display: "flex", gap: "var(--spacing-2)" }}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleEditClick(row)}
+          >
+            Editar
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => handleDelete(row.id)}
+          >
+            Eliminar
+          </Button>
+        </div>
       ),
     },
   ];
@@ -277,19 +336,258 @@ function EventsTab() {
             total
           </p>
         </div>
-        <Button variant="primary" onClick={() => navigate("/admin/eventos")}>
+        <Button variant="primary" onClick={() => setShowCreateModal(true)}>
           + Crear evento
         </Button>
       </div>
 
       {events.length === 0 ? (
-        <Alert variant="info">No hay eventos registrados todavía.</Alert>
+        <Alert variant="info">
+          No hay eventos registrados todavía. Haz clic en "Crear evento" para
+          empezar.
+        </Alert>
       ) : (
         <Table columns={columns} data={events} hoverable />
       )}
+
+      <Modal
+        isOpen={showCreateModal}
+        onClose={handleModalClose}
+        title={editingEvent ? "Editar Evento" : "Crear Nuevo Evento"}
+        size="lg"
+      >
+        <EventForm
+          event={editingEvent}
+          onSuccess={editingEvent ? handleEditSuccess : handleCreateSuccess}
+          onCancel={handleModalClose}
+        />
+      </Modal>
     </div>
   );
 }
+
+function EventForm({ event, onSuccess, onCancel }) {
+  const toast = useToast();
+  const [loading, setLoading] = useState(false);
+  const [form, setForm] = useState({
+    title: event?.title || "",
+    description: event?.description || "",
+    instructor: event?.instructor || "",
+    duration_hours: event?.duration_hours || "",
+    format: event?.format || "webinar",
+    location: event?.location || "",
+    max_students: event?.max_students || "",
+    price_member: event?.price_member || "",
+    price_non_member: event?.price_non_member || "",
+    price_joven: event?.price_joven || "",
+    price_gratuito: event?.price_gratuito || "",
+    start_date: event?.start_date ? event.start_date.split("T")[0] : "",
+    end_date: event?.end_date ? event.end_date.split("T")[0] : "",
+    registration_deadline: event?.registration_deadline
+      ? event.registration_deadline.split("T")[0]
+      : "",
+    is_active: event?.is_active === undefined || event.is_active,
+  });
+
+  const getButtonText = () => {
+    if (loading) return "Guardando...";
+    return event ? "Actualizar Evento" : "Crear Evento";
+  };
+
+  const handleSubmit = async e => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const token = localStorage.getItem("access_token");
+      const url = event
+        ? `${
+            import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api"
+          }/admin/events/${event.id}`
+        : `${
+            import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api"
+          }/admin/events`;
+
+      const res = await fetch(url, {
+        method: event ? "PUT" : "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(form),
+      });
+
+      if (res.ok) {
+        toast.success(
+          event
+            ? "Evento actualizado correctamente"
+            : "Evento creado correctamente"
+        );
+        onSuccess();
+      } else {
+        const data = await res.json();
+        toast.error(data.error || "Error al guardar el evento");
+      }
+    } catch (err) {
+      toast.error("Error al guardar el evento");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <div className="grid grid-2 gap-4 mb-4">
+        <Input
+          label="Título"
+          value={form.title}
+          onChange={e => setForm({ ...form, title: e.target.value })}
+          required
+        />
+        <Select
+          label="Formato"
+          value={form.format}
+          onChange={e => setForm({ ...form, format: e.target.value })}
+        >
+          <option value="webinar">Webinar</option>
+          <option value="presencial">Presencial</option>
+        </Select>
+      </div>
+
+      <div className="mb-4">
+        <Textarea
+          label="Descripción"
+          value={form.description}
+          onChange={e => setForm({ ...form, description: e.target.value })}
+          rows={3}
+        />
+      </div>
+
+      <div className="grid grid-2 gap-4 mb-4">
+        <Input
+          label="Instructor"
+          value={form.instructor}
+          onChange={e => setForm({ ...form, instructor: e.target.value })}
+        />
+        <Input
+          label="Duración (horas)"
+          type="number"
+          value={form.duration_hours}
+          onChange={e => setForm({ ...form, duration_hours: e.target.value })}
+        />
+      </div>
+
+      <div className="grid grid-2 gap-4 mb-4">
+        <Input
+          label="Ubicación"
+          value={form.location}
+          onChange={e => setForm({ ...form, location: e.target.value })}
+          placeholder={
+            form.format === "webinar" ? "Link del webinar" : "Dirección física"
+          }
+        />
+        <Input
+          label="Capacidad Máxima (Opcional)"
+          type="number"
+          value={form.max_students}
+          onChange={e => setForm({ ...form, max_students: e.target.value })}
+        />
+      </div>
+
+      <div className="grid grid-2 gap-4 mb-4">
+        <Input
+          label="Fecha de Inicio"
+          type="date"
+          value={form.start_date}
+          onChange={e => setForm({ ...form, start_date: e.target.value })}
+        />
+        <Input
+          label="Fecha de Fin"
+          type="date"
+          value={form.end_date}
+          onChange={e => setForm({ ...form, end_date: e.target.value })}
+        />
+      </div>
+
+      <div className="mb-4">
+        <Input
+          label="Límite de Inscripción"
+          type="date"
+          value={form.registration_deadline}
+          onChange={e =>
+            setForm({ ...form, registration_deadline: e.target.value })
+          }
+        />
+      </div>
+
+      <h3 className="mb-3" style={{ fontSize: "1.1rem" }}>
+        Precios
+      </h3>
+      <div className="grid grid-2 gap-4 mb-4">
+        <Input
+          label="Valor Socio"
+          type="number"
+          value={form.price_member}
+          onChange={e => setForm({ ...form, price_member: e.target.value })}
+        />
+        <Input
+          label="Valor No Socio"
+          type="number"
+          value={form.price_non_member}
+          onChange={e => setForm({ ...form, price_non_member: e.target.value })}
+        />
+      </div>
+
+      <div className="grid grid-2 gap-4 mb-4">
+        <Input
+          label="Valor Nex Gen"
+          type="number"
+          value={form.price_joven}
+          onChange={e => setForm({ ...form, price_joven: e.target.value })}
+        />
+        <Input
+          label="Valor Socio Emérito"
+          type="number"
+          value={form.price_gratuito}
+          onChange={e => setForm({ ...form, price_gratuito: e.target.value })}
+        />
+      </div>
+
+      <div className="mb-4">
+        <label
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "var(--spacing-2)",
+          }}
+        >
+          <input
+            type="checkbox"
+            checked={form.is_active}
+            onChange={e => setForm({ ...form, is_active: e.target.checked })}
+          />
+          <span>Evento activo</span>
+        </label>
+      </div>
+
+      <div className="flex justify-end gap-2">
+        <Button type="button" variant="outline" onClick={onCancel}>
+          Cancelar
+        </Button>
+        <Button type="submit" variant="primary" disabled={loading}>
+          {getButtonText()}
+        </Button>
+      </div>
+    </form>
+  );
+}
+
+EventForm.propTypes = {
+  event: PropTypes.object,
+  onSuccess: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
+};
 
 function OverviewTab({ stats }) {
   return (

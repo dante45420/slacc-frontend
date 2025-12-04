@@ -251,7 +251,7 @@ export default function CoursesPage() {
                       >
                         {user ? (
                           <div>
-                            <div>Precio socio</div>
+                            <div>Valor socio</div>
                             <div
                               style={{
                                 textDecoration: "line-through",
@@ -262,7 +262,7 @@ export default function CoursesPage() {
                             </div>
                           </div>
                         ) : (
-                          <div>Precio general</div>
+                          <div>Valor general</div>
                         )}
                       </div>
                     </div>
@@ -551,7 +551,7 @@ function EnrollmentModal({ course, user, onClose, onSuccess }) {
                   alignItems: "center",
                 }}
               >
-                <span style={{ fontWeight: "500" }}>Precio:</span>
+                <span style={{ fontWeight: "500" }}>Valor:</span>
                 <span
                   style={{
                     fontSize: "1.5em",

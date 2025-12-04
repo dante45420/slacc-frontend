@@ -8,6 +8,7 @@ import Home from "./pages/public/Home.jsx";
 import Contact from "./pages/public/Contact.jsx";
 import Estatutos from "./pages/public/Estatutos.jsx";
 import Comites from "./pages/public/Comites.jsx";
+import NotFound from "./pages/public/NotFound.jsx";
 
 // Auth pages
 import Login from "./pages/auth/Login.jsx";
@@ -37,7 +38,6 @@ import WhyJoin from "./pages/members/WhyJoin.jsx";
 // Admin pages
 import AdminPortal from "./pages/admin/AdminPortal.jsx";
 import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
-import AdminEvents from "./pages/admin/AdminEvents.jsx";
 import AdminUserView from "./pages/admin/AdminUserView.jsx";
 import AdminUserEdit from "./pages/admin/AdminUserEdit.jsx";
 import AdminUserNew from "./pages/admin/AdminUserNew.jsx";
@@ -87,7 +87,7 @@ export default function App() {
               element={<Placeholder title="Nosotros - Historia" />}
             />
             <Route path="/nosotros/mision" element={<Estatutos />} />
-            <Route path="/nosotros/comite" element={<Comites />} />
+            <Route path="/comites" element={<Comites />} />
             <Route path="/miembros" element={<MembersBenefits />} />
             <Route path="/miembros/beneficios" element={<MembersBenefits />} />
             <Route path="/miembros/como-unirse" element={<WhyJoin />} />
@@ -188,15 +188,7 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
-            <Route
-              path="/admin/eventos"
-              element={
-                <ProtectedRoute requireAdmin>
-                  <AdminEvents />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="*" element={<Placeholder title="Página" />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </main>
       </ToastProvider>

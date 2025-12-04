@@ -187,7 +187,7 @@ export default function EventsPage() {
                           </div>
                         </div>
                         <div>
-                          <div className="text-muted mb-1">Precio</div>
+                          <div className="text-muted mb-1">Valor</div>
                           <div className="font-bold text-primary">
                             ${getPriceDisplay(e)}
                           </div>

@@ -32,18 +32,18 @@ export default function InstagramFeed() {
         display: "grid",
         gridTemplateColumns: "repeat(3, 1fr)",
         gap: "var(--spacing-4)",
-        maxHeight: "400px",
+        maxHeight: "300px",
         overflow: "hidden",
       }}
     >
-      {posts.map(post => (
+      {posts.slice(0, 3).map(post => (
         <a
           key={post.id}
           href={post.url}
           target="_blank"
           rel="noopener noreferrer"
           className="card hover-lift instagram-card"
-          style={{ height: "100%", maxHeight: "380px" }}
+          style={{ height: "100%", maxHeight: "280px" }}
         >
           <div className="instagram-image-wrapper" style={{ height: "100%" }}>
             <img

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { apiGet, apiPost } from "../../api/client";
+import { Modal, Button, useToast } from "../../components/ui";
 
 const BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
@@ -15,6 +16,9 @@ export default function ApplicationDetail() {
   const [selectedMembershipType, setSelectedMembershipType] =
     useState("normal");
   const [resolutionNote, setResolutionNote] = useState("");
+  const [credentials, setCredentials] = useState(null);
+  const [showCredentialsModal, setShowCredentialsModal] = useState(false);
+  const toast = useToast();
 
   useEffect(() => {
     loadApplication();
@@ -62,16 +66,37 @@ export default function ApplicationDetail() {
       const result = await apiPost(
         `/admin/applications/${application.id}/confirm-payment`
       );
-      setMsg(
-        `Pago confirmado. Usuario creado con credenciales: ${result.credentials.email} / ${result.credentials.password}`
-      );
-      setTimeout(() => {
-        navigate("/admin?tab=applications");
-      }, 3000);
+
+      if (result.credentials) {
+        setCredentials(result.credentials);
+        setShowCredentialsModal(true);
+      } else {
+        setMsg(result.message || "Pago confirmado exitosamente");
+        setTimeout(() => {
+          navigate("/admin?tab=applications");
+        }, 2000);
+      }
     } catch (err) {
       setError("Error al confirmar el pago");
       console.error(err);
     }
+  }
+
+  function copyToClipboard(text) {
+    navigator.clipboard
+      .writeText(text)
+      .then(() => {
+        toast.success("Copiado al portapapeles");
+      })
+      .catch(() => {
+        toast.error("Error al copiar");
+      });
+  }
+
+  function handleCloseCredentialsModal() {
+    setShowCredentialsModal(false);
+    setCredentials(null);
+    navigate("/admin?tab=applications");
   }
 
   async function rejectApplication() {
@@ -318,13 +343,13 @@ export default function ApplicationDetail() {
                 }}
               >
                 <option value="joven">
-                  Socio Joven ($30/año) - Recién egresados
+                  Nex Gen ($30/año) - Recién egresados
                 </option>
                 <option value="normal">
                   Socio Normal ($100/año) - Profesionales con experiencia
                 </option>
                 <option value="gratuito">
-                  Socio Gratuito (Gratis) - Alto estatus invitado
+                  Socio Emérito (Gratis) - Alto estatus invitado
                 </option>
               </select>
             </div>
@@ -423,6 +448,194 @@ export default function ApplicationDetail() {
           </div>
         )}
       </div>
+
+      {/* Credentials Modal */}
+      <Modal
+        isOpen={showCredentialsModal}
+        onClose={handleCloseCredentialsModal}
+        title="Credenciales de Usuario Creadas"
+      >
+        <div style={{ padding: "var(--spacing-4)" }}>
+          <div
+            style={{
+              background: "var(--color-warning-bg)",
+              border: "2px solid var(--color-warning)",
+              borderRadius: "var(--radius)",
+              padding: "var(--spacing-4)",
+              marginBottom: "var(--spacing-4)",
+            }}
+          >
+            <p
+              style={{
+                margin: 0,
+                fontWeight: "600",
+                color: "var(--color-warning-dark)",
+              }}
+            >
+              ⚠️ IMPORTANTE: Esta información se muestra una sola vez
+            </p>
+            <p style={{ margin: "var(--spacing-2) 0 0", fontSize: "0.9rem" }}>
+              Copia estas credenciales y envíalas al usuario de forma segura.
+            </p>
+          </div>
+
+          {credentials && (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "var(--spacing-3)",
+              }}
+            >
+              <div>
+                <label
+                  style={{
+                    display: "block",
+                    fontWeight: "600",
+                    marginBottom: "var(--spacing-2)",
+                  }}
+                >
+                  Email:
+                </label>
+                <div style={{ display: "flex", gap: "var(--spacing-2)" }}>
+                  <input
+                    type="text"
+                    value={credentials.email}
+                    readOnly
+                    style={{
+                      flex: 1,
+                      padding: "var(--spacing-2)",
+                      border: "1px solid var(--color-border)",
+                      borderRadius: "var(--radius)",
+                      background: "var(--color-bg-alt)",
+                    }}
+                  />
+                  <button
+                    onClick={() => copyToClipboard(credentials.email)}
+                    style={{
+                      padding: "var(--spacing-2) var(--spacing-3)",
+                      background: "var(--color-primary)",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "var(--radius)",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Copiar
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label
+                  style={{
+                    display: "block",
+                    fontWeight: "600",
+                    marginBottom: "var(--spacing-2)",
+                  }}
+                >
+                  Contraseña Temporal:
+                </label>
+                <div style={{ display: "flex", gap: "var(--spacing-2)" }}>
+                  <input
+                    type="text"
+                    value={credentials.password}
+                    readOnly
+                    style={{
+                      flex: 1,
+                      padding: "var(--spacing-2)",
+                      border: "1px solid var(--color-border)",
+                      borderRadius: "var(--radius)",
+                      background: "var(--color-bg-alt)",
+                      fontFamily: "monospace",
+                      fontSize: "1.1rem",
+                    }}
+                  />
+                  <button
+                    onClick={() => copyToClipboard(credentials.password)}
+                    style={{
+                      padding: "var(--spacing-2) var(--spacing-3)",
+                      background: "var(--color-primary)",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "var(--radius)",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Copiar
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label
+                  style={{
+                    display: "block",
+                    fontWeight: "600",
+                    marginBottom: "var(--spacing-2)",
+                  }}
+                >
+                  Tipo de Membresía:
+                </label>
+                <input
+                  type="text"
+                  value={credentials.membership_type}
+                  readOnly
+                  style={{
+                    width: "100%",
+                    padding: "var(--spacing-2)",
+                    border: "1px solid var(--color-border)",
+                    borderRadius: "var(--radius)",
+                    background: "var(--color-bg-alt)",
+                  }}
+                />
+              </div>
+            </div>
+          )}
+
+          <div
+            style={{
+              marginTop: "var(--spacing-5)",
+              display: "flex",
+              justifyContent: "flex-end",
+              gap: "var(--spacing-2)",
+            }}
+          >
+            <button
+              onClick={() => {
+                if (credentials) {
+                  copyToClipboard(
+                    `Email: ${credentials.email}\nContraseña: ${credentials.password}\nMembresía: ${credentials.membership_type}`
+                  );
+                }
+              }}
+              style={{
+                padding: "var(--spacing-2) var(--spacing-4)",
+                background: "var(--color-secondary)",
+                color: "white",
+                border: "none",
+                borderRadius: "var(--radius)",
+                cursor: "pointer",
+              }}
+            >
+              Copiar Todo
+            </button>
+            <button
+              onClick={handleCloseCredentialsModal}
+              style={{
+                padding: "var(--spacing-2) var(--spacing-4)",
+                background: "var(--color-primary)",
+                color: "white",
+                border: "none",
+                borderRadius: "var(--radius)",
+                cursor: "pointer",
+              }}
+            >
+              Cerrar y Continuar
+            </button>
+          </div>
+        </div>
+      </Modal>
     </section>
   );
 }

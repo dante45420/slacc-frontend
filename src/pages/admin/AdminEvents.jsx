@@ -204,10 +204,8 @@ export default function AdminEvents() {
     <Section variant="default" padding="lg">
       <Container>
         <div className="mb-6">
-          <h1 className="mb-2">Gestión de Eventos y Cursos</h1>
-          <p className="text-muted">
-            Crea, edita y administra los eventos de la plataforma
-          </p>
+          <h1 className="mb-2">Creador de Eventos</h1>
+          <p className="text-muted">Crea eventos dentro de la plataforma</p>
         </div>
 
         <Card className="mb-8">
@@ -314,37 +312,6 @@ export default function AdminEvents() {
             </Button>
           </div>
         </Card>
-
-        <div className="mb-5">
-          <h2 className="mb-2">Eventos existentes</h2>
-          <p className="text-muted">
-            {events.length} {events.length === 1 ? "evento" : "eventos"} en
-            total
-          </p>
-        </div>
-
-        {events.length === 0 ? (
-          <Alert variant="info">No hay eventos creados todavía.</Alert>
-        ) : (
-          <div className="grid gap-6">
-            {events.map(event => (
-              <EventCard
-                key={event.id}
-                event={event}
-                onUpdate={updateEvent}
-                onDelete={removeEvent}
-                onViewEnrollments={viewEnrollments}
-                onUploadImage={uploadImage}
-                getImageUrl={getImageUrl}
-              />
-            ))}
-          </div>
-        )}
-
-        <EnrollmentsModal
-          modal={enrollmentsModal}
-          onClose={() => setEnrollmentsModal({ open: false, data: null })}
-        />
       </Container>
     </Section>
   );
@@ -488,7 +455,7 @@ function EventCard({
               onChange={e => handleChange("instructor", e.target.value)}
             />
             <Input
-              label="Capacidad"
+              label="Capacidad (Opcional)"
               type="number"
               value={localEvent.max_students || ""}
               onChange={e =>
@@ -496,7 +463,7 @@ function EventCard({
               }
             />
             <Input
-              label="Precio socio"
+              label="Valor socio"
               type="number"
               value={localEvent.price_member || 0}
               onChange={e =>
@@ -504,7 +471,7 @@ function EventCard({
               }
             />
             <Input
-              label="Precio no socio"
+              label="Valor no socio"
               type="number"
               value={localEvent.price_non_member || 0}
               onChange={e =>
@@ -512,7 +479,7 @@ function EventCard({
               }
             />
             <Input
-              label="Precio joven"
+              label="Valor Nex Gen"
               type="number"
               value={localEvent.price_joven || 0}
               onChange={e =>
@@ -520,7 +487,7 @@ function EventCard({
               }
             />
             <Input
-              label="Precio gratuito"
+              label="Valor gratuito"
               type="number"
               value={localEvent.price_gratuito || 0}
               onChange={e =>

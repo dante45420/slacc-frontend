@@ -2,43 +2,68 @@ import { Section, Container, Grid, Card } from "../../components/ui";
 
 const committees = [
   {
-    id: 1,
+    id: "subespecialidades",
     name: "Comité de Subespecialidades",
     description:
       "Coordinación y desarrollo de áreas especializadas en cirugía cardiovascular",
-    icon: "🏥",
+    members: [
+      { name: "Dr. Juan Pérez", role: "Presidente" },
+      { name: "Dra. María García", role: "Secretaria" },
+      { name: "Dr. Carlos Rodríguez", role: "Vocal" },
+    ],
   },
   {
-    id: 2,
+    id: "etica",
     name: "Comité de Ética",
     description:
       "Supervisión de estándares éticos y deontológicos en la práctica profesional",
-    icon: "⚖️",
+    members: [
+      { name: "Dra. Ana Martínez", role: "Presidenta" },
+      { name: "Dr. Luis Fernández", role: "Secretario" },
+      { name: "Dra. Carmen López", role: "Vocal" },
+    ],
   },
   {
-    id: 3,
+    id: "cientifico",
     name: "Comité Científico",
     description: "Promoción de la investigación y publicaciones científicas",
-    icon: "🔬",
+    members: [
+      { name: "Dr. Roberto Sánchez", role: "Presidente" },
+      { name: "Dra. Laura Torres", role: "Secretaria" },
+      { name: "Dr. Miguel Ángel Ruiz", role: "Vocal" },
+    ],
   },
   {
-    id: 4,
-    name: "Comité de Educación",
-    description: "Organización de programas de formación y educación continua",
-    icon: "📚",
-  },
-  {
-    id: 5,
-    name: "Comité de Acreditación",
+    id: "comite-a",
+    name: "Comité A",
     description:
-      "Evaluación y certificación de programas de formación en cirugía cardiovascular",
-    icon: "✓",
+      "Grupo especializado en el desarrollo de iniciativas estratégicas",
+    members: [
+      { name: "Dr. Pedro Gómez", role: "Presidente" },
+      { name: "Dra. Isabel Moreno", role: "Secretaria" },
+      { name: "Dr. Francisco Navarro", role: "Vocal" },
+    ],
   },
   {
-    id: 6,
-    name: "Comité de Relaciones Internacionales",
-    description: "Colaboración con sociedades y organizaciones internacionales",
-    icon: "🌎",
+    id: "comite-b",
+    name: "Comité B",
+    description: "Grupo enfocado en la coordinación de actividades académicas",
+    members: [
+      { name: "Dra. Patricia Jiménez", role: "Presidenta" },
+      { name: "Dr. Antonio Castro", role: "Secretario" },
+      { name: "Dra. Silvia Romero", role: "Vocal" },
+    ],
+  },
+  {
+    id: "comite-c",
+    name: "Comité C",
+    description:
+      "Grupo dedicado al análisis y seguimiento de proyectos institucionales",
+    members: [
+      { name: "Dr. Jorge Vargas", role: "Presidente" },
+      { name: "Dra. Teresa Medina", role: "Secretaria" },
+      { name: "Dr. Raúl Ortiz", role: "Vocal" },
+    ],
   },
 ];
 
@@ -54,15 +79,61 @@ export default function Comites() {
           </p>
         </div>
 
-        <Grid cols={2} gap={6}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "var(--spacing-8)",
+          }}
+        >
           {committees.map(committee => (
-            <Card key={committee.id} className="p-6">
-              <div className="text-5xl mb-4">{committee.icon}</div>
-              <h3 className="text-xl font-bold mb-3">{committee.name}</h3>
-              <p className="text-gray-600">{committee.description}</p>
-            </Card>
+            <div key={committee.id} id={committee.id}>
+              <Card className="p-6">
+                <h2 className="text-2xl font-bold mb-3">{committee.name}</h2>
+                <p className="text-gray-600 mb-6">{committee.description}</p>
+
+                <h3 className="text-lg font-semibold mb-4">
+                  Miembros del Comité
+                </h3>
+                <Grid cols={3} gap={4}>
+                  {committee.members.map(member => (
+                    <Card
+                      key={member.name}
+                      className="p-4"
+                      style={{ background: "var(--color-bg-alt)" }}
+                    >
+                      <div
+                        style={{
+                          width: "80px",
+                          height: "80px",
+                          borderRadius: "50%",
+                          background: "var(--color-primary)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          margin: "0 auto var(--spacing-3)",
+                          fontSize: "2rem",
+                          color: "white",
+                        }}
+                      >
+                        {member.name
+                          .split(" ")
+                          .map(n => n[0])
+                          .join("")}
+                      </div>
+                      <h4 className="font-semibold text-center mb-1">
+                        {member.name}
+                      </h4>
+                      <p className="text-sm text-center text-gray-600">
+                        {member.role}
+                      </p>
+                    </Card>
+                  ))}
+                </Grid>
+              </Card>
+            </div>
           ))}
-        </Grid>
+        </div>
 
         <div className="mt-12 bg-white rounded-lg shadow-md p-8">
           <h2 className="text-2xl font-bold mb-4">Funciones de los Comités</h2>

@@ -104,7 +104,7 @@ export default function EventDetail() {
               : "Por confirmar"}
           </p>
           <p>
-            <strong>Precio:</strong> ${event.price_for_user}
+            <strong>Valor:</strong> ${event.price_for_user}
           </p>
           {!isAdmin && (
             <button

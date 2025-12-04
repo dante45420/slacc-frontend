@@ -26,6 +26,20 @@ SubLink.propTypes = {
   label: PropTypes.string.isRequired,
 };
 
+function SubMenuGroup({ label, children }) {
+  return (
+    <div className="submenu-item">
+      <span style={{ cursor: "default" }}>{label}</span>
+      <div className="submenu-nested">{children}</div>
+    </div>
+  );
+}
+
+SubMenuGroup.propTypes = {
+  label: PropTypes.string.isRequired,
+  children: PropTypes.node.isRequired,
+};
+
 export default function Header() {
   const { user, logout } = useAuth();
   return (
@@ -42,14 +56,24 @@ export default function Header() {
         <ul className="menu">
           <MenuItem label="Inicio" to="/" />
           <MenuItem label="Nosotros" to="/nosotros">
-            <SubLink to="/nosotros/historia" label="Historia" />
             <SubLink to="/nosotros/mision" label="Estatutos, Misión, Visión" />
-            <SubLink to="/nosotros/comite" label="Comités" />
+            <SubLink to="/nosotros/historia" label="Historia" />
+          </MenuItem>
+          <MenuItem label="Comités" to="/comites">
+            <SubLink
+              to="/comites#subespecialidades"
+              label="Subespecialidades"
+            />
+            <SubLink to="/comites#etica" label="Ética" />
+            <SubLink to="/comites#cientifico" label="Científico" />
+            <SubLink to="/comites#comite-a" label="Comité A" />
+            <SubLink to="/comites#comite-b" label="Comité B" />
+            <SubLink to="/comites#comite-c" label="Comité C" />
           </MenuItem>
           <MenuItem label="Miembros" to="/miembros">
             <SubLink to="/por-que-ser-socio" label="Beneficios" />
-            <SubLink to="/por-que-ser-socio" label="Hazte socio" />
             <SubLink to="/miembros/directorio" label="Directorio" />
+            <SubLink to="/por-que-ser-socio" label="Hazte socio" />
             <SubLink to="/miembros/socios-jovenes" label="Nex Gen" />
             <SubLink
               to="/miembros/sociedades-afines"
@@ -57,14 +81,14 @@ export default function Header() {
             />
           </MenuItem>
           <MenuItem label="Cursos" to="/cursos">
-            <SubLink to="/cursos" label="Todos" />
-            <SubLink to="/eventos/proximos" label="Próximos" />
             <SubLink to="/eventos/pasados" label="Pasados" />
+            <SubLink to="/eventos/proximos" label="Próximos" />
+            <SubLink to="/cursos" label="Todos" />
             <SubLink to="/eventos/webinars" label="Webinars" />
           </MenuItem>
           <MenuItem label="Noticias" to="/noticias/comunicados">
-            <SubLink to="/noticias/comunicados" label="Comunicados" />
             <SubLink to="/noticias/blog" label="Artículos científicos" />
+            <SubLink to="/noticias/comunicados" label="Comunicados" />
           </MenuItem>
           <MenuItem label="Contacto" to="/contacto" />
           {user?.role === "admin" && <MenuItem label="Admin" to="/admin" />}

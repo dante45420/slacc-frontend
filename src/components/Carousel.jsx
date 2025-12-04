@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import Button from "./ui/Button.jsx";
 import PropTypes from "prop-types";
 
-export default function Carousel({ items = [], intervalMs = 6000 }) {
+export default function Carousel({ items = [], intervalMs = 9000 }) {
   const [index, setIndex] = useState(0);
   const slides = useMemo(
     () =>
@@ -56,14 +56,23 @@ export default function Carousel({ items = [], intervalMs = 6000 }) {
           <div
             key={s.title}
             className="carousel-slide"
-            style={{ backgroundImage: `url(${s.imageUrl})` }}
+            style={{
+              backgroundImage: `url(${s.imageUrl})`,
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              if (s.ctaHref) {
+                globalThis.location.href = s.ctaHref;
+              }
+            }}
           >
             <div className="carousel-overlay" />
             <div className="carousel-content">
               <h2 className="carousel-title">{s.title}</h2>
               <p className="carousel-desc">{s.description}</p>
               <Button
-                onClick={() => {
+                onClick={e => {
+                  e.stopPropagation();
                   globalThis.location.href = s.ctaHref;
                 }}
               >

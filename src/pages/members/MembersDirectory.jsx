@@ -91,7 +91,16 @@ export default function MembersDirectory() {
   return (
     <section className="section">
       <div className="container">
-        <h1>Directorio de Miembros</h1>
+        <h1>Directorio</h1>
+        <p
+          style={{
+            color: "var(--color-muted)",
+            marginBottom: "var(--spacing-6)",
+            fontSize: "1.1rem",
+          }}
+        >
+          Conéctate con cirujanos cardiovasculares de toda Latinoamérica
+        </p>
         {groups.map(g => (
           <div key={g.name} className="directory-group">
             <h3 className="directory-group-title">{g.name}</h3>

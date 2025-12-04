@@ -79,9 +79,9 @@ export default function AdminUserView() {
   else if (user.payment_status === "due") paymentVariant = "warning";
 
   const getMembershipTypeLabel = type => {
-    if (type === "joven") return "Miembro Joven";
+    if (type === "joven") return "Nex Gen";
     if (type === "normal") return "Miembro Normal";
-    if (type === "gratuito") return "Membresía Gratuita";
+    if (type === "gratuito") return "Socio Emérito";
     return type || "No definido";
   };
 

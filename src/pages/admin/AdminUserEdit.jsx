@@ -149,9 +149,9 @@ export default function AdminUserEdit() {
                     setUser({ ...user, membership_type: e.target.value })
                   }
                   options={[
-                    { value: "joven", label: "Miembro Joven" },
+                    { value: "joven", label: "Nex Gen" },
                     { value: "normal", label: "Miembro Normal" },
-                    { value: "gratuito", label: "Membresía Gratuita" },
+                    { value: "gratuito", label: "Socio Emérito" },
                   ]}
                 />
 

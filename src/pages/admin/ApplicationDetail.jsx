@@ -127,7 +127,7 @@ export default function ApplicationDetail() {
 
   const getMembershipTypeLabel = type => {
     const types = {
-      joven: "Socio Joven ($30/año)",
+      joven: "Nex Gen ($30/año)",
       normal: "Socio Normal ($100/año)",
       gratuito: "Socio Gratuito (Gratis)",
     };

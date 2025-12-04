@@ -16,10 +16,26 @@ export default function InstagramFeed() {
         "https://scontent.cdninstagram.com/v/t51.82787-15/572098534_17850428751584355_2981966545568209914_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=105&ig_cache_key=Mzc1OTg0MTI0NjI0MTE5ODQ2Mw%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6InhwaWRzLjE0NDB4MTkyMC5zZHIuQzMifQ%3D%3D&_nc_ohc=ve7DCcR5XNEQ7kNvwEjFRmN&_nc_oc=AdnTTQgmFD0ZBao2oKq8OzyK0NhWROognxsIAMHRLOKwwKGVOKAes96rNzIPpowcw5E&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&_nc_gid=f3xL6XKvDiMC1SEsBSQpIQ&oh=00_AfjhGQ-EPuAkXbx51KVOSRxvx6iDiNc2KH9E0M5qlAXnhg&oe=69256D0C",
       caption: "Latest update from SLACC",
     },
+    {
+      id: "DQqA5zIobUI",
+      url: "https://www.instagram.com/p/DQqA5zIobUI/",
+      image:
+        "https://scontent.cdninstagram.com/v/t51.82787-15/571743074_17850320978584355_2741083092391531825_n.jpg",
+      caption: "SLACC community update",
+    },
   ];
 
   return (
-    <div className="instagram-grid">
+    <div
+      className="instagram-grid"
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(3, 1fr)",
+        gap: "var(--spacing-4)",
+        maxHeight: "400px",
+        overflow: "hidden",
+      }}
+    >
       {posts.map(post => (
         <a
           key={post.id}
@@ -27,12 +43,14 @@ export default function InstagramFeed() {
           target="_blank"
           rel="noopener noreferrer"
           className="card hover-lift instagram-card"
+          style={{ height: "100%", maxHeight: "380px" }}
         >
-          <div className="instagram-image-wrapper">
+          <div className="instagram-image-wrapper" style={{ height: "100%" }}>
             <img
               src={post.image}
               alt={post.caption}
               className="instagram-image"
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
             />
             <div className="instagram-overlay">
               <svg

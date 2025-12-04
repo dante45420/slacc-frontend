@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useAuth } from "../../auth/AuthContext.jsx";
 import Section from "../../components/ui/Section.jsx";
 import Button from "../../components/ui/Button.jsx";
 import Card from "../../components/ui/Card.jsx";
 import Badge from "../../components/ui/Badge.jsx";
 import Spinner from "../../components/ui/Spinner.jsx";
 import Alert from "../../components/ui/Alert.jsx";
+import { useToast } from "../../components/ui/Toast.jsx";
+import { sanitizeHtml } from "../../utils/sanitize.js";
 
 const BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
@@ -13,9 +16,12 @@ const BASE_URL =
 export default function CourseDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const toast = useToast();
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [enrolling, setEnrolling] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -33,6 +39,37 @@ export default function CourseDetail() {
     }
     if (id) load();
   }, [id]);
+
+  const handleEnroll = async () => {
+    if (!user) {
+      toast.error("Debes iniciar sesión para inscribirte");
+      navigate("/login");
+      return;
+    }
+
+    setEnrolling(true);
+    try {
+      const token = localStorage.getItem("access_token");
+      const res = await fetch(`${BASE_URL}/events/${id}/enroll`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Error al inscribirse");
+      }
+
+      toast.success("¡Inscripción exitosa! Revisa tu email para más detalles");
+    } catch (err) {
+      toast.error(err.message || "Error al procesar la inscripción");
+    } finally {
+      setEnrolling(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -173,7 +210,7 @@ export default function CourseDetail() {
 
         {course.content && (
           <div
-            dangerouslySetInnerHTML={{ __html: course.content }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(course.content) }}
             style={{
               lineHeight: 1.8,
               color: "var(--color-text-secondary)",
@@ -191,8 +228,13 @@ export default function CourseDetail() {
             flexWrap: "wrap",
           }}
         >
-          <Button variant="primary" size="lg">
-            Inscribirse al curso
+          <Button
+            variant="primary"
+            size="lg"
+            onClick={handleEnroll}
+            disabled={enrolling}
+          >
+            {enrolling ? "Procesando..." : "Inscribirse al curso"}
           </Button>
           <Button variant="outline" size="lg">
             Compartir

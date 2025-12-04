@@ -42,9 +42,11 @@
   --color-border: #5e8cad; /* Rackley */
   --color-border-light: #d6e6f2; /* Light tint */
 
-  /* Typography - Elegant serif font */
-  --font-family-base: "Merriweather", "Georgia", "Times New Roman", serif;
-  --font-family-heading: "Playfair Display", "Merriweather", "Georgia", serif;
+  /* Typography - Modern sans-serif font */
+  --font-family-base: "Montserrat", -apple-system, BlinkMacSystemFont,
+    "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --font-family-heading: "Montserrat", -apple-system, BlinkMacSystemFont,
+    "Segoe UI", "Helvetica Neue", Arial, sans-serif;
 
   /* Border radius */
   --radius-sm: 6px;

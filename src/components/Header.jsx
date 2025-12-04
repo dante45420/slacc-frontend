@@ -33,18 +33,24 @@ export default function Header() {
       <nav className="container nav">
         <Link to="/" className="brand">
           <img
-            src="/Logo_SLACC_horizontal_azul.png"
+            src="/LOGO SLACC_ROJO_HORIZONTAL.png"
             alt="SLACC Logo"
             className="logo-image"
+            style={{ height: "60px", width: "auto" }}
           />
         </Link>
         <ul className="menu">
           <MenuItem label="Inicio" to="/" />
+          <MenuItem label="Nosotros" to="/nosotros">
+            <SubLink to="/nosotros/historia" label="Historia" />
+            <SubLink to="/nosotros/mision" label="Estatutos, Misión, Visión" />
+            <SubLink to="/nosotros/comite" label="Comités" />
+          </MenuItem>
           <MenuItem label="Miembros" to="/miembros">
             <SubLink to="/por-que-ser-socio" label="Beneficios" />
             <SubLink to="/por-que-ser-socio" label="Hazte socio" />
             <SubLink to="/miembros/directorio" label="Directorio" />
-            <SubLink to="/miembros/socios-jovenes" label="Socios Jóvenes" />
+            <SubLink to="/miembros/socios-jovenes" label="Nex Gen" />
             <SubLink
               to="/miembros/sociedades-afines"
               label="Sociedades afines"
@@ -57,8 +63,8 @@ export default function Header() {
             <SubLink to="/eventos/webinars" label="Webinars" />
           </MenuItem>
           <MenuItem label="Noticias" to="/noticias/comunicados">
-            <SubLink to="/noticias/comunicados" label="Comunicado" />
-            <SubLink to="/noticias/blog" label="Artículo científico" />
+            <SubLink to="/noticias/comunicados" label="Comunicados" />
+            <SubLink to="/noticias/blog" label="Artículos científicos" />
           </MenuItem>
           <MenuItem label="Contacto" to="/contacto" />
           {user?.role === "admin" && <MenuItem label="Admin" to="/admin" />}

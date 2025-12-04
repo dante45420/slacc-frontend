@@ -32,6 +32,7 @@ const initialFormState = {
   instructor: "",
   duration_hours: "",
   format: "webinar",
+  location: "",
   max_students: "",
   price_member: "",
   price_non_member: "",
@@ -233,16 +234,25 @@ export default function AdminEvents() {
               placeholder="Nombre del instructor"
             />
             <Input
-              label="Capacidad máxima"
+              label="Ubicación"
+              value={form.location}
+              onChange={e => setForm({ ...form, location: e.target.value })}
+              placeholder="Dirección o enlace del evento"
+            />
+            <Input
+              label="Capacidad máxima (Opcional)"
               type="number"
               value={form.max_students}
               onChange={e =>
-                setForm({ ...form, max_students: Number(e.target.value) })
+                setForm({
+                  ...form,
+                  max_students: Number(e.target.value) || null,
+                })
               }
-              placeholder="Número de estudiantes"
+              placeholder="Dejar vacío si no aplica"
             />
             <Input
-              label="Precio socio"
+              label="Valor socio"
               type="number"
               value={form.price_member}
               onChange={e =>
@@ -251,7 +261,7 @@ export default function AdminEvents() {
               placeholder="0"
             />
             <Input
-              label="Precio no socio"
+              label="Valor no socio"
               type="number"
               value={form.price_non_member}
               onChange={e =>
@@ -260,7 +270,7 @@ export default function AdminEvents() {
               placeholder="0"
             />
             <Input
-              label="Precio joven"
+              label="Valor Nex Gen"
               type="number"
               value={form.price_joven}
               onChange={e =>
@@ -269,7 +279,7 @@ export default function AdminEvents() {
               placeholder="0"
             />
             <Input
-              label="Precio gratuito"
+              label="Valor Socio Emérito"
               type="number"
               value={form.price_gratuito}
               onChange={e =>

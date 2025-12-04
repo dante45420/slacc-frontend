@@ -3,7 +3,8 @@ import Carousel from "../../components/Carousel.jsx";
 import CoursesCarousel from "../../components/CoursesCarousel.jsx";
 import InstagramFeed from "../../components/InstagramFeed.jsx";
 import NewsGrid from "../../components/NewsGrid.jsx";
-import { TextImage, TeamGrid } from "../../components/ContentBlocks.jsx";
+import { TextImage } from "../../components/ContentBlocks.jsx";
+import { TeamCarousel } from "../../components/TeamCarousel.jsx";
 import Container from "../../components/ui/Container.jsx";
 import Button from "../../components/ui/Button.jsx";
 
@@ -48,23 +49,7 @@ export default function Home() {
 
           <div className="home-section">
             <h2 className="home-section-title">Nuestro equipo</h2>
-            <TeamGrid />
-          </div>
-
-          <hr className="home-divider" />
-
-          <div>
-            <TextImage
-              title="Educación y recursos"
-              text="Contenido formativo y materiales para especialistas."
-              imageUrl="https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=1200&q=60"
-              cta={{
-                label: "Ver educación",
-                onClick: () => {
-                  globalThis.location.href = "/educacion";
-                },
-              }}
-            />
+            <TeamCarousel />
           </div>
         </div>
       </Container>

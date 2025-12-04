@@ -132,9 +132,9 @@ export default function AdminUserNew() {
                 }
                 required
               >
-                <option value="joven">Joven</option>
+                <option value="joven">Nex Gen</option>
                 <option value="normal">Normal</option>
-                <option value="gratuito">Gratuito</option>
+                <option value="gratuito">Socio Emérito</option>
               </Select>
             </div>
 

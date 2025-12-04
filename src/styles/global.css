@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Merriweather:wght@300;400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap");
 @import "./theme.css";
 
 /* Base styles */
@@ -32,7 +32,7 @@ body {
   height: 100%;
   margin: 0;
   font-family: var(--font-family-base);
-  font-weight: 300;
+  font-weight: 600;
   color: var(--color-text);
   background: var(--color-page);
   line-height: 1.6;
@@ -40,10 +40,28 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("/Logo_SLACC_vertical azul.png");
+  background-repeat: space;
+  background-position: 0 0;
+  background-size: 80px 150px;
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 0;
+}
+
 #root {
   height: 100%;
   display: flex;
   flex-direction: column;
+  position: relative;
+  z-index: 1;
 }
 
 /* Main content wrapper with margins (excluding header) */

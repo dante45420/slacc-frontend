@@ -47,7 +47,7 @@ export default function WhyJoin() {
         <h2 className="members-section-title">Categorías de membresía</h2>
         <div className="cards">
           <div className="card">
-            <h3 className="tile-title">Socio Joven</h3>
+            <h3 className="tile-title">Nex Gen</h3>
             <p className="tile-desc">
               Recién egresado (hasta 5 años). Cuota anual reducida y cupos
               especiales en cursos.

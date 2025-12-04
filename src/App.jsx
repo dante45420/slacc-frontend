@@ -1,10 +1,13 @@
 import { Routes, Route } from "react-router-dom";
 import PropTypes from "prop-types";
 import Header from "./components/Header.jsx";
+import { ProtectedRoute } from "./components/ProtectedRoute.jsx";
 
 // Public pages
 import Home from "./pages/public/Home.jsx";
 import Contact from "./pages/public/Contact.jsx";
+import Estatutos from "./pages/public/Estatutos.jsx";
+import Comites from "./pages/public/Comites.jsx";
 
 // Auth pages
 import Login from "./pages/auth/Login.jsx";
@@ -14,7 +17,6 @@ import UserProfile from "./pages/auth/UserProfile.jsx";
 import NewsList from "./pages/news/NewsList.jsx";
 import NewsPage from "./pages/news/NewsPage.jsx";
 import NewsDetail from "./pages/news/NewsDetail.jsx";
-import EditNews from "./pages/news/EditNews.jsx";
 import NewsEditor from "./pages/news/NewsEditor.jsx";
 import SubmitNews from "./pages/news/SubmitNews.jsx";
 
@@ -70,15 +72,12 @@ export default function App() {
             <Route path="/noticias/prensa" element={<NewsPage />} />
             <Route path="/noticias/blog" element={<NewsPage />} />
             <Route path="/noticias/:id" element={<NewsDetail />} />
-            <Route path="/admin/news/:id/edit" element={<EditNews />} />
-            <Route path="/admin/news/:id/view" element={<NewsDetail />} />
             <Route path="/cursos" element={<CoursesPage />} />
             <Route path="/cursos/:id" element={<CourseDetail />} />
             <Route path="/eventos/proximos" element={<EventsPage />} />
             <Route path="/eventos/webinars" element={<EventsPage />} />
             <Route path="/eventos/pasados" element={<EventsPage />} />
             <Route path="/eventos/:id" element={<EventDetail />} />
-            <Route path="/admin/eventos" element={<AdminEvents />} />
             <Route
               path="/nosotros"
               element={<Placeholder title="Nosotros" />}
@@ -87,14 +86,8 @@ export default function App() {
               path="/nosotros/historia"
               element={<Placeholder title="Nosotros - Historia" />}
             />
-            <Route
-              path="/nosotros/mision"
-              element={<Placeholder title="Nosotros - Misión y Visión" />}
-            />
-            <Route
-              path="/nosotros/comite"
-              element={<Placeholder title="Nosotros - Comité" />}
-            />
+            <Route path="/nosotros/mision" element={<Estatutos />} />
+            <Route path="/nosotros/comite" element={<Comites />} />
             <Route path="/miembros" element={<MembersBenefits />} />
             <Route path="/miembros/beneficios" element={<MembersBenefits />} />
             <Route path="/miembros/como-unirse" element={<WhyJoin />} />
@@ -119,38 +112,90 @@ export default function App() {
               path="/eventos/webinars"
               element={<Placeholder title="Eventos - Webinars" />}
             />
-            <Route
-              path="/educacion"
-              element={<Placeholder title="Educación" />}
-            />
-            <Route
-              path="/educacion/recursos"
-              element={<Placeholder title="Educación - Recursos" />}
-            />
-            <Route
-              path="/educacion/biblioteca"
-              element={<Placeholder title="Educación - Biblioteca" />}
-            />
-            <Route
-              path="/educacion/casos"
-              element={<Placeholder title="Educación - Casos" />}
-            />
             <Route path="/login" element={<Login />} />
             <Route path="/perfil" element={<UserProfile />} />
             <Route path="/solicitar-membresia" element={<JoinMembership />} />
             <Route path="/subir-noticia" element={<SubmitNews />} />
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/admin/legacy" element={<AdminPortal />} />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute requireAdmin>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/legacy"
+              element={
+                <ProtectedRoute requireAdmin>
+                  <AdminPortal />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="/admin/applications/:id"
-              element={<ApplicationDetail />}
+              element={
+                <ProtectedRoute requireAdmin>
+                  <ApplicationDetail />
+                </ProtectedRoute>
+              }
             />
-            <Route path="/admin/users/new" element={<AdminUserNew />} />
-            <Route path="/admin/users/:id" element={<AdminUserView />} />
-            <Route path="/admin/users/:id/edit" element={<AdminUserEdit />} />
-            <Route path="/admin/news/new" element={<NewsEditor />} />
-            <Route path="/admin/news/:id/edit" element={<NewsEditor />} />
-            <Route path="/admin/news/:id/view" element={<NewsDetail />} />
+            <Route
+              path="/admin/users/new"
+              element={
+                <ProtectedRoute requireAdmin>
+                  <AdminUserNew />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/users/:id"
+              element={
+                <ProtectedRoute requireAdmin>
+                  <AdminUserView />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/users/:id/edit"
+              element={
+                <ProtectedRoute requireAdmin>
+                  <AdminUserEdit />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/news/new"
+              element={
+                <ProtectedRoute requireAdmin>
+                  <NewsEditor />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/news/:id/edit"
+              element={
+                <ProtectedRoute requireAdmin>
+                  <NewsEditor />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/news/:id/view"
+              element={
+                <ProtectedRoute requireAdmin>
+                  <NewsDetail />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/eventos"
+              element={
+                <ProtectedRoute requireAdmin>
+                  <AdminEvents />
+                </ProtectedRoute>
+              }
+            />
             <Route path="*" element={<Placeholder title="Página" />} />
           </Routes>
         </main>

@@ -278,7 +278,7 @@ function EventsTab() {
           </p>
         </div>
         <Button variant="primary" onClick={() => navigate("/admin/eventos")}>
-          Gestor de eventos
+          + Crear evento
         </Button>
       </div>
 
@@ -436,9 +436,9 @@ function UsersTab() {
   const getMembershipTypeLabel = type => {
     if (!type) return "N/A";
     const types = {
-      joven: "Joven",
+      joven: "Nex Gen",
       normal: "Normal",
-      gratuito: "Gratuito",
+      gratuito: "Emérito",
     };
     return types[type] || type;
   };

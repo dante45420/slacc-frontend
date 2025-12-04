@@ -11,6 +11,7 @@ import {
   Spinner,
   useToast,
 } from "../../components/ui";
+import { sanitizeHtml } from "../../utils/sanitize";
 
 const BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
@@ -369,7 +370,9 @@ export default function NewsDetail() {
             }}
           >
             {news.content ? (
-              <div dangerouslySetInnerHTML={{ __html: news.content }} />
+              <div
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(news.content) }}
+              />
             ) : (
               <p style={{ color: "var(--color-muted)" }}>
                 Contenido de la noticia no disponible.

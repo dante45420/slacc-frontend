@@ -19,11 +19,18 @@ export default function Login() {
     setError("");
     setLoading(true);
     try {
-      await login(email, password);
-      nav("/");
+      const user = await login(email, password);
+      // Redirect admin users to admin dashboard
+      if (user?.role === "admin") {
+        nav("/admin");
+      } else {
+        nav("/");
+      }
     } catch (err) {
       console.error("Login error:", err);
-      setError("Credenciales inválidas. Por favor verifica tu email y contraseña.");
+      setError(
+        "Credenciales inválidas. Por favor verifica tu email y contraseña."
+      );
     } finally {
       setLoading(false);
     }
@@ -38,13 +45,15 @@ export default function Login() {
         </p>
       </div>
 
-      <div style={{ 
-        background: "var(--color-bg)",
-        padding: "var(--spacing-6)",
-        borderRadius: "var(--radius-lg)",
-        boxShadow: "var(--shadow-md)",
-        border: "1px solid var(--color-border)"
-      }}>
+      <div
+        style={{
+          background: "var(--color-bg)",
+          padding: "var(--spacing-6)",
+          borderRadius: "var(--radius-lg)",
+          boxShadow: "var(--shadow-md)",
+          border: "1px solid var(--color-border)",
+        }}
+      >
         <form onSubmit={submit}>
           <Input
             label="Email"
@@ -54,7 +63,7 @@ export default function Login() {
             placeholder="tu@email.com"
             required
           />
-          
+
           <Input
             label="Contraseña"
             type="password"
@@ -63,30 +72,32 @@ export default function Login() {
             placeholder="••••••••"
             required
           />
-          
+
           {error && (
             <Alert variant="error" style={{ marginBottom: "var(--spacing-4)" }}>
               {error}
             </Alert>
           )}
-          
-          <Button
-            type="submit"
-            fullWidth
-            loading={loading}
-            disabled={loading}
-          >
+
+          <Button type="submit" fullWidth loading={loading} disabled={loading}>
             Iniciar Sesión
           </Button>
         </form>
 
-        <div style={{
-          marginTop: "var(--spacing-5)",
-          paddingTop: "var(--spacing-5)",
-          borderTop: "1px solid var(--color-border)",
-          textAlign: "center"
-        }}>
-          <p style={{ color: "var(--color-muted)", marginBottom: "var(--spacing-3)" }}>
+        <div
+          style={{
+            marginTop: "var(--spacing-5)",
+            paddingTop: "var(--spacing-5)",
+            borderTop: "1px solid var(--color-border)",
+            textAlign: "center",
+          }}
+        >
+          <p
+            style={{
+              color: "var(--color-muted)",
+              marginBottom: "var(--spacing-3)",
+            }}
+          >
             ¿No tienes una cuenta?
           </p>
           <Link to="/solicitar-membresia">

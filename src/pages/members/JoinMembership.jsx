@@ -68,6 +68,7 @@ function ApplicationForm({ onResult }) {
     motivation: "",
   });
   const [documentFile, setDocumentFile] = useState(null);
+  const [fellowCertFile, setFellowCertFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
@@ -115,6 +116,7 @@ function ApplicationForm({ onResult }) {
       data.append("specialization", formData.specialization);
       data.append("experience", formData.experience);
       if (documentFile) data.append("document", documentFile);
+      if (fellowCertFile) data.append("fellow_certificate", fellowCertFile);
 
       const res = await fetch(`${BASE_URL}/applications`, {
         method: "POST",
@@ -140,6 +142,7 @@ function ApplicationForm({ onResult }) {
         motivation: "",
       });
       setDocumentFile(null);
+      setFellowCertFile(null);
       setErrors({});
     } catch (error) {
       onResult(
@@ -239,6 +242,35 @@ function ApplicationForm({ onResult }) {
         {errors.document && (
           <p className="file-error-message">{errors.document}</p>
         )}
+      </div>
+
+      <div className="file-input-wrapper">
+        <label htmlFor="fellow-certificate" className="file-input-label">
+          Certificado de Fellow (Opcional)
+        </label>
+        <input
+          id="fellow-certificate"
+          type="file"
+          accept="application/pdf,image/jpeg,image/jpg,image/png"
+          onChange={e => {
+            setFellowCertFile(e.target.files?.[0] || null);
+          }}
+          className="file-input"
+        />
+        {fellowCertFile && (
+          <p className="file-selected-message">
+            <i className="fa-solid fa-circle-check"></i> {fellowCertFile.name}
+          </p>
+        )}
+        <p
+          style={{
+            fontSize: "0.875rem",
+            color: "var(--color-muted)",
+            marginTop: "var(--spacing-2)",
+          }}
+        >
+          Si tienes un certificado de Fellow, súbelo aquí (PDF o imagen)
+        </p>
       </div>
 
       <Button

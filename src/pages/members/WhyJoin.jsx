@@ -1,7 +1,9 @@
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
+import { useAuth } from "../../auth/AuthContext.jsx";
 
 export default function WhyJoin() {
+  const { user } = useAuth();
   return (
     <section className="section">
       <div className="container">
@@ -63,12 +65,14 @@ export default function WhyJoin() {
         </div>
 
         <div className="members-cta">
-          <Link
-            to="/solicitar-membresia"
-            className="btn btn-primary members-cta-spacing"
-          >
-            Solicitar membresía
-          </Link>
+          {!user && (
+            <Link
+              to="/solicitar-membresia"
+              className="btn btn-primary members-cta-spacing"
+            >
+              Solicitar membresía
+            </Link>
+          )}
           <Link to="/miembros/beneficios" className="btn btn-outline">
             Ver todos los beneficios
           </Link>

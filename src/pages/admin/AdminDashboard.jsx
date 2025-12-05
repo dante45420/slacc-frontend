@@ -369,6 +369,10 @@ function EventsTab() {
 function EventForm({ event, onSuccess, onCancel }) {
   const toast = useToast();
   const [loading, setLoading] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [imageUrl, setImageUrl] = useState(event?.image_url || "");
+  const [createdEventId, setCreatedEventId] = useState(event?.id || null);
+  const [justCreated, setJustCreated] = useState(false);
   const [form, setForm] = useState({
     title: event?.title || "",
     description: event?.description || "",
@@ -389,13 +393,66 @@ function EventForm({ event, onSuccess, onCancel }) {
     is_active: event?.is_active === undefined || event.is_active,
   });
 
+  const getImageUrl = url => {
+    const apiBase =
+      import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
+    if (!url) return null;
+    if (url.startsWith("http")) return url;
+    return apiBase.replace("/api", "") + url;
+  };
+
+  const handleImageUpload = async file => {
+    if (!createdEventId) {
+      toast.error("Debes crear el evento primero antes de subir una imagen");
+      return;
+    }
+
+    setUploadingImage(true);
+    try {
+      const token = localStorage.getItem("access_token");
+      const fd = new FormData();
+      fd.append("image", file);
+      const res = await fetch(
+        `${
+          import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api"
+        }/admin/events/${createdEventId}/image`,
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+          body: fd,
+        }
+      );
+
+      if (res.ok) {
+        const data = await res.json();
+        setImageUrl(data.image_url);
+        toast.success("Imagen subida correctamente");
+      } else {
+        const data = await res.json();
+        toast.error(data.error || "Error al subir imagen");
+      }
+    } catch (err) {
+      toast.error("Error al subir la imagen");
+      console.error(err);
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
   const getButtonText = () => {
     if (loading) return "Guardando...";
+    if (justCreated) return "Finalizar";
     return event ? "Actualizar Evento" : "Crear Evento";
   };
 
   const handleSubmit = async e => {
     e.preventDefault();
+
+    if (justCreated) {
+      onSuccess();
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -418,12 +475,19 @@ function EventForm({ event, onSuccess, onCancel }) {
       });
 
       if (res.ok) {
+        const data = await res.json();
         toast.success(
           event
             ? "Evento actualizado correctamente"
             : "Evento creado correctamente"
         );
-        onSuccess();
+
+        if (!event && data.id) {
+          setCreatedEventId(data.id);
+          setJustCreated(true);
+        } else {
+          onSuccess();
+        }
       } else {
         const data = await res.json();
         toast.error(data.error || "Error al guardar el evento");
@@ -438,17 +502,26 @@ function EventForm({ event, onSuccess, onCancel }) {
 
   return (
     <form onSubmit={handleSubmit}>
+      {justCreated && (
+        <Alert variant="success" className="mb-4">
+          ¡Evento creado exitosamente! Ahora puedes subir una imagen o cerrar el
+          formulario.
+        </Alert>
+      )}
+
       <div className="grid grid-2 gap-4 mb-4">
         <Input
           label="Título"
           value={form.title}
           onChange={e => setForm({ ...form, title: e.target.value })}
           required
+          disabled={justCreated}
         />
         <Select
           label="Formato"
           value={form.format}
           onChange={e => setForm({ ...form, format: e.target.value })}
+          disabled={justCreated}
         >
           <option value="webinar">Webinar</option>
           <option value="presencial">Presencial</option>
@@ -461,6 +534,7 @@ function EventForm({ event, onSuccess, onCancel }) {
           value={form.description}
           onChange={e => setForm({ ...form, description: e.target.value })}
           rows={3}
+          disabled={justCreated}
         />
       </div>
 
@@ -469,12 +543,14 @@ function EventForm({ event, onSuccess, onCancel }) {
           label="Instructor"
           value={form.instructor}
           onChange={e => setForm({ ...form, instructor: e.target.value })}
+          disabled={justCreated}
         />
         <Input
           label="Duración (horas)"
           type="number"
           value={form.duration_hours}
           onChange={e => setForm({ ...form, duration_hours: e.target.value })}
+          disabled={justCreated}
         />
       </div>
 
@@ -486,12 +562,14 @@ function EventForm({ event, onSuccess, onCancel }) {
           placeholder={
             form.format === "webinar" ? "Link del webinar" : "Dirección física"
           }
+          disabled={justCreated}
         />
         <Input
           label="Capacidad Máxima (Opcional)"
           type="number"
           value={form.max_students}
           onChange={e => setForm({ ...form, max_students: e.target.value })}
+          disabled={justCreated}
         />
       </div>
 
@@ -501,12 +579,14 @@ function EventForm({ event, onSuccess, onCancel }) {
           type="date"
           value={form.start_date}
           onChange={e => setForm({ ...form, start_date: e.target.value })}
+          disabled={justCreated}
         />
         <Input
           label="Fecha de Fin"
           type="date"
           value={form.end_date}
           onChange={e => setForm({ ...form, end_date: e.target.value })}
+          disabled={justCreated}
         />
       </div>
 
@@ -518,6 +598,7 @@ function EventForm({ event, onSuccess, onCancel }) {
           onChange={e =>
             setForm({ ...form, registration_deadline: e.target.value })
           }
+          disabled={justCreated}
         />
       </div>
 
@@ -530,12 +611,14 @@ function EventForm({ event, onSuccess, onCancel }) {
           type="number"
           value={form.price_member}
           onChange={e => setForm({ ...form, price_member: e.target.value })}
+          disabled={justCreated}
         />
         <Input
           label="Valor No Socio"
           type="number"
           value={form.price_non_member}
           onChange={e => setForm({ ...form, price_non_member: e.target.value })}
+          disabled={justCreated}
         />
       </div>
 
@@ -545,13 +628,78 @@ function EventForm({ event, onSuccess, onCancel }) {
           type="number"
           value={form.price_joven}
           onChange={e => setForm({ ...form, price_joven: e.target.value })}
+          disabled={justCreated}
         />
         <Input
           label="Valor Socio Emérito"
           type="number"
           value={form.price_gratuito}
           onChange={e => setForm({ ...form, price_gratuito: e.target.value })}
+          disabled={justCreated}
         />
+      </div>
+
+      <div className="mb-4">
+        <h3 className="mb-3" style={{ fontSize: "1.1rem" }}>
+          Imagen del evento{" "}
+          {!event && (
+            <span className="text-muted text-sm font-normal">(Opcional)</span>
+          )}
+        </h3>
+        {imageUrl && (
+          <div className="mb-3">
+            <img
+              src={getImageUrl(imageUrl)}
+              alt="Preview"
+              style={{
+                maxWidth: "100%",
+                maxHeight: "300px",
+                borderRadius: "var(--radius-base)",
+                border: "1px solid var(--color-border)",
+              }}
+            />
+          </div>
+        )}
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={uploadingImage || (!event && !justCreated)}
+          asChild
+        >
+          <label
+            style={{
+              cursor:
+                uploadingImage || (!event && !justCreated)
+                  ? "not-allowed"
+                  : "pointer",
+              margin: 0,
+            }}
+          >
+            {uploadingImage ? "Subiendo..." : "Subir imagen"}
+            <input
+              type="file"
+              accept="image/*"
+              style={{ display: "none" }}
+              disabled={!event && !justCreated}
+              onChange={e => {
+                const file = e.target.files?.[0];
+                if (file) handleImageUpload(file);
+              }}
+            />
+          </label>
+        </Button>
+        {!event && !justCreated && (
+          <p className="text-muted text-sm mt-2">
+            La imagen se puede subir después de crear el evento.
+          </p>
+        )}
+        {justCreated && !imageUrl && (
+          <p className="text-muted text-sm mt-2">
+            Ahora puedes subir una imagen o cerrar y hacerlo después editando el
+            evento.
+          </p>
+        )}
       </div>
 
       <div className="mb-4">
@@ -566,6 +714,7 @@ function EventForm({ event, onSuccess, onCancel }) {
             type="checkbox"
             checked={form.is_active}
             onChange={e => setForm({ ...form, is_active: e.target.checked })}
+            disabled={justCreated}
           />
           <span>Evento activo</span>
         </label>

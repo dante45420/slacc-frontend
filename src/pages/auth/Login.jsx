@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext.jsx";
 import Section from "../../components/ui/Section.jsx";
 import Input from "../../components/ui/Input.jsx";
@@ -83,29 +83,6 @@ export default function Login() {
             Iniciar Sesión
           </Button>
         </form>
-
-        <div
-          style={{
-            marginTop: "var(--spacing-5)",
-            paddingTop: "var(--spacing-5)",
-            borderTop: "1px solid var(--color-border)",
-            textAlign: "center",
-          }}
-        >
-          <p
-            style={{
-              color: "var(--color-muted)",
-              marginBottom: "var(--spacing-3)",
-            }}
-          >
-            ¿No tienes una cuenta?
-          </p>
-          <Link to="/solicitar-membresia">
-            <Button variant="outline" fullWidth>
-              Solicitar membresía
-            </Button>
-          </Link>
-        </div>
       </div>
     </Section>
   );

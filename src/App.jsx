@@ -31,8 +31,7 @@ import EventDetail from "./pages/courses/EventDetail.jsx";
 import JoinMembership from "./pages/members/JoinMembership.jsx";
 import MembersBenefits from "./pages/members/MembersBenefits.jsx";
 import MembersDirectory from "./pages/members/MembersDirectory.jsx";
-import MembersYoung from "./pages/members/MembersYoung.jsx";
-import MembersAllied from "./pages/members/MembersAllied.jsx";
+import SociosActivos from "./pages/members/SociosActivos.jsx";
 import WhyJoin from "./pages/members/WhyJoin.jsx";
 
 // Admin pages
@@ -92,10 +91,9 @@ export default function App() {
             <Route path="/miembros/beneficios" element={<MembersBenefits />} />
             <Route path="/miembros/como-unirse" element={<WhyJoin />} />
             <Route path="/miembros/directorio" element={<MembersDirectory />} />
-            <Route path="/miembros/socios-jovenes" element={<MembersYoung />} />
             <Route
-              path="/miembros/sociedades-afines"
-              element={<MembersAllied />}
+              path="/miembros/socios-activos"
+              element={<SociosActivos />}
             />
             <Route path="/por-que-ser-socio" element={<WhyJoin />} />
             <Route path="/contacto" element={<Contact />} />

@@ -1,7 +1,9 @@
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
+import { useAuth } from "../../auth/AuthContext.jsx";
 
 export default function MembersBenefits() {
+  const { user } = useAuth();
   return (
     <section className="section">
       <div className="container">
@@ -44,11 +46,13 @@ export default function MembersBenefits() {
           />
         </div>
 
-        <div className="members-cta">
-          <Link to="/solicitar-membresia" className="btn btn-primary">
-            Solicitar membresía
-          </Link>
-        </div>
+        {!user && (
+          <div className="members-cta">
+            <Link to="/solicitar-membresia" className="btn btn-primary">
+              Solicitar membresía
+            </Link>
+          </div>
+        )}
       </div>
     </section>
   );

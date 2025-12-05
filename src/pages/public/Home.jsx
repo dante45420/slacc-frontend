@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import Carousel from "../../components/Carousel.jsx";
 import CoursesCarousel from "../../components/CoursesCarousel.jsx";
 import InstagramFeed from "../../components/InstagramFeed.jsx";
-import NewsGrid from "../../components/NewsGrid.jsx";
+import NewsCarousel from "../../components/NewsCarousel.jsx";
 import { TextImage } from "../../components/ContentBlocks.jsx";
 import { TeamCarousel } from "../../components/TeamCarousel.jsx";
 import Container from "../../components/ui/Container.jsx";
@@ -42,7 +42,7 @@ export default function Home() {
 
           <div className="home-section">
             <h2 className="home-section-title">Noticias destacadas</h2>
-            <NewsGrid />
+            <NewsCarousel limit={9} />
           </div>
 
           <hr className="home-divider" />

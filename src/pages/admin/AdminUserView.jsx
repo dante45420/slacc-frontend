@@ -59,7 +59,7 @@ export default function AdminUserView() {
           <Alert variant="error">{error}</Alert>
           <Button
             variant="outline"
-            onClick={() => navigate("/admin")}
+            onClick={() => navigate("/admin?tab=users")}
             className="mt-4"
           >
             Volver al panel
@@ -150,7 +150,10 @@ export default function AdminUserView() {
             className="flex gap-3 pt-4"
             style={{ borderTop: "1px solid var(--color-border)" }}
           >
-            <Button variant="outline" onClick={() => navigate("/admin")}>
+            <Button
+              variant="outline"
+              onClick={() => navigate("/admin?tab=users")}
+            >
               Volver
             </Button>
             <Button

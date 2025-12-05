@@ -60,25 +60,21 @@ export default function Header() {
             <SubLink to="/nosotros/historia" label="Historia" />
           </MenuItem>
           <MenuItem label="Comités" to="/comites">
-            <SubLink
-              to="/comites#subespecialidades"
-              label="Subespecialidades"
-            />
             <SubLink to="/comites#etica" label="Ética" />
             <SubLink to="/comites#cientifico" label="Científico" />
             <SubLink to="/comites#comite-a" label="Comité A" />
             <SubLink to="/comites#comite-b" label="Comité B" />
             <SubLink to="/comites#comite-c" label="Comité C" />
+            <SubLink
+              to="/comites#subespecialidades"
+              label="Subespecialidades"
+            />
           </MenuItem>
           <MenuItem label="Miembros" to="/miembros">
             <SubLink to="/por-que-ser-socio" label="Beneficios" />
             <SubLink to="/miembros/directorio" label="Directorio" />
             <SubLink to="/por-que-ser-socio" label="Hazte socio" />
-            <SubLink to="/miembros/socios-jovenes" label="Nex Gen" />
-            <SubLink
-              to="/miembros/sociedades-afines"
-              label="Sociedades afines"
-            />
+            <SubLink to="/miembros/socios-activos" label="Socios Activos" />
           </MenuItem>
           <MenuItem label="Cursos" to="/cursos">
             <SubLink to="/eventos/pasados" label="Pasados" />

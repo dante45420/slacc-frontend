@@ -312,6 +312,41 @@ export default function AdminEvents() {
             </Button>
           </div>
         </Card>
+
+        {/* List of existing events */}
+        <div className="mb-6 mt-8">
+          <h2>Eventos existentes</h2>
+          <p className="text-muted">
+            Administra los eventos creados. Puedes editar detalles, subir
+            imágenes y ver inscripciones.
+          </p>
+        </div>
+
+        {events.length === 0 ? (
+          <Alert variant="info">No hay eventos creados todavía.</Alert>
+        ) : (
+          <div className="flex-col gap-4">
+            {events.map(event => (
+              <EventCard
+                key={event.id}
+                event={event}
+                onUpdate={updateEvent}
+                onDelete={removeEvent}
+                onViewEnrollments={viewEnrollments}
+                onUploadImage={uploadImage}
+                getImageUrl={getImageUrl}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Enrollments Modal */}
+        {enrollmentsModal.open && enrollmentsModal.data && (
+          <EnrollmentsModal
+            modal={enrollmentsModal}
+            onClose={() => setEnrollmentsModal({ open: false, data: null })}
+          />
+        )}
       </Container>
     </Section>
   );

@@ -447,6 +447,114 @@ export default function ApplicationDetail() {
             </div>
           </div>
         )}
+
+        {application.status === "paid" && application.initial_password && (
+          <div
+            className="card"
+            style={{
+              marginBottom: 32,
+              border: "2px solid var(--color-primary)",
+            }}
+          >
+            <h3 style={{ marginBottom: 16, color: "var(--color-primary)" }}>
+              Credenciales del Usuario
+            </h3>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 12,
+              }}
+            >
+              <div>
+                <label
+                  htmlFor="app-email"
+                  style={{
+                    display: "block",
+                    fontWeight: "600",
+                    marginBottom: 8,
+                  }}
+                >
+                  Email:
+                </label>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <input
+                    id="app-email"
+                    type="text"
+                    value={application.email}
+                    readOnly
+                    style={{
+                      flex: 1,
+                      padding: 10,
+                      border: "1px solid #ddd",
+                      borderRadius: 6,
+                      background: "#f8f9fa",
+                    }}
+                  />
+                  <button
+                    onClick={() => copyToClipboard(application.email)}
+                    style={{
+                      padding: "10px 16px",
+                      background: "var(--color-primary)",
+                      color: "white",
+                      border: "none",
+                      borderRadius: 6,
+                      cursor: "pointer",
+                    }}
+                  >
+                    Copiar
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="app-password"
+                  style={{
+                    display: "block",
+                    fontWeight: "600",
+                    marginBottom: 8,
+                  }}
+                >
+                  Contraseña Inicial:
+                </label>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <input
+                    id="app-password"
+                    type="text"
+                    value={application.initial_password}
+                    readOnly
+                    style={{
+                      flex: 1,
+                      padding: 10,
+                      border: "1px solid #ddd",
+                      borderRadius: 6,
+                      background: "#f8f9fa",
+                      fontFamily: "monospace",
+                      fontSize: "1.1rem",
+                      fontWeight: "bold",
+                    }}
+                  />
+                  <button
+                    onClick={() =>
+                      copyToClipboard(application.initial_password)
+                    }
+                    style={{
+                      padding: "10px 16px",
+                      background: "var(--color-primary)",
+                      color: "white",
+                      border: "none",
+                      borderRadius: 6,
+                      cursor: "pointer",
+                    }}
+                  >
+                    Copiar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Credentials Modal */}
@@ -489,6 +597,7 @@ export default function ApplicationDetail() {
             >
               <div>
                 <label
+                  htmlFor="modal-email"
                   style={{
                     display: "block",
                     fontWeight: "600",
@@ -499,6 +608,7 @@ export default function ApplicationDetail() {
                 </label>
                 <div style={{ display: "flex", gap: "var(--spacing-2)" }}>
                   <input
+                    id="modal-email"
                     type="text"
                     value={credentials.email}
                     readOnly
@@ -528,6 +638,7 @@ export default function ApplicationDetail() {
 
               <div>
                 <label
+                  htmlFor="modal-password"
                   style={{
                     display: "block",
                     fontWeight: "600",
@@ -538,6 +649,7 @@ export default function ApplicationDetail() {
                 </label>
                 <div style={{ display: "flex", gap: "var(--spacing-2)" }}>
                   <input
+                    id="modal-password"
                     type="text"
                     value={credentials.password}
                     readOnly
@@ -569,6 +681,7 @@ export default function ApplicationDetail() {
 
               <div>
                 <label
+                  htmlFor="modal-membership"
                   style={{
                     display: "block",
                     fontWeight: "600",
@@ -578,6 +691,7 @@ export default function ApplicationDetail() {
                   Tipo de Membresía:
                 </label>
                 <input
+                  id="modal-membership"
                   type="text"
                   value={credentials.membership_type}
                   readOnly

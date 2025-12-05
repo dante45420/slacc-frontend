@@ -140,82 +140,98 @@ export default function NewsGrid({ items = [], category }) {
               )
             }
             hoverable
+            style={{ height: "100%", display: "flex", flexDirection: "column" }}
           >
-            <h3
-              style={{
-                marginBottom: "var(--spacing-3)",
-                fontSize: "1.25rem",
-                lineHeight: "1.4",
-                minHeight: "2.8em",
-                display: "-webkit-box",
-                WebkitLineClamp: 2,
-                WebkitBoxOrient: "vertical",
-                overflow: "hidden",
-              }}
-            >
-              {n.title}
-            </h3>
-
-            <p
-              style={{
-                color: "var(--color-muted)",
-                marginBottom: "var(--spacing-4)",
-                lineHeight: "1.6",
-                display: "-webkit-box",
-                WebkitLineClamp: 3,
-                WebkitBoxOrient: "vertical",
-                overflow: "hidden",
-              }}
-            >
-              {n.excerpt}
-            </p>
-
             <div
               style={{
                 display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginTop: "auto",
-                paddingTop: "var(--spacing-3)",
-                borderTop: "1px solid var(--color-border)",
+                flexDirection: "column",
+                height: "100%",
               }}
             >
-              <div
-                style={{ display: "flex", flexDirection: "column", gap: "4px" }}
+              <h3
+                style={{
+                  marginBottom: "var(--spacing-3)",
+                  fontSize: "1.25rem",
+                  lineHeight: "1.4",
+                  minHeight: "2.8em",
+                  maxHeight: "2.8em",
+                  display: "-webkit-box",
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: "vertical",
+                  overflow: "hidden",
+                }}
               >
-                <time
+                {n.title}
+              </h3>
+
+              <p
+                style={{
+                  color: "var(--color-muted)",
+                  marginBottom: "var(--spacing-4)",
+                  lineHeight: "1.6",
+                  minHeight: "4.8em",
+                  maxHeight: "4.8em",
+                  display: "-webkit-box",
+                  WebkitLineClamp: 3,
+                  WebkitBoxOrient: "vertical",
+                  overflow: "hidden",
+                }}
+              >
+                {n.excerpt}
+              </p>
+
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginTop: "auto",
+                  paddingTop: "var(--spacing-3)",
+                  borderTop: "1px solid var(--color-border)",
+                }}
+              >
+                <div
                   style={{
-                    fontSize: "0.875rem",
-                    color: "var(--color-muted)",
-                    fontWeight: "500",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "4px",
                   }}
                 >
-                  {formatDate(n.created_at)}
-                </time>
-                {n.author_name && (
-                  <span
+                  <time
                     style={{
-                      fontSize: "0.8rem",
-                      color: "var(--color-text-secondary)",
+                      fontSize: "0.875rem",
+                      color: "var(--color-muted)",
                       fontWeight: "500",
                     }}
                   >
-                    Por {n.author_name}
-                  </span>
-                )}
+                    {formatDate(n.created_at)}
+                  </time>
+                  {n.author_name && (
+                    <span
+                      style={{
+                        fontSize: "0.8rem",
+                        color: "var(--color-text-secondary)",
+                        fontWeight: "500",
+                      }}
+                    >
+                      Por {n.author_name}
+                    </span>
+                  )}
+                </div>
+                <span
+                  style={{
+                    color: "var(--color-primary)",
+                    fontSize: "0.875rem",
+                    fontWeight: "600",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "4px",
+                  }}
+                >
+                  Leer más <i className="fa-solid fa-arrow-right"></i>
+                </span>
               </div>
-              <span
-                style={{
-                  color: "var(--color-primary)",
-                  fontSize: "0.875rem",
-                  fontWeight: "600",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "4px",
-                }}
-              >
-                Leer más <i className="fa-solid fa-arrow-right"></i>
-              </span>
             </div>
           </Card>
         </Link>

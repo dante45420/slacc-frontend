@@ -24,8 +24,6 @@ import SubmitNews from "./pages/news/SubmitNews.jsx";
 // Courses & Events pages
 import CoursesPage from "./pages/courses/CoursesPage.jsx";
 import CourseDetail from "./pages/courses/CourseDetail.jsx";
-import EventsPage from "./pages/courses/EventsPage.jsx";
-import EventDetail from "./pages/courses/EventDetail.jsx";
 
 // Members pages
 import JoinMembership from "./pages/members/JoinMembership.jsx";
@@ -35,7 +33,6 @@ import SociosActivos from "./pages/members/SociosActivos.jsx";
 import WhyJoin from "./pages/members/WhyJoin.jsx";
 
 // Admin pages
-import AdminPortal from "./pages/admin/AdminPortal.jsx";
 import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
 import AdminUserView from "./pages/admin/AdminUserView.jsx";
 import AdminUserEdit from "./pages/admin/AdminUserEdit.jsx";
@@ -73,10 +70,6 @@ export default function App() {
             <Route path="/noticias/:id" element={<NewsDetail />} />
             <Route path="/cursos" element={<CoursesPage />} />
             <Route path="/cursos/:id" element={<CourseDetail />} />
-            <Route path="/eventos/proximos" element={<EventsPage />} />
-            <Route path="/eventos/webinars" element={<EventsPage />} />
-            <Route path="/eventos/pasados" element={<EventsPage />} />
-            <Route path="/eventos/:id" element={<EventDetail />} />
             <Route
               path="/nosotros"
               element={<Placeholder title="Nosotros" />}
@@ -97,19 +90,6 @@ export default function App() {
             />
             <Route path="/por-que-ser-socio" element={<WhyJoin />} />
             <Route path="/contacto" element={<Contact />} />
-            <Route path="/eventos" element={<Placeholder title="Eventos" />} />
-            <Route
-              path="/eventos/proximos"
-              element={<Placeholder title="Eventos - Próximos" />}
-            />
-            <Route
-              path="/eventos/pasados"
-              element={<Placeholder title="Eventos - Pasados" />}
-            />
-            <Route
-              path="/eventos/webinars"
-              element={<Placeholder title="Eventos - Webinars" />}
-            />
             <Route path="/login" element={<Login />} />
             <Route path="/perfil" element={<UserProfile />} />
             <Route path="/solicitar-membresia" element={<JoinMembership />} />
@@ -119,14 +99,6 @@ export default function App() {
               element={
                 <ProtectedRoute requireAdmin>
                   <AdminDashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/legacy"
-              element={
-                <ProtectedRoute requireAdmin>
-                  <AdminPortal />
                 </ProtectedRoute>
               }
             />

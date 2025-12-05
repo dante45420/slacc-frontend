@@ -56,6 +56,11 @@ export default function CourseDetail() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
+        body: JSON.stringify({
+          name: user.name || user.email,
+          email: user.email,
+          phone: user.phone || "",
+        }),
       });
 
       if (!res.ok) {
@@ -63,7 +68,18 @@ export default function CourseDetail() {
         throw new Error(errorData.error || "Error al inscribirse");
       }
 
-      toast.success("¡Inscripción exitosa! Revisa tu email para más detalles");
+      const data = await res.json();
+      toast.success(
+        "¡Inscripción exitosa! " +
+          (data.message || "Revisa tu email para más detalles")
+      );
+
+      // Reload course data to show updated enrollment status
+      const courseRes = await fetch(`${BASE_URL}/courses/${id}`);
+      if (courseRes.ok) {
+        const courseData = await courseRes.json();
+        setCourse(courseData);
+      }
     } catch (err) {
       toast.error(err.message || "Error al procesar la inscripción");
     } finally {
@@ -232,9 +248,11 @@ export default function CourseDetail() {
             variant="primary"
             size="lg"
             onClick={handleEnroll}
-            disabled={enrolling}
+            disabled={enrolling || course.is_enrolled}
           >
-            {enrolling ? "Procesando..." : "Inscribirse al curso"}
+            {course.is_enrolled && "Ya estás inscrito"}
+            {!course.is_enrolled && enrolling && "Procesando..."}
+            {!course.is_enrolled && !enrolling && "Inscribirse al curso"}
           </Button>
           <Button variant="outline" size="lg">
             Compartir

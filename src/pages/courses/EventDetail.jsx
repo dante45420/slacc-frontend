@@ -12,7 +12,11 @@ export default function EventDetail() {
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [enrolling, setEnrolling] = useState(false);
-  const [form, setForm] = useState({ name: "", email: "", phone: "" });
+  const [form, setForm] = useState({
+    name: user?.name || "",
+    email: user?.email || "",
+    phone: "",
+  });
 
   const isAdmin = user?.role === "admin";
 
@@ -27,10 +31,26 @@ export default function EventDetail() {
     if (id) load();
   }, [id]);
 
+  useEffect(() => {
+    if (user) {
+      setForm(prev => ({
+        ...prev,
+        name: user.name || prev.name,
+        email: user.email || prev.email,
+      }));
+    }
+  }, [user]);
+
   async function enroll() {
+    const token = localStorage.getItem("access_token");
+    const headers = { "Content-Type": "application/json" };
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
     const res = await fetch(`${BASE_URL}/events/${id}/enroll`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers,
       body: JSON.stringify(form),
     });
     const data = await res.json();
@@ -110,8 +130,9 @@ export default function EventDetail() {
             <button
               className="btn btn-primary"
               onClick={() => setEnrolling(true)}
+              disabled={event.is_enrolled}
             >
-              Inscribirse
+              {event.is_enrolled ? "Ya estás inscrito" : "Inscribirse"}
             </button>
           )}
         </div>

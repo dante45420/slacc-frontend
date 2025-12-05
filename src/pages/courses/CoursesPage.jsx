@@ -28,6 +28,7 @@ export default function CoursesPage() {
   const [loading, setLoading] = useState(true);
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [showEnrollmentForm, setShowEnrollmentForm] = useState(false);
+  const [enrolledCourseIds, setEnrolledCourseIds] = useState(new Set());
 
   useEffect(() => {
     loadCourses();
@@ -279,10 +280,15 @@ export default function CoursesPage() {
                     <button
                       className="btn btn-primary"
                       onClick={() => handleEnrollClick(course)}
-                      disabled={!isOpen}
+                      disabled={!isOpen || enrolledCourseIds.has(course.id)}
                       style={{ flex: 1 }}
                     >
-                      {isOpen ? "Inscribirse" : "Inscripción Cerrada"}
+                      {(() => {
+                        if (enrolledCourseIds.has(course.id))
+                          return "Ya inscrito";
+                        if (isOpen) return "Inscribirse";
+                        return "Inscripción Cerrada";
+                      })()}
                     </button>
                   </div>
 
@@ -320,6 +326,9 @@ export default function CoursesPage() {
             }}
             onSuccess={() => {
               setShowEnrollmentForm(false);
+              setEnrolledCourseIds(
+                prev => new Set([...prev, selectedCourse.id])
+              );
               setSelectedCourse(null);
               loadCourses();
             }}
@@ -338,7 +347,7 @@ function EnrollmentModal({ course, user, onClose, onSuccess }) {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [step, setStep] = useState(1); // 1: formulario, 2: pago, 3: confirmación
+  const [step, setStep] = useState(1); // 1: formulario, 2: confirmación
 
   let userPrice;
   if (user) {
@@ -359,38 +368,17 @@ function EnrollmentModal({ course, user, onClose, onSuccess }) {
   }
 
   async function handleEnroll() {
-    if (step === 1) {
-      if (!formData.student_name || !formData.student_email) {
-        setError("Nombre y email son requeridos");
-        return;
-      }
-      setStep(2);
-    } else if (step === 2) {
-      try {
-        setLoading(true);
-        await apiPost(`/courses/${course.id}/enroll`, formData);
-        setStep(3);
-      } catch (err) {
-        setError(
-          "Error al inscribirse: " + (err.message || "Error desconocido")
-        );
-      } finally {
-        setLoading(false);
-      }
+    if (!formData.student_name || !formData.student_email) {
+      setError("Nombre y email son requeridos");
+      return;
     }
-  }
 
-  async function confirmPayment() {
     try {
       setLoading(true);
-      // Simular confirmación de pago
-      await apiPost(
-        `/courses/${course.id}/enrollments/${course.enrollment_id}/confirm-payment`
-      );
-      onSuccess();
+      await apiPost(`/courses/${course.id}/enroll`, formData);
+      setStep(2); // Go to success step
     } catch (err) {
-      console.error("Error confirming payment:", err);
-      setError("Error al confirmar pago");
+      setError("Error al inscribirse: " + (err.message || "Error desconocido"));
     } finally {
       setLoading(false);
     }
@@ -578,113 +566,40 @@ function EnrollmentModal({ course, user, onClose, onSuccess }) {
         )}
 
         {step === 2 && (
-          <div>
-            <h3 style={{ marginBottom: 16 }}>Confirmar Pago</h3>
-            <p style={{ color: "var(--color-muted)", marginBottom: 24 }}>
-              Simulación de pago - En producción se integraría con Mercado Pago
-            </p>
-
-            <div
-              style={{
-                background: "#f8f9fa",
-                padding: 16,
-                borderRadius: 8,
-                marginBottom: 24,
-                border: "1px solid #e9ecef",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  marginBottom: 8,
-                }}
-              >
-                <span>Curso:</span>
-                <span>{course.title}</span>
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  marginBottom: 8,
-                }}
-              >
-                <span>Estudiante:</span>
-                <span>{formData.student_name}</span>
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  marginBottom: 8,
-                }}
-              >
-                <span>Email:</span>
-                <span>{formData.student_email}</span>
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  fontWeight: "bold",
-                  fontSize: "1.1em",
-                }}
-              >
-                <span>Total:</span>
-                <span>${userPrice}</span>
-              </div>
-            </div>
-
-            <div
-              style={{
-                background: "#d4edda",
-                color: "#155724",
-                padding: 12,
-                borderRadius: 6,
-                marginBottom: 24,
-                textAlign: "center",
-              }}
-            >
-              ✅ Pago simulado exitoso
-            </div>
-          </div>
-        )}
-
-        {step === 3 && (
           <div style={{ textAlign: "center" }}>
             <div style={{ fontSize: "3em", marginBottom: 16 }}>🎉</div>
             <h3 style={{ marginBottom: 16 }}>¡Inscripción Exitosa!</h3>
             <p style={{ color: "var(--color-muted)", marginBottom: 24 }}>
               Te has inscrito correctamente al curso. Recibirás un email de
-              confirmación.
+              confirmación con los detalles.
             </p>
           </div>
         )}
 
         <div style={{ display: "flex", gap: 12, justifyContent: "flex-end" }}>
-          {step < 3 && (
-            <button className="btn btn-outline" onClick={onClose}>
-              Cancelar
+          {step === 1 && (
+            <>
+              <button className="btn btn-outline" onClick={onClose}>
+                Cancelar
+              </button>
+              <button
+                className="btn btn-primary"
+                onClick={handleEnroll}
+                disabled={loading}
+              >
+                {loading ? "Procesando..." : "Inscribirse"}
+              </button>
+            </>
+          )}
+          {step === 2 && (
+            <button className="btn btn-primary" onClick={onSuccess}>
+              Cerrar
             </button>
           )}
-          <button
-            className="btn btn-primary"
-            onClick={step === 2 ? confirmPayment : handleEnroll}
-            disabled={loading}
-          >
-            {loading ? "Procesando..." : getButtonLabel(step)}
-          </button>
         </div>
       </div>
     </div>
   );
-}
-
-function getButtonLabel(step) {
-  if (step === 1) return "Continuar al Pago";
-  if (step === 2) return "Confirmar Pago";
-  return "Finalizar";
 }
 
 EnrollmentModal.propTypes = {

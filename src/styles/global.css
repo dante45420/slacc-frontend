@@ -149,7 +149,7 @@ img {
 .site-header {
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 1000;
   background: rgba(240, 249, 255, 0.98);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--color-border);
@@ -200,7 +200,7 @@ img {
   padding: var(--spacing-3) var(--spacing-3);
   display: inline-block;
   font-weight: 500;
-  font-size: 17px;
+  font-size: 18px;
   border-radius: var(--radius-sm);
   transition: all var(--transition-base);
 }
@@ -208,6 +208,23 @@ img {
 .menu > li > a:hover {
   color: var(--color-primary);
   background: var(--color-bg-alt);
+}
+
+/* Hamburger menu button - hidden on desktop */
+.hamburger-menu {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: var(--color-text);
+  cursor: pointer;
+  padding: var(--spacing-2);
+  transition: color var(--transition-fast);
+  margin-left: auto;
+}
+
+.hamburger-menu:hover {
+  color: var(--color-primary);
 }
 
 .submenu {
@@ -1863,6 +1880,78 @@ img {
 }
 
 /* Responsive */
+@media (max-width: 1200px) {
+  /* Show hamburger menu on tablets and below */
+  .hamburger-menu {
+    display: block;
+  }
+
+  .menu {
+    position: fixed;
+    top: 92px;
+    right: -100%;
+    width: 280px;
+    height: calc(100vh - 92px);
+    background: var(--color-bg);
+    border-left: 1px solid var(--color-border);
+    box-shadow: var(--shadow-lg);
+    flex-direction: column;
+    align-items: flex-start;
+    padding: var(--spacing-4);
+    overflow-y: auto;
+    transition: right 0.3s ease;
+    z-index: 99;
+  }
+
+  .menu.menu-open {
+    right: 0;
+  }
+
+  .menu > li {
+    width: 100%;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .menu > li:last-child {
+    border-bottom: none;
+  }
+
+  .menu > li > a {
+    width: 100%;
+    padding: var(--spacing-3);
+    font-size: 16px;
+  }
+
+  .submenu {
+    position: static;
+    display: none;
+    box-shadow: none;
+    border: none;
+    border-radius: 0;
+    background: var(--color-bg-alt);
+    margin-top: var(--spacing-1);
+    padding: var(--spacing-2) 0;
+  }
+
+  .menu > li:hover .submenu {
+    display: block;
+  }
+
+  .submenu a,
+  .submenu button {
+    padding: var(--spacing-2) var(--spacing-4);
+    font-size: 14px;
+  }
+
+  .submenu-nested {
+    position: static;
+    box-shadow: none;
+    border: none;
+    margin-left: var(--spacing-4);
+    margin-top: var(--spacing-1);
+  }
+}
+
 @media (max-width: 1024px) {
   .cards {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -1878,25 +1967,6 @@ img {
 
   .cards {
     grid-template-columns: 1fr;
-  }
-
-  .menu {
-    flex-wrap: wrap;
-    gap: var(--spacing-2);
-    font-size: 14px;
-  }
-
-  .menu > li > a {
-    padding: var(--spacing-2);
-  }
-
-  .submenu {
-    position: static;
-    display: none;
-    box-shadow: none;
-    border: none;
-    margin-top: var(--spacing-2);
-    background: var(--color-bg-alt);
   }
 
   .carousel-slide {

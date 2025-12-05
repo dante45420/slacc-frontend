@@ -6,7 +6,9 @@ import { useState } from "react";
 function MenuItem({ label, to, children, onClick }) {
   return (
     <li>
-      <Link to={to} onClick={onClick}>{label}</Link>
+      <Link to={to} onClick={onClick}>
+        {label}
+      </Link>
       {children ? <div className="submenu">{children}</div> : null}
     </li>
   );
@@ -20,7 +22,11 @@ MenuItem.propTypes = {
 };
 
 function SubLink({ to, label, onClick }) {
-  return <Link to={to} onClick={onClick}>{label}</Link>;
+  return (
+    <Link to={to} onClick={onClick}>
+      {label}
+    </Link>
+  );
 }
 
 SubLink.propTypes = {
@@ -66,27 +72,59 @@ export default function Header() {
             style={{ height: "60px", width: "auto" }}
           />
         </Link>
-        
-        <button 
-          className="hamburger-menu" 
+
+        <button
+          className="hamburger-menu"
           onClick={toggleMobileMenu}
           aria-label="Toggle menu"
         >
-          <i className={mobileMenuOpen ? "fa-solid fa-xmark" : "fa-solid fa-bars"}></i>
+          <i
+            className={
+              mobileMenuOpen ? "fa-solid fa-xmark" : "fa-solid fa-bars"
+            }
+          ></i>
         </button>
 
         <ul className={`menu ${mobileMenuOpen ? "menu-open" : ""}`}>
           <MenuItem label="Inicio" to="/" onClick={closeMobileMenu} />
           <MenuItem label="Nosotros" to="/nosotros" onClick={closeMobileMenu}>
-            <SubLink to="/nosotros/mision" label="Estatutos, Misión, Visión" onClick={closeMobileMenu} />
-            <SubLink to="/nosotros/historia" label="Historia" onClick={closeMobileMenu} />
+            <SubLink
+              to="/nosotros/mision"
+              label="Estatutos, Misión, Visión"
+              onClick={closeMobileMenu}
+            />
+            <SubLink
+              to="/nosotros/historia"
+              label="Historia"
+              onClick={closeMobileMenu}
+            />
           </MenuItem>
           <MenuItem label="Comités" to="/comites" onClick={closeMobileMenu}>
-            <SubLink to="/comites#etica" label="Ética" onClick={closeMobileMenu} />
-            <SubLink to="/comites#cientifico" label="Científico" onClick={closeMobileMenu} />
-            <SubLink to="/comites#comite-a" label="Comité A" onClick={closeMobileMenu} />
-            <SubLink to="/comites#comite-b" label="Comité B" onClick={closeMobileMenu} />
-            <SubLink to="/comites#comite-c" label="Comité C" onClick={closeMobileMenu} />
+            <SubLink
+              to="/comites#etica"
+              label="Ética"
+              onClick={closeMobileMenu}
+            />
+            <SubLink
+              to="/comites#cientifico"
+              label="Científico"
+              onClick={closeMobileMenu}
+            />
+            <SubLink
+              to="/comites#comite-a"
+              label="Comité A"
+              onClick={closeMobileMenu}
+            />
+            <SubLink
+              to="/comites#comite-b"
+              label="Comité B"
+              onClick={closeMobileMenu}
+            />
+            <SubLink
+              to="/comites#comite-c"
+              label="Comité C"
+              onClick={closeMobileMenu}
+            />
             <SubLink
               to="/comites#subespecialidades"
               label="Subespecialidades"
@@ -94,24 +132,70 @@ export default function Header() {
             />
           </MenuItem>
           <MenuItem label="Miembros" to="/miembros" onClick={closeMobileMenu}>
-            <SubLink to="/por-que-ser-socio" label="Beneficios" onClick={closeMobileMenu} />
-            <SubLink to="/miembros/directorio" label="Directorio" onClick={closeMobileMenu} />
-            <SubLink to="/por-que-ser-socio" label="Hazte socio" onClick={closeMobileMenu} />
-            <SubLink to="/miembros/socios-activos" label="Socios Activos" onClick={closeMobileMenu} />
+            <SubLink
+              to="/por-que-ser-socio"
+              label="Beneficios"
+              onClick={closeMobileMenu}
+            />
+            <SubLink
+              to="/miembros/directorio"
+              label="Directorio"
+              onClick={closeMobileMenu}
+            />
+            <SubLink
+              to="/por-que-ser-socio"
+              label="Hazte socio"
+              onClick={closeMobileMenu}
+            />
+            <SubLink
+              to="/miembros/socios-activos"
+              label="Socios Activos"
+              onClick={closeMobileMenu}
+            />
           </MenuItem>
           <MenuItem label="Cursos" to="/cursos" onClick={closeMobileMenu}>
-            <SubLink to="/eventos/pasados" label="Pasados" onClick={closeMobileMenu} />
-            <SubLink to="/eventos/proximos" label="Próximos" onClick={closeMobileMenu} />
+            <SubLink
+              to="/eventos/pasados"
+              label="Pasados"
+              onClick={closeMobileMenu}
+            />
+            <SubLink
+              to="/eventos/proximos"
+              label="Próximos"
+              onClick={closeMobileMenu}
+            />
             <SubLink to="/cursos" label="Todos" onClick={closeMobileMenu} />
-            <SubLink to="/eventos/webinars" label="Webinars" onClick={closeMobileMenu} />
+            <SubLink
+              to="/eventos/webinars"
+              label="Webinars"
+              onClick={closeMobileMenu}
+            />
           </MenuItem>
-          <MenuItem label="Noticias" to="/noticias/comunicados" onClick={closeMobileMenu}>
-            <SubLink to="/noticias/blog" label="Artículos científicos" onClick={closeMobileMenu} />
-            <SubLink to="/noticias/comunicados" label="Comunicados" onClick={closeMobileMenu} />
+          <MenuItem
+            label="Noticias"
+            to="/noticias/comunicados"
+            onClick={closeMobileMenu}
+          >
+            <SubLink
+              to="/noticias/blog"
+              label="Artículos científicos"
+              onClick={closeMobileMenu}
+            />
+            <SubLink
+              to="/noticias/comunicados"
+              label="Comunicados"
+              onClick={closeMobileMenu}
+            />
           </MenuItem>
           <MenuItem label="Contacto" to="/contacto" onClick={closeMobileMenu} />
-          {user?.role === "admin" && <MenuItem label="Admin" to="/admin" onClick={closeMobileMenu} />}
-          <MenuItem label="Usuario" to={user ? "/perfil" : "/login"} onClick={closeMobileMenu}>
+          {user?.role === "admin" && (
+            <MenuItem label="Admin" to="/admin" onClick={closeMobileMenu} />
+          )}
+          <MenuItem
+            label="Usuario"
+            to={user ? "/perfil" : "/login"}
+            onClick={closeMobileMenu}
+          >
             {user ? (
               <button
                 onClick={e => {
@@ -124,7 +208,11 @@ export default function Header() {
               </button>
             ) : (
               <>
-                <SubLink to="/login" label="Iniciar sesión" onClick={closeMobileMenu} />
+                <SubLink
+                  to="/login"
+                  label="Iniciar sesión"
+                  onClick={closeMobileMenu}
+                />
                 <SubLink
                   to="/solicitar-membresia"
                   label="Solicitar membresía"

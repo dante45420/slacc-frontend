@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { apiGet, apiPost } from "../../api/client";
-import { Modal, Button, useToast } from "../../components/ui";
+import { Modal, useToast } from "../../components/ui";
 
 const BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";

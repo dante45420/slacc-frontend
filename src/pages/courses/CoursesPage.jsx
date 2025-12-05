@@ -28,7 +28,6 @@ export default function CoursesPage() {
   const [loading, setLoading] = useState(true);
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [showEnrollmentForm, setShowEnrollmentForm] = useState(false);
-  const [enrolledCourseIds, setEnrolledCourseIds] = useState(new Set());
 
   useEffect(() => {
     loadCourses();
@@ -280,12 +279,11 @@ export default function CoursesPage() {
                     <button
                       className="btn btn-primary"
                       onClick={() => handleEnrollClick(course)}
-                      disabled={!isOpen || enrolledCourseIds.has(course.id)}
+                      disabled={!isOpen || course.is_enrolled}
                       style={{ flex: 1 }}
                     >
                       {(() => {
-                        if (enrolledCourseIds.has(course.id))
-                          return "Ya inscrito";
+                        if (course.is_enrolled) return "Ya inscrito";
                         if (isOpen) return "Inscribirse";
                         return "Inscripción Cerrada";
                       })()}
@@ -326,9 +324,6 @@ export default function CoursesPage() {
             }}
             onSuccess={() => {
               setShowEnrollmentForm(false);
-              setEnrolledCourseIds(
-                prev => new Set([...prev, selectedCourse.id])
-              );
               setSelectedCourse(null);
               loadCourses();
             }}

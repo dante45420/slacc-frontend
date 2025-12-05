@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext.jsx";
+import { apiGet } from "../../api/client.js";
 import Section from "../../components/ui/Section.jsx";
 import Button from "../../components/ui/Button.jsx";
 import Card from "../../components/ui/Card.jsx";
@@ -27,9 +28,7 @@ export default function CourseDetail() {
     async function load() {
       try {
         setLoading(true);
-        const res = await fetch(`${BASE_URL}/courses/${id}`);
-        if (!res.ok) throw new Error("No se pudo cargar el curso");
-        const data = await res.json();
+        const data = await apiGet(`/courses/${id}`);
         setCourse(data);
       } catch (e) {
         setError(e.message || "Error cargando curso");
@@ -75,11 +74,8 @@ export default function CourseDetail() {
       );
 
       // Reload course data to show updated enrollment status
-      const courseRes = await fetch(`${BASE_URL}/courses/${id}`);
-      if (courseRes.ok) {
-        const courseData = await courseRes.json();
-        setCourse(courseData);
-      }
+      const courseData = await apiGet(`/courses/${id}`);
+      setCourse(courseData);
     } catch (err) {
       toast.error(err.message || "Error al procesar la inscripción");
     } finally {
@@ -239,9 +235,6 @@ export default function CourseDetail() {
             marginTop: "var(--spacing-6)",
             paddingTop: "var(--spacing-5)",
             borderTop: "1px solid var(--color-border)",
-            display: "flex",
-            gap: "var(--spacing-3)",
-            flexWrap: "wrap",
           }}
         >
           <Button
@@ -253,9 +246,6 @@ export default function CourseDetail() {
             {course.is_enrolled && "Ya estás inscrito"}
             {!course.is_enrolled && enrolling && "Procesando..."}
             {!course.is_enrolled && !enrolling && "Inscribirse al curso"}
-          </Button>
-          <Button variant="outline" size="lg">
-            Compartir
           </Button>
         </div>
       </Card>

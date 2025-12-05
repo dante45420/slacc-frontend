@@ -1,10 +1,62 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import PropTypes from "prop-types";
 import { apiGet, apiPost } from "../../api/client";
-import { Modal, useToast } from "../../components/ui";
+import {
+  Section,
+  Container,
+  Card,
+  Button,
+  Badge,
+  Grid,
+  Alert,
+  Spinner,
+  Modal,
+  Input,
+  useToast,
+} from "../../components/ui";
 
 const BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
+
+function InfoField({ label, value, link, fullWidth }) {
+  const displayValue = value || "No especificado";
+
+  return (
+    <div style={{ gridColumn: fullWidth ? "1 / -1" : "auto" }}>
+      <div
+        style={{
+          marginBottom: "var(--spacing-1)",
+          fontWeight: "600",
+          color: "var(--color-text-secondary)",
+        }}
+      >
+        {label}
+      </div>
+      <div style={{ color: "var(--color-text)" }}>
+        {link && value ? (
+          <a
+            href={value}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: "var(--color-primary)" }}
+          >
+            {displayValue}
+          </a>
+        ) : (
+          displayValue
+        )}
+      </div>
+    </div>
+  );
+}
+
+InfoField.propTypes = {
+  label: PropTypes.string.isRequired,
+  value: PropTypes.string,
+  link: PropTypes.bool,
+  fullWidth: PropTypes.bool,
+};
 
 export default function ApplicationDetail() {
   const { id } = useParams();
@@ -118,35 +170,39 @@ export default function ApplicationDetail() {
 
   if (loading) {
     return (
-      <section className="section">
-        <div className="container">
-          <div style={{ textAlign: "center", padding: "48px 0" }}>
-            <div style={{ fontSize: "1.2em", color: "var(--color-muted)" }}>
-              Cargando...
-            </div>
+      <Section variant="default" padding="lg">
+        <Container>
+          <div style={{ textAlign: "center" }}>
+            <Spinner size="lg" />
+            <p
+              style={{
+                marginTop: "var(--spacing-4)",
+                color: "var(--color-muted)",
+              }}
+            >
+              Cargando aplicación...
+            </p>
           </div>
-        </div>
-      </section>
+        </Container>
+      </Section>
     );
   }
 
   if (error || !application) {
     return (
-      <section className="section">
-        <div className="container">
-          <div style={{ textAlign: "center", padding: "48px 0" }}>
-            <div style={{ color: "crimson", marginBottom: 16 }}>
-              {error || "Postulación no encontrada"}
-            </div>
-            <button
-              className="btn btn-outline"
-              onClick={() => navigate("/admin?tab=applications")}
-            >
-              Volver al Panel Admin
-            </button>
-          </div>
-        </div>
-      </section>
+      <Section variant="default" padding="lg">
+        <Container>
+          <Alert variant="error" style={{ marginBottom: "var(--spacing-4)" }}>
+            {error || "Postulación no encontrada"}
+          </Alert>
+          <Button
+            variant="outline"
+            onClick={() => navigate("/admin?tab=applications")}
+          >
+            <i className="fa-solid fa-arrow-left"></i> Volver al Panel Admin
+          </Button>
+        </Container>
+      </Section>
     );
   }
 
@@ -170,163 +226,243 @@ export default function ApplicationDetail() {
     return statuses[status] || status;
   };
 
-  const getStatusColor = status => {
-    const colors = {
-      pending: "var(--color-accent)",
-      approved: "var(--color-secondary)",
-      rejected: "crimson",
-      payment_pending: "orange",
-      paid: "green",
+  const getStatusVariant = status => {
+    const variants = {
+      paid: "success",
+      payment_pending: "warning",
+      rejected: "warning",
+      approved: "info",
+      pending: "neutral",
     };
-    return colors[status] || "var(--color-muted)";
+    return variants[status] || "neutral";
   };
 
   return (
-    <section className="section">
-      <div className="container" style={{ maxWidth: 800 }}>
-        <div style={{ marginBottom: 32 }}>
-          <button
-            className="btn btn-outline"
-            onClick={() => navigate("/admin?tab=applications")}
-            style={{ marginBottom: 24 }}
-          >
-            <i className="fa-solid fa-arrow-left"></i> Volver al Panel Admin
-          </button>
+    <Section variant="default" padding="lg">
+      <Container size="lg">
+        <Button
+          variant="outline"
+          onClick={() => navigate("/admin?tab=applications")}
+          style={{ marginBottom: "var(--spacing-5)" }}
+        >
+          <i className="fa-solid fa-arrow-left"></i> Volver al Panel Admin
+        </Button>
 
+        {/* Header Card */}
+        <Card style={{ marginBottom: "var(--spacing-5)" }}>
           <div
             style={{
-              background: "#f8f9fa",
-              padding: 24,
-              borderRadius: 12,
-              border: "1px solid #e9ecef",
-              marginBottom: 24,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "flex-start",
+              gap: "var(--spacing-4)",
+              flexWrap: "wrap",
             }}
           >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: 16,
-              }}
-            >
-              <h1 style={{ margin: 0 }}>Postulación de {application.name}</h1>
-              <div
-                style={{
-                  background: getStatusColor(application.status),
-                  color: "white",
-                  padding: "8px 16px",
-                  borderRadius: 20,
-                  fontSize: "0.9em",
-                  fontWeight: "bold",
-                }}
-              >
-                {getStatusLabel(application.status)}
-              </div>
+            <div>
+              <h1 style={{ margin: 0, marginBottom: "var(--spacing-2)" }}>
+                {application.name}
+              </h1>
+              <p style={{ color: "var(--color-muted)", margin: 0 }}>
+                Fecha de solicitud:{" "}
+                {new Date(application.created_at).toLocaleDateString("es-ES", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </p>
             </div>
-            <p style={{ color: "var(--color-muted)", margin: 0 }}>
-              Postuló el{" "}
-              {new Date(application.created_at).toLocaleDateString("es-ES", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </p>
+            <Badge variant={getStatusVariant(application.status)} size="md">
+              {getStatusLabel(application.status)}
+            </Badge>
           </div>
-        </div>
+        </Card>
 
         {msg && (
-          <div
-            style={{
-              background: "#d4edda",
-              color: "#155724",
-              padding: 16,
-              borderRadius: 8,
-              marginBottom: 24,
-              textAlign: "center",
-            }}
-          >
+          <Alert variant="success" style={{ marginBottom: "var(--spacing-5)" }}>
             {msg}
-          </div>
+          </Alert>
         )}
-
         {error && (
-          <div
-            style={{
-              background: "#f8d7da",
-              color: "#721c24",
-              padding: 16,
-              borderRadius: 8,
-              marginBottom: 24,
-              textAlign: "center",
-            }}
-          >
+          <Alert variant="error" style={{ marginBottom: "var(--spacing-5)" }}>
             {error}
-          </div>
+          </Alert>
         )}
 
-        <div
+        {/* Personal Information */}
+        <h2
           style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: 24,
-            marginBottom: 32,
+            marginBottom: "var(--spacing-4)",
+            color: "var(--color-primary)",
           }}
         >
-          <div className="card">
-            <h3 style={{ marginBottom: 16, color: "var(--color-primary)" }}>
-              Información Personal
-            </h3>
-            <div style={{ marginBottom: 12 }}>
-              <strong>Nombre:</strong> {application.name}
-            </div>
-            <div style={{ marginBottom: 12 }}>
-              <strong>Email:</strong> {application.email}
-            </div>
-            <div style={{ marginBottom: 12 }}>
-              <strong>Teléfono:</strong>{" "}
-              {application.phone || "No especificado"}
-            </div>
-            <div style={{ marginBottom: 12 }}>
-              <strong>Especialización:</strong>{" "}
-              {application.specialization || "No especificada"}
-            </div>
-            <div>
-              <strong>Años de experiencia:</strong>{" "}
-              {application.experience_years || "No especificado"}
-            </div>
-          </div>
+          Información Personal
+        </h2>
+        <Card style={{ marginBottom: "var(--spacing-5)" }}>
+          <Grid columns="1fr 1fr" gap="var(--spacing-4)">
+            <InfoField label="Nombre Completo" value={application.name} />
+            <InfoField label="Correo Electrónico" value={application.email} />
+            <InfoField label="Ciudad" value={application.city} />
+            <InfoField label="País" value={application.country} />
+            <InfoField label="WhatsApp" value={application.whatsapp} />
+            <InfoField label="Página Web" value={application.website} link />
+          </Grid>
+        </Card>
 
-          <div className="card">
-            <h3 style={{ marginBottom: 16, color: "var(--color-primary)" }}>
-              Motivación
-            </h3>
-            <div
+        {/* Academic Information */}
+        <h2
+          style={{
+            marginBottom: "var(--spacing-4)",
+            color: "var(--color-primary)",
+          }}
+        >
+          Información Académica
+        </h2>
+        <Card style={{ marginBottom: "var(--spacing-5)" }}>
+          <Grid columns="1fr 1fr" gap="var(--spacing-4)">
+            <InfoField
+              label="Especialidad"
+              value={application.specialization}
+            />
+            <InfoField
+              label="Fecha de Término de Residencia"
+              value={
+                application.residency_end_date
+                  ? new Date(application.residency_end_date).toLocaleDateString(
+                      "es-ES"
+                    )
+                  : null
+              }
+            />
+            <InfoField
+              label="Universidad"
+              value={application.university}
+              fullWidth
+            />
+            <InfoField
+              label="Fecha de Fellow de Cadera"
+              value={
+                application.fellowship_date
+                  ? new Date(application.fellowship_date).toLocaleDateString(
+                      "es-ES"
+                    )
+                  : null
+              }
+            />
+            <InfoField
+              label="Lugar de Fellow"
+              value={application.fellowship_location}
+            />
+          </Grid>
+        </Card>
+
+        {/* Professional Information */}
+        <h2
+          style={{
+            marginBottom: "var(--spacing-4)",
+            color: "var(--color-primary)",
+          }}
+        >
+          Información Profesional
+        </h2>
+        <Card style={{ marginBottom: "var(--spacing-5)" }}>
+          <Grid columns="1fr 1fr" gap="var(--spacing-4)">
+            <InfoField
+              label="Hospital Actual"
+              value={application.current_hospital}
+            />
+            <InfoField
+              label="Cargo Actual"
+              value={application.current_position}
+            />
+            <InfoField
+              label="Grado Docente"
+              value={application.teaching_degree}
+              fullWidth
+            />
+          </Grid>
+        </Card>
+
+        {/* Documents */}
+        {application.attachments && application.attachments.length > 0 && (
+          <>
+            <h2
               style={{
-                background: "#f8f9fa",
-                padding: 16,
-                borderRadius: 8,
-                minHeight: 120,
-                border: "1px solid #e9ecef",
+                marginBottom: "var(--spacing-4)",
+                color: "var(--color-primary)",
               }}
             >
-              {application.motivation || "No especificada"}
-            </div>
-          </div>
-        </div>
+              Documentos Adjuntos
+            </h2>
+            <Card style={{ marginBottom: "var(--spacing-5)" }}>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "var(--spacing-3)",
+                }}
+              >
+                {application.attachments.map((att, idx) => (
+                  <a
+                    key={att.id}
+                    href={`${BASE_URL.replace("/api", "")}${att.file_url}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "var(--spacing-2)",
+                      padding: "var(--spacing-3)",
+                      background: "var(--color-bg-alt)",
+                      borderRadius: "var(--radius)",
+                      textDecoration: "none",
+                      color: "var(--color-text)",
+                      transition: "all var(--transition-fast)",
+                    }}
+                    onMouseOver={e =>
+                      (e.currentTarget.style.background =
+                        "var(--color-primary-light)")
+                    }
+                    onMouseOut={e =>
+                      (e.currentTarget.style.background = "var(--color-bg-alt)")
+                    }
+                  >
+                    <i
+                      className="fa-solid fa-file-pdf"
+                      style={{ fontSize: "1.5em", color: "var(--color-error)" }}
+                    ></i>
+                    <span>Documento {idx + 1}</span>
+                    <i
+                      className="fa-solid fa-external-link"
+                      style={{ marginLeft: "auto", fontSize: "0.9em" }}
+                    ></i>
+                  </a>
+                ))}
+              </div>
+            </Card>
+          </>
+        )}
 
+        {/* Decision Section */}
         {application.status === "pending" && (
-          <div className="card" style={{ marginBottom: 32 }}>
-            <h3 style={{ marginBottom: 16, color: "var(--color-primary)" }}>
-              Decisión
-            </h3>
+          <Card style={{ marginBottom: "var(--spacing-5)" }}>
+            <h2
+              style={{
+                marginBottom: "var(--spacing-4)",
+                color: "var(--color-primary)",
+              }}
+            >
+              Decisión de la Solicitud
+            </h2>
 
-            <div style={{ marginBottom: 16 }}>
+            <div style={{ marginBottom: "var(--spacing-4)" }}>
               <label
                 htmlFor="membership-type-select"
-                style={{ display: "block", marginBottom: 8, fontWeight: "500" }}
+                style={{
+                  display: "block",
+                  marginBottom: "var(--spacing-2)",
+                  fontWeight: "600",
+                }}
               >
                 Tipo de Membresía a Asignar:
               </label>
@@ -336,9 +472,9 @@ export default function ApplicationDetail() {
                 onChange={e => setSelectedMembershipType(e.target.value)}
                 style={{
                   width: "100%",
-                  padding: 12,
-                  border: "1px solid #ddd",
-                  borderRadius: 6,
+                  padding: "var(--spacing-3)",
+                  border: "1px solid var(--color-border)",
+                  borderRadius: "var(--radius)",
                   fontSize: "1em",
                 }}
               >
@@ -354,10 +490,14 @@ export default function ApplicationDetail() {
               </select>
             </div>
 
-            <div style={{ marginBottom: 24 }}>
+            <div style={{ marginBottom: "var(--spacing-5)" }}>
               <label
                 htmlFor="resolution-note-textarea"
-                style={{ display: "block", marginBottom: 8, fontWeight: "500" }}
+                style={{
+                  display: "block",
+                  marginBottom: "var(--spacing-2)",
+                  fontWeight: "600",
+                }}
               >
                 Nota de Resolución:
               </label>
@@ -368,194 +508,193 @@ export default function ApplicationDetail() {
                 placeholder="Nota opcional para el postulante..."
                 style={{
                   width: "100%",
-                  padding: 12,
-                  border: "1px solid #ddd",
-                  borderRadius: 6,
-                  minHeight: 80,
+                  padding: "var(--spacing-3)",
+                  border: "1px solid var(--color-border)",
+                  borderRadius: "var(--radius)",
+                  minHeight: "100px",
                   resize: "vertical",
+                  fontFamily: "inherit",
                 }}
               />
             </div>
 
             <div
-              style={{ display: "flex", gap: 16, justifyContent: "flex-end" }}
+              style={{
+                display: "flex",
+                gap: "var(--spacing-3)",
+                justifyContent: "flex-end",
+              }}
             >
-              <button
-                className="btn btn-outline"
+              <Button
+                variant="outline"
                 onClick={rejectApplication}
                 style={{
-                  background: "crimson",
+                  background: "var(--color-error)",
                   color: "white",
                   border: "none",
                 }}
               >
                 Rechazar
-              </button>
-              <button className="btn btn-primary" onClick={approveApplication}>
+              </Button>
+              <Button variant="primary" onClick={approveApplication}>
                 Aprobar
-              </button>
+              </Button>
             </div>
-          </div>
+          </Card>
         )}
 
+        {/* Payment Pending */}
         {application.status === "payment_pending" && (
-          <div
-            className="card"
-            style={{ marginBottom: 32, border: "2px solid orange" }}
+          <Card
+            style={{
+              marginBottom: "var(--spacing-5)",
+              border: "2px solid var(--color-warning)",
+            }}
           >
-            <h3 style={{ marginBottom: 16, color: "orange" }}>
-              Esperando Pago
-            </h3>
-            <p style={{ marginBottom: 16, color: "var(--color-muted)" }}>
+            <h2
+              style={{
+                marginBottom: "var(--spacing-4)",
+                color: "var(--color-warning)",
+              }}
+            >
+              Esperando Confirmación de Pago
+            </h2>
+            <p
+              style={{
+                marginBottom: "var(--spacing-4)",
+                color: "var(--color-muted)",
+              }}
+            >
               La postulación fue aprobada como{" "}
               <strong>
                 {getMembershipTypeLabel(application.membership_type)}
               </strong>
-              {". "}
-              Una vez que la secretaria envíe el link de pago y el usuario
-              complete el pago, puedes confirmar aquí para crear las
-              credenciales del usuario.
+              . Una vez que el usuario complete el pago, confirma aquí para
+              crear las credenciales.
             </p>
-            <div
-              style={{ display: "flex", gap: 16, justifyContent: "flex-end" }}
+            <Button
+              variant="primary"
+              onClick={confirmPayment}
+              style={{ background: "var(--color-success)" }}
             >
-              <button
-                className="btn btn-primary"
-                onClick={confirmPayment}
-                style={{ background: "green" }}
-              >
-                Confirmar Pago y Crear Usuario
-              </button>
-            </div>
-          </div>
+              Confirmar Pago y Crear Usuario
+            </Button>
+          </Card>
         )}
 
-        {application.resolution_note && (
-          <div className="card">
-            <h3 style={{ marginBottom: 16, color: "var(--color-primary)" }}>
+        {/* Resolution Note */}
+        {application.resolution_note && application.status !== "pending" && (
+          <Card style={{ marginBottom: "var(--spacing-5)" }}>
+            <h2
+              style={{
+                marginBottom: "var(--spacing-4)",
+                color: "var(--color-primary)",
+              }}
+            >
               Nota de Resolución
-            </h3>
+            </h2>
             <div
               style={{
-                background: "#f8f9fa",
-                padding: 16,
-                borderRadius: 8,
-                border: "1px solid #e9ecef",
+                background: "var(--color-bg-alt)",
+                padding: "var(--spacing-4)",
+                borderRadius: "var(--radius)",
+                border: "1px solid var(--color-border)",
               }}
             >
               {application.resolution_note}
             </div>
-          </div>
+          </Card>
         )}
 
+        {/* Credentials */}
         {application.status === "paid" && application.initial_password && (
-          <div
-            className="card"
+          <Card
             style={{
-              marginBottom: 32,
-              border: "2px solid var(--color-primary)",
+              marginBottom: "var(--spacing-5)",
+              border: "2px solid var(--color-success)",
             }}
           >
-            <h3 style={{ marginBottom: 16, color: "var(--color-primary)" }}>
-              Credenciales del Usuario
-            </h3>
-            <div
+            <h2
               style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 12,
+                marginBottom: "var(--spacing-4)",
+                color: "var(--color-success)",
               }}
             >
+              Credenciales del Usuario
+            </h2>
+            <Grid columns="1fr" gap="var(--spacing-4)">
               <div>
                 <label
-                  htmlFor="app-email"
                   style={{
                     display: "block",
                     fontWeight: "600",
-                    marginBottom: 8,
+                    marginBottom: "var(--spacing-2)",
                   }}
                 >
                   Email:
                 </label>
-                <div style={{ display: "flex", gap: 8 }}>
+                <div style={{ display: "flex", gap: "var(--spacing-2)" }}>
                   <input
-                    id="app-email"
                     type="text"
                     value={application.email}
                     readOnly
                     style={{
                       flex: 1,
-                      padding: 10,
-                      border: "1px solid #ddd",
-                      borderRadius: 6,
-                      background: "#f8f9fa",
+                      padding: "var(--spacing-2)",
+                      border: "1px solid var(--color-border)",
+                      borderRadius: "var(--radius)",
+                      background: "var(--color-bg-alt)",
                     }}
                   />
-                  <button
+                  <Button
+                    variant="primary"
                     onClick={() => copyToClipboard(application.email)}
-                    style={{
-                      padding: "10px 16px",
-                      background: "var(--color-primary)",
-                      color: "white",
-                      border: "none",
-                      borderRadius: 6,
-                      cursor: "pointer",
-                    }}
                   >
                     Copiar
-                  </button>
+                  </Button>
                 </div>
               </div>
 
               <div>
                 <label
-                  htmlFor="app-password"
                   style={{
                     display: "block",
                     fontWeight: "600",
-                    marginBottom: 8,
+                    marginBottom: "var(--spacing-2)",
                   }}
                 >
                   Contraseña Inicial:
                 </label>
-                <div style={{ display: "flex", gap: 8 }}>
+                <div style={{ display: "flex", gap: "var(--spacing-2)" }}>
                   <input
-                    id="app-password"
                     type="text"
                     value={application.initial_password}
                     readOnly
                     style={{
                       flex: 1,
-                      padding: 10,
-                      border: "1px solid #ddd",
-                      borderRadius: 6,
-                      background: "#f8f9fa",
+                      padding: "var(--spacing-2)",
+                      border: "1px solid var(--color-border)",
+                      borderRadius: "var(--radius)",
+                      background: "var(--color-bg-alt)",
                       fontFamily: "monospace",
                       fontSize: "1.1rem",
                       fontWeight: "bold",
                     }}
                   />
-                  <button
+                  <Button
+                    variant="primary"
                     onClick={() =>
                       copyToClipboard(application.initial_password)
                     }
-                    style={{
-                      padding: "10px 16px",
-                      background: "var(--color-primary)",
-                      color: "white",
-                      border: "none",
-                      borderRadius: 6,
-                      cursor: "pointer",
-                    }}
                   >
                     Copiar
-                  </button>
+                  </Button>
                 </div>
               </div>
-            </div>
-          </div>
+            </Grid>
+          </Card>
         )}
-      </div>
+      </Container>
 
       {/* Credentials Modal */}
       <Modal
@@ -563,193 +702,103 @@ export default function ApplicationDetail() {
         onClose={handleCloseCredentialsModal}
         title="Credenciales de Usuario Creadas"
       >
-        <div style={{ padding: "var(--spacing-4)" }}>
-          <div
-            style={{
-              background: "var(--color-warning-bg)",
-              border: "2px solid var(--color-warning)",
-              borderRadius: "var(--radius)",
-              padding: "var(--spacing-4)",
-              marginBottom: "var(--spacing-4)",
-            }}
-          >
-            <p
-              style={{
-                margin: 0,
-                fontWeight: "600",
-                color: "var(--color-warning-dark)",
-              }}
-            >
-              ⚠️ IMPORTANTE: Esta información se muestra una sola vez
-            </p>
-            <p style={{ margin: "var(--spacing-2) 0 0", fontSize: "0.9rem" }}>
-              Copia estas credenciales y envíalas al usuario de forma segura.
-            </p>
-          </div>
+        <Alert variant="warning" className="mb-4">
+          <strong>⚠️ IMPORTANTE:</strong> Esta información se muestra una sola
+          vez. Copia estas credenciales y envíalas al usuario de forma segura.
+        </Alert>
 
-          {credentials && (
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "var(--spacing-3)",
-              }}
-            >
-              <div>
-                <label
-                  htmlFor="modal-email"
-                  style={{
-                    display: "block",
-                    fontWeight: "600",
-                    marginBottom: "var(--spacing-2)",
-                  }}
-                >
-                  Email:
-                </label>
-                <div style={{ display: "flex", gap: "var(--spacing-2)" }}>
-                  <input
-                    id="modal-email"
-                    type="text"
-                    value={credentials.email}
-                    readOnly
-                    style={{
-                      flex: 1,
-                      padding: "var(--spacing-2)",
-                      border: "1px solid var(--color-border)",
-                      borderRadius: "var(--radius)",
-                      background: "var(--color-bg-alt)",
-                    }}
-                  />
-                  <button
-                    onClick={() => copyToClipboard(credentials.email)}
-                    style={{
-                      padding: "var(--spacing-2) var(--spacing-3)",
-                      background: "var(--color-primary)",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "var(--radius)",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Copiar
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <label
-                  htmlFor="modal-password"
-                  style={{
-                    display: "block",
-                    fontWeight: "600",
-                    marginBottom: "var(--spacing-2)",
-                  }}
-                >
-                  Contraseña Temporal:
-                </label>
-                <div style={{ display: "flex", gap: "var(--spacing-2)" }}>
-                  <input
-                    id="modal-password"
-                    type="text"
-                    value={credentials.password}
-                    readOnly
-                    style={{
-                      flex: 1,
-                      padding: "var(--spacing-2)",
-                      border: "1px solid var(--color-border)",
-                      borderRadius: "var(--radius)",
-                      background: "var(--color-bg-alt)",
-                      fontFamily: "monospace",
-                      fontSize: "1.1rem",
-                    }}
-                  />
-                  <button
-                    onClick={() => copyToClipboard(credentials.password)}
-                    style={{
-                      padding: "var(--spacing-2) var(--spacing-3)",
-                      background: "var(--color-primary)",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "var(--radius)",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Copiar
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <label
-                  htmlFor="modal-membership"
-                  style={{
-                    display: "block",
-                    fontWeight: "600",
-                    marginBottom: "var(--spacing-2)",
-                  }}
-                >
-                  Tipo de Membresía:
-                </label>
-                <input
-                  id="modal-membership"
+        {credentials && (
+          <div className="flex flex-col gap-3">
+            <div>
+              <label htmlFor="modal-email" className="font-semibold mb-2 block">
+                Email:
+              </label>
+              <div className="flex gap-2">
+                <Input
+                  id="modal-email"
                   type="text"
-                  value={credentials.membership_type}
+                  value={credentials.email}
                   readOnly
-                  style={{
-                    width: "100%",
-                    padding: "var(--spacing-2)",
-                    border: "1px solid var(--color-border)",
-                    borderRadius: "var(--radius)",
-                    background: "var(--color-bg-alt)",
-                  }}
+                  className="flex-1"
                 />
+                <Button
+                  onClick={() => copyToClipboard(credentials.email)}
+                  variant="primary"
+                  size="sm"
+                >
+                  Copiar
+                </Button>
               </div>
             </div>
-          )}
 
-          <div
-            style={{
-              marginTop: "var(--spacing-5)",
-              display: "flex",
-              justifyContent: "flex-end",
-              gap: "var(--spacing-2)",
-            }}
-          >
-            <button
-              onClick={() => {
-                if (credentials) {
-                  copyToClipboard(
-                    `Email: ${credentials.email}\nContraseña: ${credentials.password}\nMembresía: ${credentials.membership_type}`
-                  );
-                }
-              }}
-              style={{
-                padding: "var(--spacing-2) var(--spacing-4)",
-                background: "var(--color-secondary)",
-                color: "white",
-                border: "none",
-                borderRadius: "var(--radius)",
-                cursor: "pointer",
-              }}
-            >
-              Copiar Todo
-            </button>
-            <button
-              onClick={handleCloseCredentialsModal}
-              style={{
-                padding: "var(--spacing-2) var(--spacing-4)",
-                background: "var(--color-primary)",
-                color: "white",
-                border: "none",
-                borderRadius: "var(--radius)",
-                cursor: "pointer",
-              }}
-            >
-              Cerrar y Continuar
-            </button>
+            <div>
+              <label
+                htmlFor="modal-password"
+                className="font-semibold mb-2 block"
+              >
+                Contraseña Temporal:
+              </label>
+              <div className="flex gap-2">
+                <Input
+                  id="modal-password"
+                  type="text"
+                  value={credentials.password}
+                  readOnly
+                  className="flex-1"
+                  style={{ fontFamily: "monospace", fontSize: "1.1rem" }}
+                />
+                <Button
+                  onClick={() => copyToClipboard(credentials.password)}
+                  variant="primary"
+                  size="sm"
+                >
+                  Copiar
+                </Button>
+              </div>
+            </div>
+
+            <div>
+              <label
+                htmlFor="modal-membership"
+                className="font-semibold mb-2 block"
+              >
+                Tipo de Membresía:
+              </label>
+              <Input
+                id="modal-membership"
+                type="text"
+                value={credentials.membership_type}
+                readOnly
+              />
+            </div>
           </div>
+        )}
+
+        <div className="flex justify-end gap-2 mt-5">
+          <Button
+            onClick={() => {
+              if (credentials) {
+                copyToClipboard(
+                  `Email: ${credentials.email}\nContraseña: ${credentials.password}\nMembresía: ${credentials.membership_type}`
+                );
+              }
+            }}
+            variant="secondary"
+          >
+            Copiar Todo
+          </Button>
+          <Button onClick={handleCloseCredentialsModal} variant="primary">
+            Cerrar y Continuar
+          </Button>
         </div>
       </Modal>
-    </section>
+    </Section>
   );
 }
+
+InfoField.propTypes = {
+  label: PropTypes.string.isRequired,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  link: PropTypes.bool,
+  fullWidth: PropTypes.bool,
+};

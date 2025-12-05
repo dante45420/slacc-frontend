@@ -1,14 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
-import {
-  Section,
-  Input,
-  Textarea,
-  Button,
-  Alert,
-  Grid,
-} from "../../components/ui";
+import { Section, Input, Button, Alert, Grid } from "../../components/ui";
 
 export default function JoinMembership() {
   const [appSent, setAppSent] = useState(false);
@@ -60,15 +53,25 @@ export default function JoinMembership() {
 
 function ApplicationForm({ onResult }) {
   const [formData, setFormData] = useState({
+    // Información Personal
     name: "",
     email: "",
-    phone: "",
+    website: "",
+    city: "",
+    country: "",
+    whatsapp: "",
+    // Información Académica
     specialization: "",
-    experience: "",
-    motivation: "",
+    residency_end_date: "",
+    university: "",
+    fellowship_date: "",
+    fellowship_location: "",
+    // Información Profesional
+    current_hospital: "",
+    current_position: "",
+    teaching_degree: "",
   });
-  const [documentFile, setDocumentFile] = useState(null);
-  const [fellowCertFile, setFellowCertFile] = useState(null);
+  const [documentFiles, setDocumentFiles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
@@ -82,17 +85,51 @@ function ApplicationForm({ onResult }) {
     }
   };
 
+  const handleFileChange = e => {
+    const files = Array.from(e.target.files || []);
+    if (files.length > 3) {
+      setErrors(prev => ({
+        ...prev,
+        documents: "Máximo 3 archivos PDF permitidos",
+      }));
+      return;
+    }
+
+    const invalidFiles = files.filter(
+      f => !f.name.toLowerCase().endsWith(".pdf")
+    );
+    if (invalidFiles.length > 0) {
+      setErrors(prev => ({
+        ...prev,
+        documents: "Solo se permiten archivos PDF",
+      }));
+      return;
+    }
+
+    setDocumentFiles(files);
+    if (errors.documents) {
+      setErrors(prev => ({ ...prev, documents: "" }));
+    }
+  };
+
+  const removeFile = index => {
+    setDocumentFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
   const validate = () => {
     const newErrors = {};
+    // Required fields
     if (!formData.name.trim()) newErrors.name = "El nombre es requerido";
     if (!formData.email.trim()) newErrors.email = "El email es requerido";
+    if (!formData.city.trim()) newErrors.city = "La ciudad es requerida";
+    if (!formData.country.trim()) newErrors.country = "El país es requerido";
+    if (!formData.whatsapp.trim()) newErrors.whatsapp = "WhatsApp es requerido";
     if (!formData.specialization.trim())
-      newErrors.specialization = "La especialización es requerida";
-    if (!formData.experience)
-      newErrors.experience = "Los años de experiencia son requeridos";
-    if (!formData.motivation.trim())
-      newErrors.motivation = "La motivación es requerida";
-    if (!documentFile) newErrors.document = "El documento PDF es requerido";
+      newErrors.specialization = "La especialidad es requerida";
+    if (!formData.university.trim())
+      newErrors.university = "La universidad es requerida";
+    if (documentFiles.length === 0)
+      newErrors.documents = "Al menos un documento PDF es requerido";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -109,14 +146,27 @@ function ApplicationForm({ onResult }) {
     setLoading(true);
     try {
       const data = new FormData();
+      // Personal
       data.append("name", formData.name);
       data.append("email", formData.email);
-      data.append("phone", formData.phone);
-      data.append("motivation", formData.motivation);
+      data.append("website", formData.website);
+      data.append("city", formData.city);
+      data.append("country", formData.country);
+      data.append("whatsapp", formData.whatsapp);
+      // Academic
       data.append("specialization", formData.specialization);
-      data.append("experience", formData.experience);
-      if (documentFile) data.append("document", documentFile);
-      if (fellowCertFile) data.append("fellow_certificate", fellowCertFile);
+      data.append("residency_end_date", formData.residency_end_date);
+      data.append("university", formData.university);
+      data.append("fellowship_date", formData.fellowship_date);
+      data.append("fellowship_location", formData.fellowship_location);
+      // Professional
+      data.append("current_hospital", formData.current_hospital);
+      data.append("current_position", formData.current_position);
+      data.append("teaching_degree", formData.teaching_degree);
+      // Documents
+      documentFiles.forEach((file, index) => {
+        data.append(`document${index > 0 ? index + 1 : ""}`, file);
+      });
 
       const res = await fetch(`${BASE_URL}/applications`, {
         method: "POST",
@@ -136,13 +186,20 @@ function ApplicationForm({ onResult }) {
       setFormData({
         name: "",
         email: "",
-        phone: "",
+        website: "",
+        city: "",
+        country: "",
+        whatsapp: "",
         specialization: "",
-        experience: "",
-        motivation: "",
+        residency_end_date: "",
+        university: "",
+        fellowship_date: "",
+        fellowship_location: "",
+        current_hospital: "",
+        current_position: "",
+        teaching_degree: "",
       });
-      setDocumentFile(null);
-      setFellowCertFile(null);
+      setDocumentFiles([]);
       setErrors({});
     } catch (error) {
       onResult(
@@ -156,17 +213,29 @@ function ApplicationForm({ onResult }) {
 
   return (
     <form onSubmit={send}>
+      {/* Información Personal */}
+      <h3
+        style={{
+          marginTop: "var(--spacing-6)",
+          marginBottom: "var(--spacing-4)",
+          color: "var(--color-primary)",
+        }}
+      >
+        Información Personal
+      </h3>
+
+      <Input
+        label="Nombre Completo"
+        value={formData.name}
+        onChange={handleChange("name")}
+        error={errors.name}
+        placeholder="Dr. Juan Pérez"
+        required
+      />
+
       <Grid columns="1fr 1fr" gap="var(--spacing-4)">
         <Input
-          label="Nombre Completo"
-          value={formData.name}
-          onChange={handleChange("name")}
-          error={errors.name}
-          placeholder="Dr. Juan Pérez"
-          required
-        />
-        <Input
-          label="Email"
+          label="Correo Electrónico"
           type="email"
           value={formData.email}
           onChange={handleChange("email")}
@@ -174,93 +243,200 @@ function ApplicationForm({ onResult }) {
           placeholder="juan@ejemplo.com"
           required
         />
+        <Input
+          label="Página Web"
+          type="url"
+          value={formData.website}
+          onChange={handleChange("website")}
+          error={errors.website}
+          placeholder="https://ejemplo.com"
+        />
+      </Grid>
+
+      <Grid columns="1fr 1fr" gap="var(--spacing-4)">
+        <Input
+          label="Ciudad"
+          value={formData.city}
+          onChange={handleChange("city")}
+          error={errors.city}
+          placeholder="Bogotá"
+          required
+        />
+        <Input
+          label="País"
+          value={formData.country}
+          onChange={handleChange("country")}
+          error={errors.country}
+          placeholder="Colombia"
+          required
+        />
       </Grid>
 
       <Input
-        label="Teléfono"
+        label="WhatsApp"
         type="tel"
-        value={formData.phone}
-        onChange={handleChange("phone")}
-        error={errors.phone}
+        value={formData.whatsapp}
+        onChange={handleChange("whatsapp")}
+        error={errors.whatsapp}
         placeholder="+57 300 123 4567"
         helperText="Incluye código de país"
+        required
+      />
+
+      {/* Información Académica */}
+      <h3
+        style={{
+          marginTop: "var(--spacing-6)",
+          marginBottom: "var(--spacing-4)",
+          color: "var(--color-primary)",
+        }}
+      >
+        Información Académica
+      </h3>
+
+      <Grid columns="1fr 1fr" gap="var(--spacing-4)">
+        <Input
+          label="Especialidad"
+          value={formData.specialization}
+          onChange={handleChange("specialization")}
+          error={errors.specialization}
+          placeholder="Cirugía Cardiovascular"
+          required
+        />
+        <Input
+          label="Fecha de Término de la Residencia"
+          type="date"
+          value={formData.residency_end_date}
+          onChange={handleChange("residency_end_date")}
+          error={errors.residency_end_date}
+        />
+      </Grid>
+
+      <Input
+        label="Universidad"
+        value={formData.university}
+        onChange={handleChange("university")}
+        error={errors.university}
+        placeholder="Universidad Nacional"
+        required
       />
 
       <Grid columns="1fr 1fr" gap="var(--spacing-4)">
         <Input
-          label="Especialización"
-          value={formData.specialization}
-          onChange={handleChange("specialization")}
-          error={errors.specialization}
-          placeholder="Ej: Cirugía Cardiovascular"
-          required
+          label="Fecha de Fellow de Cadera"
+          type="date"
+          value={formData.fellowship_date}
+          onChange={handleChange("fellowship_date")}
+          error={errors.fellowship_date}
         />
         <Input
-          label="Años de Experiencia"
-          type="number"
-          min="0"
-          value={formData.experience}
-          onChange={handleChange("experience")}
-          error={errors.experience}
-          placeholder="5"
-          required
+          label="Lugar Realización Fellow de Cadera"
+          value={formData.fellowship_location}
+          onChange={handleChange("fellowship_location")}
+          error={errors.fellowship_location}
+          placeholder="Hospital Universitario"
         />
       </Grid>
 
-      <Textarea
-        label="Motivación para unirse a SLACC"
-        value={formData.motivation}
-        onChange={handleChange("motivation")}
-        error={errors.motivation}
-        placeholder="Cuéntanos por qué quieres formar parte de nuestra asociación..."
-        rows={6}
-        required
+      {/* Información Profesional */}
+      <h3
+        style={{
+          marginTop: "var(--spacing-6)",
+          marginBottom: "var(--spacing-4)",
+          color: "var(--color-primary)",
+        }}
+      >
+        Información Profesional
+      </h3>
+
+      <Grid columns="1fr 1fr" gap="var(--spacing-4)">
+        <Input
+          label="Hospital Actual donde Ejerce"
+          value={formData.current_hospital}
+          onChange={handleChange("current_hospital")}
+          error={errors.current_hospital}
+          placeholder="Hospital Central"
+        />
+        <Input
+          label="Cargo Actual"
+          value={formData.current_position}
+          onChange={handleChange("current_position")}
+          error={errors.current_position}
+          placeholder="Cirujano Cardiovascular"
+        />
+      </Grid>
+
+      <Input
+        label="Grado Docente"
+        value={formData.teaching_degree}
+        onChange={handleChange("teaching_degree")}
+        error={errors.teaching_degree}
+        placeholder="Profesor Asociado"
       />
+
+      {/* Documento */}
+      <h3
+        style={{
+          marginTop: "var(--spacing-6)",
+          marginBottom: "var(--spacing-4)",
+          color: "var(--color-primary)",
+        }}
+      >
+        Documentación
+      </h3>
 
       <div className="file-input-wrapper">
         <label htmlFor="application-document" className="file-input-label">
-          Documento (PDF) *
+          Documentos CV/Certificados (PDF) *
         </label>
         <input
           id="application-document"
           type="file"
           accept="application/pdf"
-          onChange={e => {
-            setDocumentFile(e.target.files?.[0] || null);
-            if (errors.document) {
-              setErrors(prev => ({ ...prev, document: "" }));
-            }
-          }}
-          className={`file-input ${errors.document ? "error" : ""}`}
+          multiple
+          onChange={handleFileChange}
+          className={`file-input ${errors.documents ? "error" : ""}`}
           required
         />
-        {documentFile && (
-          <p className="file-selected-message">
-            <i className="fa-solid fa-circle-check"></i> {documentFile.name}
-          </p>
+        {documentFiles.length > 0 && (
+          <div style={{ marginTop: "var(--spacing-3)" }}>
+            {documentFiles.map((file, index) => (
+              <div
+                key={index}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: "var(--spacing-2)",
+                  background: "var(--color-bg-alt)",
+                  borderRadius: "var(--radius-sm)",
+                  marginBottom: "var(--spacing-2)",
+                }}
+              >
+                <p className="file-selected-message" style={{ margin: 0 }}>
+                  <i className="fa-solid fa-circle-check"></i> {file.name}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => removeFile(index)}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "var(--color-error)",
+                    cursor: "pointer",
+                    padding: "var(--spacing-1)",
+                    fontSize: "1.2em",
+                  }}
+                  aria-label="Eliminar archivo"
+                >
+                  <i className="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+            ))}
+          </div>
         )}
-        {errors.document && (
-          <p className="file-error-message">{errors.document}</p>
-        )}
-      </div>
-
-      <div className="file-input-wrapper">
-        <label htmlFor="fellow-certificate" className="file-input-label">
-          Certificado de Fellow (Opcional)
-        </label>
-        <input
-          id="fellow-certificate"
-          type="file"
-          accept="application/pdf,image/jpeg,image/jpg,image/png"
-          onChange={e => {
-            setFellowCertFile(e.target.files?.[0] || null);
-          }}
-          className="file-input"
-        />
-        {fellowCertFile && (
-          <p className="file-selected-message">
-            <i className="fa-solid fa-circle-check"></i> {fellowCertFile.name}
-          </p>
+        {errors.documents && (
+          <p className="file-error-message">{errors.documents}</p>
         )}
         <p
           style={{
@@ -269,7 +445,7 @@ function ApplicationForm({ onResult }) {
             marginTop: "var(--spacing-2)",
           }}
         >
-          Si tienes un certificado de Fellow, súbelo aquí (PDF o imagen)
+          Puedes adjuntar hasta 3 archivos PDF (CV y certificados)
         </p>
       </div>
 

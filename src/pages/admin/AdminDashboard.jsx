@@ -1034,7 +1034,7 @@ function ApplicationsTab() {
     const variants = {
       pending: "warning",
       approved: "info",
-      rejected: "error",
+      rejected: "warning",
       payment_pending: "warning",
       paid: "success",
     };
@@ -1086,11 +1086,11 @@ function ApplicationsTab() {
       ),
     },
     {
-      key: "experience_years",
-      label: "Experiencia",
+      key: "specialization",
+      label: "Especialidad",
       render: row => (
         <span style={{ fontSize: "0.875rem" }}>
-          {row.experience_years ? `${row.experience_years} años` : "N/A"}
+          {row.specialization || "No especificada"}
         </span>
       ),
     },
@@ -1176,9 +1176,9 @@ function NewsTab() {
     const variants = {
       published: "success",
       pending: "warning",
-      rejected: "error",
+      rejected: "warning",
     };
-    return variants[status] || "default";
+    return variants[status] || "neutral";
   };
 
   const getStatusLabel = status => {

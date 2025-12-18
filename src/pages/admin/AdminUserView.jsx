@@ -95,9 +95,9 @@ export default function AdminUserView() {
     <Section variant="default">
       <Container size="sm">
         <div className="flex items-center justify-between mb-5">
-          <h1 className="mt-0 mb-0">Detalles del Usuario</h1>
+          <h1 className="mt-0 mb-0">Detalles del Socio</h1>
           <Badge variant={roleVariant} size="md">
-            {user.role === "admin" ? "Administrador" : "Miembro"}
+            {user.role === "admin" ? "Administrador" : "Socio"}
           </Badge>
         </div>
 
@@ -160,7 +160,7 @@ export default function AdminUserView() {
               variant="primary"
               onClick={() => navigate(`/admin/users/${id}/edit`)}
             >
-              Editar Usuario
+              Editar Socio
             </Button>
           </div>
         </Card>

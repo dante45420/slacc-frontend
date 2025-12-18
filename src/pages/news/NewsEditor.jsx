@@ -29,7 +29,7 @@ export default function NewsEditor() {
     title: "",
     excerpt: "",
     content: "",
-    category: "comunicados",
+    category: "articulos-cientificos",
     tags: "",
     author: "",
     source: "",
@@ -60,7 +60,7 @@ export default function NewsEditor() {
         title: news.title || "",
         excerpt: news.excerpt || "",
         content: news.content || "",
-        category: news.category || "general",
+        category: news.category || "articulos-cientificos",
         tags: news.tags || "",
         author: news.author || "",
         source: news.source || "",
@@ -206,12 +206,13 @@ export default function NewsEditor() {
                   value={formData.category}
                   onChange={handleInputChange}
                 >
-                  <option value="general">General</option>
-                  <option value="comunicados">Comunicados</option>
-                  <option value="prensa">Prensa</option>
-                  <option value="blog">Blog</option>
-                  <option value="eventos">Eventos</option>
-                  <option value="educacion">Educación</option>
+                  <option value="articulos-cientificos">
+                    Artículos científicos
+                  </option>
+                  <option value="articulos-destacados">
+                    Artículos destacados
+                  </option>
+                  <option value="editoriales">Editoriales</option>
                 </Select>
 
                 <Select

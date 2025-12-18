@@ -5,6 +5,16 @@ import { Button } from "./ui";
 
 export function TeamCarousel({ members = [] }) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [itemsPerSlide, setItemsPerSlide] = useState(3);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setItemsPerSlide(window.innerWidth <= 768 ? 1 : 3);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const items = members.length
     ? members
@@ -41,7 +51,6 @@ export function TeamCarousel({ members = [] }) {
         },
       ];
 
-  const itemsPerSlide = 3;
   const totalSlides = Math.ceil(items.length / itemsPerSlide);
 
   useEffect(() => {
@@ -79,6 +88,7 @@ export function TeamCarousel({ members = [] }) {
             return (
               <div
                 key={`slide-${slideIndex}`}
+                className="team-carousel-slide"
                 style={{
                   minWidth: "100%",
                   display: "flex",
@@ -90,6 +100,7 @@ export function TeamCarousel({ members = [] }) {
                 {slideMembers.map((member, idx) => (
                   <div
                     key={`${member.name}-${idx}`}
+                    className="team-member-card"
                     style={{
                       flex: "0 0 auto",
                       width: "280px",

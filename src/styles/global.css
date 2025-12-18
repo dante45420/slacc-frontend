@@ -8,6 +8,10 @@
   padding: 0;
 }
 
+:root {
+  --header-height: 92px;
+}
+
 /* Ensure all elements inherit the font */
 input,
 button,
@@ -26,6 +30,7 @@ td {
 html {
   height: 100%;
   scroll-behavior: smooth;
+  scrollbar-gutter: stable;
 }
 
 body {
@@ -164,19 +169,28 @@ img {
 }
 
 .nav {
+  width: 100%;
+  max-width: 100%;
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: var(--spacing-6);
-  padding: var(--spacing-4) 0;
+  gap: clamp(0.5rem, 2vw, var(--spacing-6));
+  padding: var(--spacing-4) calc(20rem - var(--scrollbar-width, 0px));
+  padding-left: 20rem;
 }
 
 .brand {
   font-weight: 800;
   color: var(--color-primary);
   letter-spacing: -0.5px;
-  font-size: 24px;
+  font-size: clamp(18px, 4vw, 24px);
   transition: transform var(--transition-base);
+  flex-shrink: 0;
+}
+
+.brand .logo-image {
+  height: clamp(40px, 8vw, 60px) !important;
+  width: auto;
 }
 
 .brand:hover {
@@ -190,10 +204,17 @@ img {
   padding: 0;
   margin: 0;
   align-items: center;
+  flex: 1;
 }
 
 .menu > li {
   position: relative;
+}
+
+/* Keep the profile icon pinned to the right edge on desktop */
+.menu > li:last-child {
+  margin-left: auto;
+  margin-right: 0;
 }
 
 .menu > li > a {
@@ -203,6 +224,11 @@ img {
   font-size: 18px;
   border-radius: var(--radius-sm);
   transition: all var(--transition-base);
+}
+
+/* Hide submenu chevron on desktop */
+.submenu-chevron {
+  display: none;
 }
 
 .menu > li > a:hover {
@@ -215,12 +241,13 @@ img {
   display: none;
   background: none;
   border: none;
-  font-size: 24px;
+  font-size: clamp(20px, 5vw, 24px);
   color: var(--color-text);
   cursor: pointer;
   padding: var(--spacing-2);
   transition: color var(--transition-fast);
   margin-left: auto;
+  flex-shrink: 0;
 }
 
 .hamburger-menu:hover {
@@ -839,6 +866,7 @@ img {
   overflow: hidden;
   box-shadow: var(--shadow-md);
   border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
 }
 
 .carousel-track {
@@ -1886,12 +1914,26 @@ img {
     display: block;
   }
 
+  :root {
+    --header-height: 84px;
+  }
+
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+  }
+
+  .nav {
+    padding: var(--spacing-3) clamp(1rem, 3vw, 2rem);
+  }
+
   .menu {
     position: fixed;
-    top: 92px;
+    top: var(--header-height, 84px);
     right: -100%;
-    width: 280px;
-    height: calc(100vh - 92px);
+    width: min(280px, 80vw);
+    height: calc(100vh - var(--header-height, 84px));
     background: var(--color-bg);
     border-left: 1px solid var(--color-border);
     box-shadow: var(--shadow-lg);
@@ -1900,7 +1942,8 @@ img {
     padding: var(--spacing-4);
     overflow-y: auto;
     transition: right 0.3s ease;
-    z-index: 99;
+    z-index: 999;
+    margin: 0;
   }
 
   .menu.menu-open {
@@ -1913,6 +1956,7 @@ img {
   }
 
   .menu > li:last-child {
+    margin-left: 0;
     border-bottom: none;
   }
 
@@ -1920,6 +1964,16 @@ img {
     width: 100%;
     padding: var(--spacing-3);
     font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  /* Show submenu chevron on mobile */
+  .submenu-chevron {
+    display: inline;
+    margin-left: auto;
+    font-size: 0.8em;
   }
 
   .submenu {
@@ -1933,7 +1987,13 @@ img {
     padding: var(--spacing-2) 0;
   }
 
+  /* Disable hover behavior on mobile - only click to toggle */
   .menu > li:hover .submenu {
+    display: none;
+  }
+
+  /* Allow click to toggle submenus on mobile */
+  .menu > li.submenu-open .submenu {
     display: block;
   }
 
@@ -1969,12 +2029,48 @@ img {
     grid-template-columns: 1fr;
   }
 
+  .carousel {
+    overflow-x: hidden;
+  }
+
   .carousel-slide {
     height: 300px;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    flex-shrink: 0;
+    flex-grow: 0;
+  }
+
+  .carousel-track {
+    display: flex;
+    width: 100%;
+  }
+
+  /* NewsCarousel: Show only one news card per slide on mobile */
+  .news-carousel-container {
+    flex-direction: row !important;
+    justify-content: center !important;
+  }
+
+  .news-carousel-container a {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: none !important;
+  }
+
+  /* TeamCarousel: Ensure team members fit properly on mobile */
+  .team-carousel-slide {
+    padding: 1rem !important;
+  }
+
+  .team-member-card {
+    width: 100% !important;
+    max-width: 280px !important;
   }
 
   .carousel-content {
     bottom: var(--spacing-4);
+    padding: var(--spacing-3) var(--spacing-4);
   }
 
   .carousel-title {
@@ -1983,6 +2079,13 @@ img {
 
   .carousel-desc {
     font-size: 14px;
+  }
+
+  .carousel-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+    margin: 0 var(--spacing-2);
   }
 
   h1 {
@@ -2037,6 +2140,35 @@ img {
 @media (max-width: 480px) {
   .container {
     padding: 0 var(--spacing-3);
+  }
+
+  .nav {
+    padding: var(--spacing-2) var(--spacing-3);
+    gap: var(--spacing-2);
+  }
+
+  .brand {
+    font-size: 16px;
+  }
+
+  .brand .logo-image {
+    height: 40px !important;
+  }
+
+  .hamburger-menu {
+    font-size: 20px;
+    padding: var(--spacing-1);
+  }
+
+  .carousel-slide {
+    height: 250px;
+  }
+
+  .carousel-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+    margin: 0 var(--spacing-1);
   }
 
   .card {

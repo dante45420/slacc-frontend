@@ -19,15 +19,15 @@ function getImageUrl(imageUrl) {
 }
 
 const categoryLabels = {
-  comunicados: "Comunicado",
-  prensa: "Prensa",
-  blog: "Blog",
+  "articulos-cientificos": "Artículos científicos",
+  "articulos-destacados": "Artículos destacados",
+  editoriales: "Editoriales",
 };
 
 const categoryVariants = {
-  comunicados: "primary",
-  prensa: "info",
-  blog: "accent",
+  "articulos-cientificos": "accent",
+  "articulos-destacados": "primary",
+  editoriales: "info",
 };
 
 function formatDate(dateString) {

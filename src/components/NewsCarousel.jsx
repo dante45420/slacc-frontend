@@ -7,15 +7,15 @@ const BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
 
 const categoryLabels = {
-  comunicados: "Comunicado",
-  prensa: "Prensa",
-  blog: "Blog",
+  "articulos-cientificos": "Artículos científicos",
+  "articulos-destacados": "Artículos destacados",
+  editoriales: "Editoriales",
 };
 
 const categoryVariants = {
-  comunicados: "primary",
-  prensa: "info",
-  blog: "accent",
+  "articulos-cientificos": "accent",
+  "articulos-destacados": "primary",
+  editoriales: "info",
 };
 
 function getImageUrl(imageUrl) {
@@ -54,6 +54,16 @@ export default function NewsCarousel({ limit = 9, category }) {
   const [news, setNews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [index, setIndex] = useState(0);
+  const [itemsPerSlide, setItemsPerSlide] = useState(3);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setItemsPerSlide(window.innerWidth <= 768 ? 1 : 3);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     setLoading(true);
@@ -118,10 +128,10 @@ export default function NewsCarousel({ limit = 9, category }) {
     );
   }
 
-  // Group news into slides of 3
+  // Group news into slides (1 on mobile, 3 on desktop)
   const slides = [];
-  for (let i = 0; i < news.length; i += 3) {
-    slides.push(news.slice(i, i + 3));
+  for (let i = 0; i < news.length; i += itemsPerSlide) {
+    slides.push(news.slice(i, i + itemsPerSlide));
   }
 
   const go = i => setIndex((i + slides.length) % slides.length);
@@ -147,6 +157,7 @@ export default function NewsCarousel({ limit = 9, category }) {
             }}
           >
             <div
+              className="news-carousel-container"
               style={{
                 display: "flex",
                 gap: "var(--spacing-5)",

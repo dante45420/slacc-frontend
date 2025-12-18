@@ -1,23 +1,27 @@
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import NewsGrid from "../../components/NewsGrid.jsx";
-import { Section, Container, Tabs } from "../../components/ui";
+import { Section, Container, Tabs, Button } from "../../components/ui";
 
 export default function NewsPage() {
   const location = useLocation();
   const navigate = useNavigate();
-  const [active, setActive] = useState("comunicados");
+  const [active, setActive] = useState("articulos-cientificos");
 
   useEffect(() => {
-    if (location.pathname.endsWith("/prensa")) setActive("prensa");
-    else if (location.pathname.endsWith("/blog")) setActive("blog");
-    else setActive("comunicados");
+    if (location.pathname.endsWith("/articulos-destacados")) {
+      setActive("articulos-destacados");
+    } else if (location.pathname.endsWith("/editoriales")) {
+      setActive("editoriales");
+    } else {
+      setActive("articulos-cientificos");
+    }
   }, [location.pathname]);
 
   const tabs = [
-    { id: "comunicados", label: "Comunicados" },
-    { id: "prensa", label: "Prensa" },
-    { id: "blog", label: "Blog" },
+    { id: "articulos-cientificos", label: "Artículos científicos" },
+    { id: "articulos-destacados", label: "Artículos destacados" },
+    { id: "editoriales", label: "Editoriales" },
   ];
 
   const handleTabChange = tabId => {
@@ -28,19 +32,19 @@ export default function NewsPage() {
   return (
     <Section variant="default" padding="lg">
       <Container size="lg">
-        <h1
-          style={{
-            marginBottom: "var(--spacing-6)",
-            fontSize: "2.5rem",
-            textAlign: "center",
-          }}
+        <div
+          className="flex justify-between align-center mb-6"
+          style={{ flexWrap: "wrap" }}
         >
-          Noticias
-        </h1>
+          <h1 className="mb-0">Noticias</h1>
+          <Link to="/subir-noticia">
+            <Button variant="primary">Enviar artículo</Button>
+          </Link>
+        </div>
 
         <Tabs tabs={tabs} activeTab={active} onChange={handleTabChange} />
 
-        <div style={{ marginTop: "var(--spacing-6)" }}>
+        <div className="mt-6">
           <NewsGrid category={active} />
         </div>
       </Container>

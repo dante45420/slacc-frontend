@@ -7,10 +7,10 @@ import {
   Button,
   Badge,
   Card,
-  Grid,
   Spinner,
   useToast,
 } from "../../components/ui";
+import NewsCarousel from "../../components/NewsCarousel.jsx";
 import { sanitizeHtml } from "../../utils/sanitize";
 
 const BASE_URL =
@@ -41,15 +41,16 @@ function getStatusLabel(status) {
 }
 
 function getCategoryBadgeVariant(category) {
-  if (category === "comunicados") return "primary";
-  if (category === "prensa") return "info";
+  if (category === "articulos-destacados") return "primary";
+  if (category === "editoriales") return "info";
   return "accent";
 }
 
 function getCategoryLabel(category) {
-  if (category === "comunicados") return "Comunicado";
-  if (category === "prensa") return "Prensa";
-  return "Blog";
+  if (category === "articulos-cientificos") return "Artículos científicos";
+  if (category === "articulos-destacados") return "Artículos destacados";
+  if (category === "editoriales") return "Editoriales";
+  return category;
 }
 
 function getStatusBadgeVariant(status) {
@@ -278,6 +279,16 @@ export default function NewsDetail() {
                   >
                     {formatDate(news.created_at)}
                   </time>
+                  {news.author_name && (
+                    <span
+                      style={{
+                        color: "var(--color-muted)",
+                        fontSize: "0.95rem",
+                      }}
+                    >
+                      Por {news.author_name}
+                    </span>
+                  )}
                 </div>
               </div>
 
@@ -431,41 +442,7 @@ export default function NewsDetail() {
               >
                 Más noticias
               </h2>
-              <Grid cols={3} gap="4">
-                {more.map(n => (
-                  <Card
-                    key={n.id}
-                    image={getImageUrl(n.image_url)}
-                    imageAlt={n.title}
-                    hoverable
-                  >
-                    <h4
-                      style={{
-                        marginBottom: "var(--spacing-2)",
-                        fontSize: "1.1rem",
-                        lineHeight: "1.4",
-                      }}
-                    >
-                      {n.title}
-                    </h4>
-                    <p
-                      style={{
-                        color: "var(--color-muted)",
-                        marginBottom: "var(--spacing-3)",
-                        fontSize: "0.95rem",
-                        lineHeight: "1.6",
-                      }}
-                    >
-                      {n.excerpt}
-                    </p>
-                    <Link to={`/noticias/${n.id}`}>
-                      <Button variant="outline" size="sm">
-                        Leer más <i className="fa-solid fa-arrow-right"></i>
-                      </Button>
-                    </Link>
-                  </Card>
-                ))}
-              </Grid>
+              <NewsCarousel limit={9} category={news?.category} />
             </div>
           )}
         </article>

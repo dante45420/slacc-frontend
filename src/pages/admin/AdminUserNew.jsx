@@ -44,14 +44,14 @@ export default function AdminUserNew() {
       if (!res.ok) throw new Error("No se pudo crear");
       const data = await res.json();
       toast.success(
-        `Usuario creado correctamente. Contraseña inicial: ${data.initial_password}`
+        `Socio creado correctamente. Contraseña inicial: ${data.initial_password}`
       );
       setTimeout(() => {
         navigate("/admin?tab=users");
       }, 2000);
     } catch (e) {
       setError(e.message);
-      toast.error("Error al crear el usuario");
+      toast.error("Error al crear el socio");
     } finally {
       setSaving(false);
     }
@@ -69,9 +69,9 @@ export default function AdminUserNew() {
             <i className="fa-solid fa-arrow-left"></i> Volver al Panel Admin
           </Button>
 
-          <h1 className="mb-2">Crear Usuario</h1>
+          <h1 className="mb-2">Crear Socio</h1>
           <p className="text-muted">
-            Completa el formulario para crear un nuevo miembro
+            Completa el formulario para crear un nuevo socio
           </p>
         </div>
 
@@ -100,7 +100,7 @@ export default function AdminUserNew() {
                 label="Nombre completo *"
                 id="new-user-name"
                 type="text"
-                placeholder="Nombre del usuario"
+                placeholder="Nombre del socio"
                 value={form.name}
                 onChange={e => setForm({ ...form, name: e.target.value })}
                 required
@@ -163,7 +163,7 @@ export default function AdminUserNew() {
                 Cancelar
               </Button>
               <Button type="submit" variant="primary" disabled={saving}>
-                {saving ? "Creando..." : "Crear Usuario"}
+                {saving ? "Creando..." : "Crear Socio"}
               </Button>
             </div>
           </form>

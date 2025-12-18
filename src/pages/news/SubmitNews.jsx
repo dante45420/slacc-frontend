@@ -1,77 +1,127 @@
 import { useState } from "react";
-const BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
+import { apiPostForm } from "../../api/client";
+import {
+  Section,
+  Container,
+  Card,
+  Input,
+  Textarea,
+  Select,
+  Button,
+  Alert,
+  useToast,
+} from "../../components/ui";
 
 export default function SubmitNews() {
   const [title, setTitle] = useState("");
   const [excerpt, setExcerpt] = useState("");
   const [content, setContent] = useState("");
+  const [category, setCategory] = useState("articulos-cientificos");
+  const [imageFile, setImageFile] = useState(null);
   const [msg, setMsg] = useState("");
+  const [loading, setLoading] = useState(false);
+  const toast = useToast();
 
   async function submit(e) {
     e.preventDefault();
+    setLoading(true);
+    setMsg("");
+
     const form = new FormData();
     form.append("title", title);
     form.append("excerpt", excerpt);
     form.append("content", content);
-    if (e.target.image.files[0]) form.append("image", e.target.image.files[0]);
-    const token = localStorage.getItem("access_token");
-    const res = await fetch(`${BASE_URL}/news`, {
-      method: "POST",
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
-      body: form,
-    });
-    if (!res.ok) {
-      setMsg("Error al enviar la noticia");
-      return;
+    form.append("category", category);
+    if (imageFile) form.append("image", imageFile);
+
+    try {
+      const data = await apiPostForm("/news", form);
+      toast.success("Enviado para revisión");
+      setMsg(`Enviado para revisión (id ${data.id}).`);
+      setTitle("");
+      setExcerpt("");
+      setContent("");
+      setCategory("articulos-cientificos");
+      setImageFile(null);
+      if (e.target.image) e.target.image.value = "";
+    } catch (err) {
+      console.error(err);
+      toast.error("Error al enviar");
+      setMsg("Error al enviar el artículo.");
+    } finally {
+      setLoading(false);
     }
-    const data = await res.json();
-    setMsg(`Noticia creada con estado ${data.status} (id ${data.id})`);
   }
 
   return (
-    <section className="section">
-      <div className="container" style={{ maxWidth: 720 }}>
-        <h2>Subir noticia</h2>
-        <form onSubmit={submit}>
-          <div style={{ marginBottom: 12 }}>
-            <label htmlFor="news-title">Título</label>
-            <input
-              id="news-title"
-              value={title}
-              onChange={e => setTitle(e.target.value)}
-              style={{ width: "100%", padding: 10 }}
-              required
-            />
+    <Section variant="default" padding="lg">
+      <Container size="default">
+        <div className="form-wrapper-centered">
+          <div className="mb-6">
+            <h1 className="mb-2">Enviar artículo</h1>
+            <p className="text-muted">
+              Tu envío quedará en estado “Pendiente” hasta revisión.
+            </p>
           </div>
-          <div style={{ marginBottom: 12 }}>
-            <label htmlFor="news-excerpt">Resumen</label>
-            <input
-              id="news-excerpt"
-              value={excerpt}
-              onChange={e => setExcerpt(e.target.value)}
-              style={{ width: "100%", padding: 10 }}
-            />
-          </div>
-          <div style={{ marginBottom: 12 }}>
-            <label htmlFor="news-content">Contenido</label>
-            <textarea
-              id="news-content"
-              value={content}
-              onChange={e => setContent(e.target.value)}
-              style={{ width: "100%", padding: 10, minHeight: 140 }}
-            />
-          </div>
-          <div style={{ marginBottom: 12 }}>
-            <label htmlFor="news-image">Imagen (opcional)</label>
-            <input id="news-image" name="image" type="file" accept="image/*" />
-          </div>
-          <button className="btn btn-primary" type="submit">
-            Enviar
-          </button>
-        </form>
-        {msg ? <p style={{ marginTop: 12 }}>{msg}</p> : null}
-      </div>
-    </section>
+
+          <form onSubmit={submit}>
+            <Card className="mb-4">
+              <div className="grid grid-2 gap-4 mb-4">
+                <Select
+                  label="Categoría"
+                  value={category}
+                  onChange={e => setCategory(e.target.value)}
+                >
+                  <option value="articulos-cientificos">
+                    Artículos científicos
+                  </option>
+                  <option value="articulos-destacados">
+                    Artículos destacados
+                  </option>
+                  <option value="editoriales">Editoriales</option>
+                </Select>
+
+                <Input
+                  label="Imagen (opcional)"
+                  type="file"
+                  name="image"
+                  accept="image/*"
+                  onChange={e => setImageFile(e.target.files?.[0] || null)}
+                />
+              </div>
+
+              <Input
+                label="Título"
+                value={title}
+                onChange={e => setTitle(e.target.value)}
+                required
+              />
+
+              <Textarea
+                label="Resumen"
+                value={excerpt}
+                onChange={e => setExcerpt(e.target.value)}
+                rows={3}
+              />
+
+              <Textarea
+                label="Contenido"
+                value={content}
+                onChange={e => setContent(e.target.value)}
+                rows={8}
+              />
+
+              <div className="flex justify-end mt-4">
+                <Button type="submit" loading={loading} disabled={loading}>
+                  Enviar
+                </Button>
+              </div>
+            </Card>
+
+            {msg ? <Alert variant="info">{msg}</Alert> : null}
+          </form>
+        </div>
+      </Container>
+    </Section>
   );
 }

@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import Header from "./components/Header.jsx";
 import { ProtectedRoute } from "./components/ProtectedRoute.jsx";
@@ -64,9 +64,30 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/noticias" element={<NewsList />} />
-            <Route path="/noticias/comunicados" element={<NewsPage />} />
-            <Route path="/noticias/prensa" element={<NewsPage />} />
-            <Route path="/noticias/blog" element={<NewsPage />} />
+            <Route
+              path="/noticias/articulos-cientificos"
+              element={<NewsPage />}
+            />
+            <Route
+              path="/noticias/articulos-destacados"
+              element={<NewsPage />}
+            />
+            <Route path="/noticias/editoriales" element={<NewsPage />} />
+            {/* Legacy category URLs (redirects) */}
+            <Route
+              path="/noticias/blog"
+              element={
+                <Navigate to="/noticias/articulos-cientificos" replace />
+              }
+            />
+            <Route
+              path="/noticias/comunicados"
+              element={<Navigate to="/noticias/articulos-destacados" replace />}
+            />
+            <Route
+              path="/noticias/prensa"
+              element={<Navigate to="/noticias/editoriales" replace />}
+            />
             <Route path="/noticias/:id" element={<NewsDetail />} />
             <Route path="/cursos" element={<CoursesPage />} />
             <Route path="/cursos/:id" element={<CourseDetail />} />
@@ -93,7 +114,14 @@ export default function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/perfil" element={<UserProfile />} />
             <Route path="/solicitar-membresia" element={<JoinMembership />} />
-            <Route path="/subir-noticia" element={<SubmitNews />} />
+            <Route
+              path="/subir-noticia"
+              element={
+                <ProtectedRoute>
+                  <SubmitNews />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="/admin"
               element={

@@ -62,7 +62,7 @@ export default function AdminUserEdit() {
         }),
       });
       if (!res.ok) throw new Error("No se pudo guardar");
-      toast.success("Usuario actualizado correctamente");
+      toast.success("Socio actualizado correctamente");
       navigate("/admin?tab=users");
     } catch (e) {
       setError(e.message);
@@ -88,7 +88,7 @@ export default function AdminUserEdit() {
     return (
       <Section variant="default">
         <Container size="sm">
-          <Alert variant="error">No se pudo cargar el usuario</Alert>
+          <Alert variant="error">No se pudo cargar el socio</Alert>
           <Button
             variant="outline"
             onClick={() => navigate("/admin")}
@@ -104,7 +104,7 @@ export default function AdminUserEdit() {
   return (
     <Section variant="default">
       <Container size="sm">
-        <h1 className="mb-5">Editar Usuario</h1>
+        <h1 className="mb-5">Editar Socio</h1>
 
         {error && (
           <Alert variant="error" className="mb-4">
@@ -133,10 +133,10 @@ export default function AdminUserEdit() {
                   }
                   style={{ width: "auto", cursor: "pointer" }}
                 />
-                <span className="font-medium">Usuario activo</span>
+                <span className="font-medium">Socio activo</span>
               </label>
               <p className="text-muted text-sm mt-1 mb-0">
-                Los usuarios inactivos no pueden acceder al sistema
+                Los socios inactivos no pueden acceder al sistema
               </p>
             </div>
 

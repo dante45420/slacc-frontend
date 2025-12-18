@@ -111,7 +111,7 @@ export default function AdminDashboard() {
 
   const tabs = [
     { id: "overview", label: "Resumen" },
-    { id: "users", label: "Usuarios" },
+    { id: "users", label: "Socios" },
     { id: "applications", label: "Postulaciones" },
     { id: "news", label: "Noticias" },
     { id: "events", label: "Eventos" },
@@ -123,7 +123,7 @@ export default function AdminDashboard() {
         <div className="mb-5">
           <h1 className="mt-0 mb-2">Panel de Administración</h1>
           <p className="text-muted mb-0">
-            Gestiona usuarios, noticias, cursos y postulaciones
+            Gestiona socios, noticias, cursos y postulaciones
           </p>
         </div>
 
@@ -756,7 +756,7 @@ function OverviewTab({ stats }) {
         </div>
 
         <div className="card card-centered">
-          <h3>Usuarios</h3>
+          <h3>Socios</h3>
           <div className="large-number-secondary">
             {stats.users?.total || 0}
           </div>
@@ -914,7 +914,7 @@ function UsersTab() {
   const columns = [
     {
       key: "name",
-      label: "Usuario",
+      label: "Socio",
       render: row => (
         <div>
           <div style={{ fontWeight: "600", marginBottom: "4px" }}>
@@ -931,7 +931,7 @@ function UsersTab() {
       label: "Rol",
       render: row => (
         <Badge variant={row.role === "admin" ? "primary" : "neutral"}>
-          {row.role === "admin" ? "Administrador" : "Miembro"}
+          {row.role === "admin" ? "Administrador" : "Socio"}
         </Badge>
       ),
     },
@@ -990,19 +990,18 @@ function UsersTab() {
     <div>
       <div className="flex justify-between align-center mb-5">
         <div>
-          <h2 style={{ margin: 0, marginBottom: "4px" }}>Usuarios</h2>
+          <h2 style={{ margin: 0, marginBottom: "4px" }}>Socios</h2>
           <p style={{ margin: 0, color: "var(--color-muted)" }}>
-            {users.length} {users.length === 1 ? "usuario" : "usuarios"} en
-            total
+            {users.length} {users.length === 1 ? "socio" : "socios"} en total
           </p>
         </div>
         <Button variant="primary" onClick={() => navigate("/admin/users/new")}>
-          + Crear Usuario
+          + Crear Socio
         </Button>
       </div>
 
       {users.length === 0 ? (
-        <Alert variant="info">No hay usuarios registrados todavía.</Alert>
+        <Alert variant="info">No hay socios registrados todavía.</Alert>
       ) : (
         <Table columns={columns} data={users} hoverable />
       )}
@@ -1196,9 +1195,9 @@ function NewsTab() {
     if (!category) return "Sin categoría";
 
     const labels = {
-      comunicados: "Comunicado",
-      prensa: "Prensa",
-      blog: "Blog",
+      "articulos-cientificos": "Artículos científicos",
+      "articulos-destacados": "Artículos destacados",
+      editoriales: "Editoriales",
     };
     return labels[category] || category;
   };
@@ -1337,7 +1336,7 @@ function SimpleNewsForm({ onSuccess }) {
   const [title, setTitle] = useState("");
   const [excerpt, setExcerpt] = useState("");
   const [content, setContent] = useState("");
-  const [category, setCategory] = useState("comunicados");
+  const [category, setCategory] = useState("articulos-cientificos");
   const [loading, setLoading] = useState(false);
   const BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
 
@@ -1370,7 +1369,7 @@ function SimpleNewsForm({ onSuccess }) {
       setTitle("");
       setExcerpt("");
       setContent("");
-      setCategory("comunicados");
+      setCategory("articulos-cientificos");
 
       // Reset file input if form exists
       if (e.currentTarget) {
@@ -1402,9 +1401,9 @@ function SimpleNewsForm({ onSuccess }) {
           value={category}
           onChange={e => setCategory(e.target.value)}
         >
-          <option value="comunicados">Comunicados</option>
-          <option value="prensa">Prensa</option>
-          <option value="blog">Blog</option>
+          <option value="articulos-cientificos">Artículos científicos</option>
+          <option value="articulos-destacados">Artículos destacados</option>
+          <option value="editoriales">Editoriales</option>
         </Select>
       </div>
       <div className="mb-4">

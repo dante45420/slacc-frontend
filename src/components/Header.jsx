@@ -1,13 +1,31 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext.jsx";
 import PropTypes from "prop-types";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-function MenuItem({ label, to, children, onClick }) {
+function MenuItem({ label, to, ariaLabel, children, onClick }) {
+  const [submenuOpen, setSubmenuOpen] = useState(false);
+
+  const handleClick = e => {
+    if (children && window.innerWidth <= 1200) {
+      e.preventDefault();
+      setSubmenuOpen(!submenuOpen);
+    } else if (onClick) {
+      onClick();
+    }
+  };
+
   return (
-    <li>
-      <Link to={to} onClick={onClick}>
+    <li className={submenuOpen ? "submenu-open" : ""}>
+      <Link to={to} onClick={handleClick} aria-label={ariaLabel}>
         {label}
+        {children && (
+          <i
+            className={`fa-solid ${
+              submenuOpen ? "fa-chevron-down" : "fa-chevron-right"
+            } submenu-chevron`}
+          ></i>
+        )}
       </Link>
       {children ? <div className="submenu">{children}</div> : null}
     </li>
@@ -15,8 +33,9 @@ function MenuItem({ label, to, children, onClick }) {
 }
 
 MenuItem.propTypes = {
-  label: PropTypes.string.isRequired,
+  label: PropTypes.node.isRequired,
   to: PropTypes.string.isRequired,
+  ariaLabel: PropTypes.string,
   children: PropTypes.node,
   onClick: PropTypes.func,
 };
@@ -53,6 +72,23 @@ export default function Header() {
   const { user, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  useEffect(() => {
+    const updateHeaderHeight = () => {
+      const header = document.getElementById("site-header");
+      if (header) {
+        const height = header.offsetHeight;
+        document.documentElement.style.setProperty(
+          "--header-height",
+          `${height}px`
+        );
+      }
+    };
+
+    updateHeaderHeight();
+    window.addEventListener("resize", updateHeaderHeight);
+    return () => window.removeEventListener("resize", updateHeaderHeight);
+  }, []);
+
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
   };
@@ -62,8 +98,8 @@ export default function Header() {
   };
 
   return (
-    <header className="site-header">
-      <nav className="container nav">
+    <header className="site-header" id="site-header">
+      <nav className="nav">
         <Link to="/" className="brand">
           <img
             src="/LOGO SLACC_ROJO_HORIZONTAL.png"
@@ -86,19 +122,9 @@ export default function Header() {
         </button>
 
         <ul className={`menu ${mobileMenuOpen ? "menu-open" : ""}`}>
-          <MenuItem label="Inicio" to="/" onClick={closeMobileMenu} />
-          <MenuItem label="Nosotros" to="/nosotros" onClick={closeMobileMenu}>
-            <SubLink
-              to="/nosotros/mision"
-              label="Estatutos, Misión, Visión"
-              onClick={closeMobileMenu}
-            />
-            <SubLink
-              to="/nosotros/historia"
-              label="Historia"
-              onClick={closeMobileMenu}
-            />
-          </MenuItem>
+          {user?.role === "admin" && (
+            <MenuItem label="Admin" to="/admin" onClick={closeMobileMenu} />
+          )}
           <MenuItem label="Comités" to="/comites" onClick={closeMobileMenu}>
             <SubLink
               to="/comites#etica"
@@ -131,6 +157,25 @@ export default function Header() {
               onClick={closeMobileMenu}
             />
           </MenuItem>
+          <MenuItem label="Contacto" to="/contacto" onClick={closeMobileMenu} />
+          <MenuItem label="Cursos" to="/cursos" onClick={closeMobileMenu}>
+            <SubLink
+              to="/eventos/pasados"
+              label="Pasados"
+              onClick={closeMobileMenu}
+            />
+            <SubLink
+              to="/eventos/proximos"
+              label="Próximos"
+              onClick={closeMobileMenu}
+            />
+            <SubLink to="/cursos" label="Todos" onClick={closeMobileMenu} />
+            <SubLink
+              to="/eventos/webinars"
+              label="Webinars"
+              onClick={closeMobileMenu}
+            />
+          </MenuItem>
           <MenuItem label="Miembros" to="/miembros" onClick={closeMobileMenu}>
             <SubLink
               to="/por-que-ser-socio"
@@ -153,46 +198,49 @@ export default function Header() {
               onClick={closeMobileMenu}
             />
           </MenuItem>
-          <MenuItem label="Cursos" to="/cursos" onClick={closeMobileMenu}>
+          <MenuItem label="Nosotros" to="/nosotros" onClick={closeMobileMenu}>
             <SubLink
-              to="/eventos/pasados"
-              label="Pasados"
+              to="/nosotros/mision"
+              label="Estatutos, Misión, Visión"
               onClick={closeMobileMenu}
             />
             <SubLink
-              to="/eventos/proximos"
-              label="Próximos"
-              onClick={closeMobileMenu}
-            />
-            <SubLink to="/cursos" label="Todos" onClick={closeMobileMenu} />
-            <SubLink
-              to="/eventos/webinars"
-              label="Webinars"
+              to="/nosotros/historia"
+              label="Historia"
               onClick={closeMobileMenu}
             />
           </MenuItem>
           <MenuItem
             label="Noticias"
-            to="/noticias/comunicados"
+            to="/noticias/articulos-cientificos"
             onClick={closeMobileMenu}
           >
             <SubLink
-              to="/noticias/blog"
+              to="/noticias/articulos-cientificos"
               label="Artículos científicos"
               onClick={closeMobileMenu}
             />
             <SubLink
-              to="/noticias/comunicados"
-              label="Comunicados"
+              to="/noticias/articulos-destacados"
+              label="Artículos destacados"
               onClick={closeMobileMenu}
             />
+            <SubLink
+              to="/noticias/editoriales"
+              label="Editoriales"
+              onClick={closeMobileMenu}
+            />
+            {user && (
+              <SubLink
+                to="/subir-noticia"
+                label="Enviar artículo"
+                onClick={closeMobileMenu}
+              />
+            )}
           </MenuItem>
-          <MenuItem label="Contacto" to="/contacto" onClick={closeMobileMenu} />
-          {user?.role === "admin" && (
-            <MenuItem label="Admin" to="/admin" onClick={closeMobileMenu} />
-          )}
           <MenuItem
-            label="Usuario"
+            label={<i className="fa-solid fa-user"></i>}
+            ariaLabel={user ? "Perfil" : "Iniciar sesión"}
             to={user ? "/perfil" : "/login"}
             onClick={closeMobileMenu}
           >

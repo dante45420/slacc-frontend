@@ -100,7 +100,7 @@ export default function ApplicationDetail() {
         note: resolutionNote,
       });
       setMsg(
-        "Postulación aprobada. El usuario quedó en estado de pago pendiente."
+        "Postulación aprobada. El socio quedó en estado de pago pendiente."
       );
       setTimeout(() => {
         loadApplication(); // Recargar para ver el nuevo estado
@@ -569,15 +569,15 @@ export default function ApplicationDetail() {
               <strong>
                 {getMembershipTypeLabel(application.membership_type)}
               </strong>
-              . Una vez que el usuario complete el pago, confirma aquí para
-              crear las credenciales.
+              . Una vez que el socio complete el pago, confirma aquí para crear
+              las credenciales.
             </p>
             <Button
               variant="primary"
               onClick={confirmPayment}
               style={{ background: "var(--color-success)" }}
             >
-              Confirmar Pago y Crear Usuario
+              Confirmar Pago y Crear Socio
             </Button>
           </Card>
         )}
@@ -620,7 +620,7 @@ export default function ApplicationDetail() {
                 color: "var(--color-success)",
               }}
             >
-              Credenciales del Usuario
+              Credenciales del Socio
             </h2>
             <Grid columns="1fr" gap="var(--spacing-4)">
               <div>
@@ -700,11 +700,11 @@ export default function ApplicationDetail() {
       <Modal
         isOpen={showCredentialsModal}
         onClose={handleCloseCredentialsModal}
-        title="Credenciales de Usuario Creadas"
+        title="Credenciales de Socio Creadas"
       >
         <Alert variant="warning" className="mb-4">
           <strong>⚠️ IMPORTANTE:</strong> Esta información se muestra una sola
-          vez. Copia estas credenciales y envíalas al usuario de forma segura.
+          vez. Copia estas credenciales y envíalas al socio de forma segura.
         </Alert>
 
         {credentials && (

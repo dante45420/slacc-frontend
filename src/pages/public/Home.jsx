@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import Carousel from "../../components/Carousel.jsx";
-import CoursesCarousel from "../../components/CoursesCarousel.jsx";
+import EventsCarousel from "../../components/EventsCarousel.jsx";
 import InstagramFeed from "../../components/InstagramFeed.jsx";
 import NewsCarousel from "../../components/NewsCarousel.jsx";
 import { TextImage } from "../../components/ContentBlocks.jsx";
@@ -27,7 +27,7 @@ export default function Home() {
           <div className="home-section">
             <div className="home-section-header">
               <h2 className="home-section-title-inline">
-                Cursos patrocinados por SLACC
+                Eventos patrocinados por SLACC
               </h2>
               <Link to="/eventos/webinars">
                 <Button variant="outline">
@@ -35,7 +35,7 @@ export default function Home() {
                 </Button>
               </Link>
             </div>
-            <CoursesCarousel />
+            <EventsCarousel />
           </div>
 
           <hr className="home-divider" />

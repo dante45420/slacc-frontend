@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import PropTypes from "prop-types";
 import { apiGet, apiPost } from "../../api/client";
 import { useAuth } from "../../auth/AuthContext";
@@ -16,59 +16,70 @@ function formatDate(dateString) {
   });
 }
 
-function isRegistrationOpen(course) {
-  if (!course.registration_deadline) return true;
-  return new Date() <= new Date(course.registration_deadline);
+function isRegistrationOpen(event) {
+  if (!event.registration_deadline) return true;
+  return new Date() <= new Date(event.registration_deadline);
 }
 
-export default function CoursesPage() {
+export default function EventsPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [courses, setCourses] = useState([]);
+  const location = useLocation();
+  const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedCourse, setSelectedCourse] = useState(null);
+  const [selectedEvent, setSelectedEvent] = useState(null);
   const [showEnrollmentForm, setShowEnrollmentForm] = useState(false);
 
-  useEffect(() => {
-    loadCourses();
-  }, []);
+  // Determine filter from URL path
+  const getFilterParams = () => {
+    const path = location.pathname;
+    if (path.includes("/pasados")) return "?past=true";
+    if (path.includes("/proximos")) return "?past=false";
+    if (path.includes("/webinars")) return "?type=webinar";
+    return "";
+  };
 
-  async function loadCourses() {
+  useEffect(() => {
+    loadEvents();
+  }, [location.pathname]);
+
+  async function loadEvents() {
     try {
       setLoading(true);
-      const data = await apiGet("/courses");
-      setCourses(data);
+      const filterParams = getFilterParams();
+      const data = await apiGet(`/events${filterParams}`);
+      setEvents(data);
     } catch (err) {
-      console.error("Error loading courses:", err);
+      console.error("Error loading events:", err);
     } finally {
       setLoading(false);
     }
   }
 
-  function handleEnrollClick(course) {
-    setSelectedCourse(course);
+  function handleEnrollClick(event) {
+    setSelectedEvent(event);
     setShowEnrollmentForm(true);
   }
 
-  function getPriceForUser(course) {
+  function getPriceForUser(event) {
     if (!user) {
-      return course.price_non_member;
+      return event.price_non_member;
     }
 
     let price;
     if (user.membership_type === "joven") {
-      price = course.price_joven > 0 ? course.price_joven : course.price_member;
+      price = event.price_joven > 0 ? event.price_joven : event.price_member;
     } else if (user.membership_type === "gratuito") {
-      price = Math.max(course.price_gratuito, 0);
+      price = Math.max(event.price_gratuito, 0);
     } else {
-      price = course.price_member;
+      price = event.price_member;
     }
     return price;
   }
 
-  function getDiscountPercentage(course) {
-    const fullPrice = course.price_non_member;
-    const userPrice = getPriceForUser(course);
+  function getDiscountPercentage(event) {
+    const fullPrice = event.price_non_member;
+    const userPrice = getPriceForUser(event);
     if (fullPrice > 0 && userPrice < fullPrice) {
       return Math.round(((fullPrice - userPrice) / fullPrice) * 100);
     }
@@ -79,7 +90,7 @@ export default function CoursesPage() {
     return (
       <section className="section">
         <div className="container">
-          <p>Cargando cursos...</p>
+          <p>Cargando eventos...</p>
         </div>
       </section>
     );
@@ -89,7 +100,7 @@ export default function CoursesPage() {
     <section className="section">
       <div className="container">
         <div style={{ textAlign: "center", marginBottom: 48 }}>
-          <h1>Cursos y Educación Continua</h1>
+          <h1>Eventos y Educación Continua</h1>
           <p
             style={{
               fontSize: "1.2em",
@@ -98,12 +109,12 @@ export default function CoursesPage() {
               margin: "0 auto",
             }}
           >
-            Amplía tus conocimientos con nuestros cursos especializados en
+            Amplía tus conocimientos con nuestros eventos especializados en
             cirugía de cadera
           </p>
         </div>
 
-        {courses.length === 0 ? (
+        {events.length === 0 ? (
           <div style={{ textAlign: "center", padding: "48px 0" }}>
             <div
               style={{
@@ -112,33 +123,33 @@ export default function CoursesPage() {
                 marginBottom: 16,
               }}
             >
-              No hay cursos disponibles en este momento
+              No hay eventos disponibles en este momento
             </div>
             <p style={{ color: "var(--color-muted)" }}>
-              Pronto tendremos nuevos cursos disponibles. ¡Mantente atento!
+              Pronto tendremos nuevos eventos disponibles. ¡Mantente atento!
             </p>
           </div>
         ) : (
           <div className="cards">
-            {courses.map(course => {
-              const userPrice = getPriceForUser(course);
-              const discount = getDiscountPercentage(course);
-              const isOpen = isRegistrationOpen(course);
+            {events.map(event => {
+              const userPrice = getPriceForUser(event);
+              const discount = getDiscountPercentage(event);
+              const isOpen = isRegistrationOpen(event);
 
               return (
                 <div
-                  key={course.id}
+                  key={event.id}
                   className="card"
                   style={{ position: "relative" }}
                 >
-                  {course.image_url && (
+                  {event.image_url && (
                     <img
                       src={
-                        course.image_url.startsWith("http")
-                          ? course.image_url
-                          : `${BASE_URL.replace("/api", "")}${course.image_url}`
+                        event.image_url.startsWith("http")
+                          ? event.image_url
+                          : `${BASE_URL.replace("/api", "")}${event.image_url}`
                       }
-                      alt={course.title}
+                      alt={event.title}
                       style={{
                         width: "100%",
                         height: "200px",
@@ -150,11 +161,11 @@ export default function CoursesPage() {
                   )}
 
                   <div style={{ marginBottom: 16 }}>
-                    <h3 style={{ marginBottom: 8 }}>{course.title}</h3>
+                    <h3 style={{ marginBottom: 8 }}>{event.title}</h3>
                     <p
                       style={{ color: "var(--color-muted)", marginBottom: 12 }}
                     >
-                      {course.description}
+                      {event.description}
                     </p>
                   </div>
 
@@ -167,7 +178,7 @@ export default function CoursesPage() {
                       }}
                     >
                       <span style={{ fontWeight: "500" }}>Instructor:</span>
-                      <span>{course.instructor || "Por definir"}</span>
+                      <span>{event.instructor || "Por definir"}</span>
                     </div>
                     <div
                       style={{
@@ -177,7 +188,7 @@ export default function CoursesPage() {
                       }}
                     >
                       <span style={{ fontWeight: "500" }}>Duración:</span>
-                      <span>{course.duration_hours || "N/A"} horas</span>
+                      <span>{event.duration_hours || "N/A"} horas</span>
                     </div>
                     <div
                       style={{
@@ -187,7 +198,7 @@ export default function CoursesPage() {
                       }}
                     >
                       <span style={{ fontWeight: "500" }}>Inicio:</span>
-                      <span>{formatDate(course.start_date)}</span>
+                      <span>{formatDate(event.start_date)}</span>
                     </div>
                     <div
                       style={{
@@ -198,8 +209,8 @@ export default function CoursesPage() {
                     >
                       <span style={{ fontWeight: "500" }}>Cupos:</span>
                       <span>
-                        {course.max_students
-                          ? `${course.max_students} estudiantes`
+                        {event.max_students
+                          ? `${event.max_students} estudiantes`
                           : "Sin límite"}
                       </span>
                     </div>
@@ -258,7 +269,7 @@ export default function CoursesPage() {
                                 color: "var(--color-muted)",
                               }}
                             >
-                              ${course.price_non_member}
+                              ${event.price_non_member}
                             </div>
                           </div>
                         ) : (
@@ -271,19 +282,19 @@ export default function CoursesPage() {
                   <div style={{ display: "flex", gap: 8 }}>
                     <button
                       className="btn btn-outline"
-                      onClick={() => navigate(`/cursos/${course.id}`)}
+                      onClick={() => navigate(`/eventos/${event.id}`)}
                       style={{ flex: 1 }}
                     >
                       Ver Detalles
                     </button>
                     <button
                       className="btn btn-primary"
-                      onClick={() => handleEnrollClick(course)}
-                      disabled={!isOpen || course.is_enrolled}
+                      onClick={() => handleEnrollClick(event)}
+                      disabled={!isOpen || event.is_enrolled}
                       style={{ flex: 1 }}
                     >
                       {(() => {
-                        if (course.is_enrolled) return "Ya inscrito";
+                        if (event.is_enrolled) return "Ya inscrito";
                         if (isOpen) return "Inscribirse";
                         return "Inscripción Cerrada";
                       })()}
@@ -314,18 +325,18 @@ export default function CoursesPage() {
         )}
 
         {/* Modal de inscripción */}
-        {showEnrollmentForm && selectedCourse && (
+        {showEnrollmentForm && selectedEvent && (
           <EnrollmentModal
-            course={selectedCourse}
+            event={selectedEvent}
             user={user}
             onClose={() => {
               setShowEnrollmentForm(false);
-              setSelectedCourse(null);
+              setSelectedEvent(null);
             }}
             onSuccess={() => {
               setShowEnrollmentForm(false);
-              setSelectedCourse(null);
-              loadCourses();
+              setSelectedEvent(null);
+              loadEvents();
             }}
           />
         )}
@@ -334,7 +345,7 @@ export default function CoursesPage() {
   );
 }
 
-function EnrollmentModal({ course, user, onClose, onSuccess }) {
+function EnrollmentModal({ event, user, onClose, onSuccess }) {
   const [formData, setFormData] = useState({
     student_name: user?.name || "",
     student_email: user?.email || "",
@@ -347,14 +358,14 @@ function EnrollmentModal({ course, user, onClose, onSuccess }) {
   let userPrice;
   if (user) {
     if (user.membership_type === "joven") {
-      userPrice = course.price_joven || course.price_member;
+      userPrice = event.price_joven || event.price_member;
     } else if (user.membership_type === "gratuito") {
-      userPrice = course.price_gratuito || 0;
+      userPrice = event.price_gratuito || 0;
     } else {
-      userPrice = course.price_member;
+      userPrice = event.price_member;
     }
   } else {
-    userPrice = course.price_non_member;
+    userPrice = event.price_non_member;
   }
 
   function handleInputChange(e) {
@@ -370,7 +381,13 @@ function EnrollmentModal({ course, user, onClose, onSuccess }) {
 
     try {
       setLoading(true);
-      await apiPost(`/courses/${course.id}/enroll`, formData);
+      // Transform field names to match backend expectations
+      const payload = {
+        name: formData.student_name,
+        email: formData.student_email,
+        phone: formData.student_phone,
+      };
+      await apiPost(`/events/${event.id}/enroll`, payload);
       setStep(2); // Go to success step
     } catch (err) {
       setError("Error al inscribirse: " + (err.message || "Error desconocido"));
@@ -445,9 +462,9 @@ function EnrollmentModal({ course, user, onClose, onSuccess }) {
 
         {step === 1 && (
           <div>
-            <h3 style={{ marginBottom: 16 }}>{course.title}</h3>
+            <h3 style={{ marginBottom: 16 }}>{event.title}</h3>
             <p style={{ color: "var(--color-muted)", marginBottom: 24 }}>
-              {course.description}
+              {event.description}
             </p>
 
             <div style={{ marginBottom: 16 }}>
@@ -598,7 +615,7 @@ function EnrollmentModal({ course, user, onClose, onSuccess }) {
 }
 
 EnrollmentModal.propTypes = {
-  course: PropTypes.shape({
+  event: PropTypes.shape({
     id: PropTypes.number.isRequired,
     title: PropTypes.string.isRequired,
     description: PropTypes.string,

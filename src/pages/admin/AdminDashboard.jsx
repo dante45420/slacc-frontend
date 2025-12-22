@@ -306,7 +306,7 @@ function EventsTab() {
       key: "actions",
       label: "Acciones",
       render: row => (
-        <div style={{ display: "flex", gap: "var(--spacing-2)" }}>
+        <div className="flex gap-2">
           <Button
             variant="outline"
             size="sm"
@@ -315,7 +315,7 @@ function EventsTab() {
             Editar
           </Button>
           <Button
-            variant="ghost"
+            variant="danger"
             size="sm"
             onClick={() => handleDelete(row.id)}
           >
@@ -373,6 +373,7 @@ function EventForm({ event, onSuccess, onCancel }) {
   const [imageUrl, setImageUrl] = useState(event?.image_url || "");
   const [createdEventId, setCreatedEventId] = useState(event?.id || null);
   const [justCreated, setJustCreated] = useState(false);
+  const [pendingImageFile, setPendingImageFile] = useState(null);
   const [form, setForm] = useState({
     title: event?.title || "",
     description: event?.description || "",
@@ -403,7 +404,10 @@ function EventForm({ event, onSuccess, onCancel }) {
 
   const handleImageUpload = async file => {
     if (!createdEventId) {
-      toast.error("Debes crear el evento primero antes de subir una imagen");
+      // Store file for upload after event creation
+      setPendingImageFile(file);
+      setImageUrl(URL.createObjectURL(file)); // Preview only
+      toast.success("Imagen seleccionada. Se subirá al crear el evento.");
       return;
     }
 
@@ -426,6 +430,40 @@ function EventForm({ event, onSuccess, onCancel }) {
       if (res.ok) {
         const data = await res.json();
         setImageUrl(data.image_url);
+        toast.success("Imagen subida correctamente");
+      } else {
+        const data = await res.json();
+        toast.error(data.error || "Error al subir imagen");
+      }
+    } catch (err) {
+      toast.error("Error al subir la imagen");
+      console.error(err);
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const uploadImageToEvent = async (eventId, file) => {
+    setUploadingImage(true);
+    try {
+      const token = localStorage.getItem("access_token");
+      const fd = new FormData();
+      fd.append("image", file);
+      const res = await fetch(
+        `${
+          import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api"
+        }/admin/events/${eventId}/image`,
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+          body: fd,
+        }
+      );
+
+      if (res.ok) {
+        const data = await res.json();
+        setImageUrl(data.image_url);
+        setPendingImageFile(null);
         toast.success("Imagen subida correctamente");
       } else {
         const data = await res.json();
@@ -485,6 +523,11 @@ function EventForm({ event, onSuccess, onCancel }) {
         if (!event && data.id) {
           setCreatedEventId(data.id);
           setJustCreated(true);
+
+          // Upload pending image if one was selected
+          if (pendingImageFile) {
+            uploadImageToEvent(data.id, pendingImageFile);
+          }
         } else {
           onSuccess();
         }
@@ -664,24 +707,25 @@ function EventForm({ event, onSuccess, onCancel }) {
           type="button"
           variant="outline"
           size="sm"
-          disabled={uploadingImage || (!event && !justCreated)}
+          disabled={uploadingImage}
           asChild
         >
           <label
             style={{
-              cursor:
-                uploadingImage || (!event && !justCreated)
-                  ? "not-allowed"
-                  : "pointer",
+              cursor: uploadingImage ? "not-allowed" : "pointer",
               margin: 0,
             }}
           >
-            {uploadingImage ? "Subiendo..." : "Subir imagen"}
+            {uploadingImage
+              ? "Subiendo..."
+              : pendingImageFile
+              ? "Cambiar imagen"
+              : "Subir imagen"}
             <input
               type="file"
               accept="image/*"
               style={{ display: "none" }}
-              disabled={!event && !justCreated}
+              disabled={uploadingImage}
               onChange={e => {
                 const file = e.target.files?.[0];
                 if (file) handleImageUpload(file);
@@ -689,11 +733,6 @@ function EventForm({ event, onSuccess, onCancel }) {
             />
           </label>
         </Button>
-        {!event && !justCreated && (
-          <p className="text-muted text-sm mt-2">
-            La imagen se puede subir después de crear el evento.
-          </p>
-        )}
         {justCreated && !imageUrl && (
           <p className="text-muted text-sm mt-2">
             Ahora puedes subir una imagen o cerrar y hacerlo después editando el
@@ -703,13 +742,7 @@ function EventForm({ event, onSuccess, onCancel }) {
       </div>
 
       <div className="mb-4">
-        <label
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "var(--spacing-2)",
-          }}
-        >
+        <label className="flex align-center gap-2">
           <input
             type="checkbox"
             checked={form.is_active}
@@ -779,54 +812,27 @@ function OverviewTab({ stats }) {
       <div className="card">
         <h3 className="mb-16">Estados de Postulaciones</h3>
         <div className="flex-column-gap-8">
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              padding: "8px 0",
-              borderBottom: "1px solid #eee",
-            }}
-          >
+          <div className="status-row">
             <span>Pendientes</span>
             <span style={{ fontWeight: "bold", color: "var(--color-accent)" }}>
               {stats.applications?.pending || 0}
             </span>
           </div>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              padding: "8px 0",
-              borderBottom: "1px solid #eee",
-            }}
-          >
+          <div className="status-row">
             <span>Esperando Pago</span>
-            <span style={{ fontWeight: "bold", color: "orange" }}>
+            <span style={{ fontWeight: "bold", color: "var(--color-warning)" }}>
               {stats.applications?.payment_pending || 0}
             </span>
           </div>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              padding: "8px 0",
-              borderBottom: "1px solid #eee",
-            }}
-          >
+          <div className="status-row">
             <span>Pagadas</span>
-            <span style={{ fontWeight: "bold", color: "green" }}>
+            <span style={{ fontWeight: "bold", color: "var(--color-success)" }}>
               {stats.applications?.paid || 0}
             </span>
           </div>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              padding: "8px 0",
-            }}
-          >
+          <div className="status-row-last">
             <span>Rechazadas</span>
-            <span style={{ fontWeight: "bold", color: "crimson" }}>
+            <span style={{ fontWeight: "bold", color: "var(--color-error)" }}>
               {stats.applications?.rejected || 0}
             </span>
           </div>
@@ -957,7 +963,7 @@ function UsersTab() {
       key: "is_active",
       label: "Estado",
       render: row => (
-        <Badge variant={row.is_active ? "success" : "error"}>
+        <Badge variant={row.is_active ? "success" : "warning"}>
           {row.is_active ? "Activo" : "Inactivo"}
         </Badge>
       ),
@@ -1078,15 +1084,6 @@ function ApplicationsTab() {
     {
       key: "specialization",
       label: "Especialización",
-      render: row => (
-        <span style={{ fontSize: "0.875rem" }}>
-          {row.specialization || "No especificada"}
-        </span>
-      ),
-    },
-    {
-      key: "specialization",
-      label: "Especialidad",
       render: row => (
         <span style={{ fontSize: "0.875rem" }}>
           {row.specialization || "No especificada"}

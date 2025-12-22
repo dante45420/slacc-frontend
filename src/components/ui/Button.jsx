@@ -8,6 +8,7 @@ export default function Button({
   disabled = false,
   children,
   className,
+  asChild,
   ...props
 }) {
   const baseClass = "btn";

@@ -21,9 +21,9 @@ import NewsDetail from "./pages/news/NewsDetail.jsx";
 import NewsEditor from "./pages/news/NewsEditor.jsx";
 import SubmitNews from "./pages/news/SubmitNews.jsx";
 
-// Courses & Events pages
-import CoursesPage from "./pages/courses/CoursesPage.jsx";
-import CourseDetail from "./pages/courses/CourseDetail.jsx";
+// Events pages
+import EventsPage from "./pages/events/EventsPage.jsx";
+import EventDetail from "./pages/events/EventDetail.jsx";
 
 // Members pages
 import JoinMembership from "./pages/members/JoinMembership.jsx";
@@ -89,8 +89,13 @@ export default function App() {
               element={<Navigate to="/noticias/editoriales" replace />}
             />
             <Route path="/noticias/:id" element={<NewsDetail />} />
-            <Route path="/cursos" element={<CoursesPage />} />
-            <Route path="/cursos/:id" element={<CourseDetail />} />
+            <Route path="/eventos" element={<EventsPage />} />
+            <Route path="/eventos/pasados" element={<EventsPage />} />
+            <Route path="/eventos/proximos" element={<EventsPage />} />
+            <Route path="/eventos/webinars" element={<EventsPage />} />
+            <Route path="/eventos/:id" element={<EventDetail />} />
+            <Route path="/cursos" element={<EventsPage />} />
+            <Route path="/cursos/:id" element={<EventDetail />} />
             <Route
               path="/nosotros"
               element={<Placeholder title="Nosotros" />}

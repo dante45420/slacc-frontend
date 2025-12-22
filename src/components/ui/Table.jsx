@@ -2,6 +2,7 @@ import PropTypes from "prop-types";
 
 /**
  * Table component for displaying tabular data
+ * Automatically switches to card view on mobile devices
  *
  * @example
  * <Table
@@ -12,6 +13,7 @@ import PropTypes from "prop-types";
  *   ]}
  *   data={users}
  *   onRowClick={(row) => navigate(`/users/${row.id}`)}
+ *   responsive={true}
  * />
  */
 export default function Table({
@@ -20,6 +22,7 @@ export default function Table({
   onRowClick,
   hoverable = false,
   striped = false,
+  responsive = true,
   className = "",
 }) {
   const tableClasses = [
@@ -31,8 +34,13 @@ export default function Table({
     .filter(Boolean)
     .join(" ");
 
+  const containerClasses = ["table-container", responsive && "table-responsive"]
+    .filter(Boolean)
+    .join(" ");
+
   return (
-    <div className="table-container">
+    <div className={containerClasses}>
+      {/* Desktop table view */}
       <table className={tableClasses}>
         <thead>
           <tr>
@@ -67,6 +75,46 @@ export default function Table({
           )}
         </tbody>
       </table>
+
+      {/* Mobile card view */}
+      {responsive && (
+        <div className="table-mobile-cards">
+          {data.length === 0 ? (
+            <div className="table-empty-mobile">No hay datos para mostrar</div>
+          ) : (
+            data.map((row, idx) => (
+              <div
+                key={row.id || idx}
+                className={`table-card ${
+                  onRowClick ? "table-card-clickable" : ""
+                }`}
+                onClick={onRowClick ? () => onRowClick(row) : undefined}
+                onKeyDown={
+                  onRowClick
+                    ? e => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          onRowClick(row);
+                        }
+                      }
+                    : undefined
+                }
+                role={onRowClick ? "button" : undefined}
+                tabIndex={onRowClick ? 0 : undefined}
+              >
+                {columns.map(col => (
+                  <div key={col.key} className="table-card-row">
+                    <div className="table-card-label">{col.label}</div>
+                    <div className="table-card-value">
+                      {col.render ? col.render(row) : row[col.key]}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ))
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -84,5 +132,6 @@ Table.propTypes = {
   onRowClick: PropTypes.func,
   hoverable: PropTypes.bool,
   striped: PropTypes.bool,
+  responsive: PropTypes.bool,
   className: PropTypes.string,
 };

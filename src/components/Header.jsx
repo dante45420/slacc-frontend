@@ -158,7 +158,7 @@ export default function Header() {
             />
           </MenuItem>
           <MenuItem label="Contacto" to="/contacto" onClick={closeMobileMenu} />
-          <MenuItem label="Cursos" to="/cursos" onClick={closeMobileMenu}>
+          <MenuItem label="Eventos" to="/eventos" onClick={closeMobileMenu}>
             <SubLink
               to="/eventos/pasados"
               label="Pasados"
@@ -169,7 +169,7 @@ export default function Header() {
               label="Próximos"
               onClick={closeMobileMenu}
             />
-            <SubLink to="/cursos" label="Todos" onClick={closeMobileMenu} />
+            <SubLink to="/eventos" label="Todos" onClick={closeMobileMenu} />
             <SubLink
               to="/eventos/webinars"
               label="Webinars"

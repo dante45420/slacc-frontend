@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-export default function CoursesList() {
+export default function EventsList() {
   const demo = [
     { id: 1, title: "Curso Introductorio", description: "Bases de cirugía de cadera" },
     { id: 2, title: "Workshop Avanzado", description: "Casos complejos" }

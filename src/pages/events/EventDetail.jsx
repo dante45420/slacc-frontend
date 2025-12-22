@@ -14,12 +14,12 @@ import { sanitizeHtml } from "../../utils/sanitize.js";
 const BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
 
-export default function CourseDetail() {
+export default function EventDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
   const toast = useToast();
-  const [course, setCourse] = useState(null);
+  const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [enrolling, setEnrolling] = useState(false);
@@ -28,10 +28,10 @@ export default function CourseDetail() {
     async function load() {
       try {
         setLoading(true);
-        const data = await apiGet(`/courses/${id}`);
-        setCourse(data);
+        const data = await apiGet(`/events/${id}`);
+        setEvent(data);
       } catch (e) {
-        setError(e.message || "Error cargando curso");
+        setError(e.message || "Error cargando evento");
       } finally {
         setLoading(false);
       }
@@ -73,9 +73,9 @@ export default function CourseDetail() {
           (data.message || "Revisa tu email para más detalles")
       );
 
-      // Reload course data to show updated enrollment status
-      const courseData = await apiGet(`/courses/${id}`);
-      setCourse(courseData);
+      // Reload event data to show updated enrollment status
+      const eventData = await apiGet(`/events/${id}`);
+      setEvent(eventData);
     } catch (err) {
       toast.error(err.message || "Error al procesar la inscripción");
     } finally {
@@ -94,22 +94,22 @@ export default function CourseDetail() {
               color: "var(--color-muted)",
             }}
           >
-            Cargando curso...
+            Cargando evento...
           </p>
         </div>
       </Section>
     );
   }
 
-  if (error || !course) {
+  if (error || !event) {
     return (
       <Section variant="default">
-        <Alert variant="error">{error || "Curso no encontrado"}</Alert>
+        <Alert variant="error">{error || "Evento no encontrado"}</Alert>
       </Section>
     );
   }
 
-  const formatType = course.format === "webinar" ? "Webinar" : "Presencial";
+  const formatType = event.format === "webinar" ? "Webinar" : "Presencial";
 
   return (
     <Section variant="default" padding="lg">
@@ -122,14 +122,14 @@ export default function CourseDetail() {
       </Button>
 
       <Card style={{ padding: "var(--spacing-6)" }}>
-        {course.image_url && (
+        {event.image_url && (
           <img
             src={
-              course.image_url.startsWith("http")
-                ? course.image_url
-                : `${BASE_URL.replace("/api", "")}${course.image_url}`
+              event.image_url.startsWith("http")
+                ? event.image_url
+                : `${BASE_URL.replace("/api", "")}${event.image_url}`
             }
-            alt={course.title}
+            alt={event.title}
             style={{
               width: "100%",
               maxHeight: 400,
@@ -151,9 +151,9 @@ export default function CourseDetail() {
               gap: "var(--spacing-3)",
             }}
           >
-            <h1 style={{ margin: 0, flex: 1 }}>{course.title}</h1>
+            <h1 style={{ margin: 0, flex: 1 }}>{event.title}</h1>
             <Badge
-              variant={course.format === "webinar" ? "info" : "secondary"}
+              variant={event.format === "webinar" ? "info" : "secondary"}
               size="md"
             >
               {formatType}
@@ -167,7 +167,7 @@ export default function CourseDetail() {
               lineHeight: 1.7,
             }}
           >
-            {course.description}
+            {event.description}
           </p>
         </div>
 
@@ -187,7 +187,7 @@ export default function CourseDetail() {
               Instructor
             </strong>
             <p style={{ margin: "var(--spacing-1) 0 0" }}>
-              {course.instructor || "Por definir"}
+              {event.instructor || "Por definir"}
             </p>
           </div>
           <div>
@@ -195,7 +195,7 @@ export default function CourseDetail() {
               Duración
             </strong>
             <p style={{ margin: "var(--spacing-1) 0 0" }}>
-              {course.duration_hours || "N/A"} horas
+              {event.duration_hours || "N/A"} horas
             </p>
           </div>
           <div>
@@ -203,8 +203,8 @@ export default function CourseDetail() {
               Inicio
             </strong>
             <p style={{ margin: "var(--spacing-1) 0 0" }}>
-              {course.start_date
-                ? new Date(course.start_date).toLocaleDateString("es-ES", {
+              {event.start_date
+                ? new Date(event.start_date).toLocaleDateString("es-ES", {
                     year: "numeric",
                     month: "long",
                     day: "numeric",
@@ -220,9 +220,9 @@ export default function CourseDetail() {
           </div>
         </div>
 
-        {course.content && (
+        {event.content && (
           <div
-            dangerouslySetInnerHTML={{ __html: sanitizeHtml(course.content) }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(event.content) }}
             style={{
               lineHeight: 1.8,
               color: "var(--color-text-secondary)",
@@ -241,11 +241,11 @@ export default function CourseDetail() {
             variant="primary"
             size="lg"
             onClick={handleEnroll}
-            disabled={enrolling || course.is_enrolled}
+            disabled={enrolling || event.is_enrolled}
           >
-            {course.is_enrolled && "Ya estás inscrito"}
-            {!course.is_enrolled && enrolling && "Procesando..."}
-            {!course.is_enrolled && !enrolling && "Inscribirse al curso"}
+            {event.is_enrolled && "Ya estás inscrito"}
+            {!event.is_enrolled && enrolling && "Procesando..."}
+            {!event.is_enrolled && !enrolling && "Inscribirse al evento"}
           </Button>
         </div>
       </Card>

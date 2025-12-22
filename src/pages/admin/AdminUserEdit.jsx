@@ -121,17 +121,14 @@ export default function AdminUserEdit() {
             />
 
             <div>
-              <label
-                className="flex items-center gap-2"
-                style={{ cursor: "pointer" }}
-              >
+              <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={user.is_active}
                   onChange={e =>
                     setUser({ ...user, is_active: e.target.checked })
                   }
-                  style={{ width: "auto", cursor: "pointer" }}
+                  className="w-auto cursor-pointer"
                 />
                 <span className="font-medium">Socio activo</span>
               </label>
@@ -171,10 +168,7 @@ export default function AdminUserEdit() {
             )}
           </div>
 
-          <div
-            className="flex gap-3 mt-5 pt-4"
-            style={{ borderTop: "1px solid var(--color-border)" }}
-          >
+          <div className="flex gap-3 mt-5 pt-4 border-t">
             <Button
               variant="outline"
               onClick={() => navigate(-1)}

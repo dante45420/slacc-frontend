@@ -22,7 +22,7 @@ export default function Input({
           {label}
         </label>
       )}
-      <div style={{ position: "relative" }}>
+      <div className="input-wrapper">
         <input
           id={inputId}
           type={actualType}
@@ -33,20 +33,7 @@ export default function Input({
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            style={{
-              position: "absolute",
-              right: "12px",
-              top: "50%",
-              transform: "translateY(-50%)",
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              color: "var(--color-text-secondary)",
-              padding: "4px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
+            className="input-password-toggle"
             aria-label={
               showPassword ? "Ocultar contraseña" : "Mostrar contraseña"
             }

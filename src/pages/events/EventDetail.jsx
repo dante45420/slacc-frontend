@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext.jsx";
-import { apiGet } from "../../api/client.js";
+import { apiGet, apiPost } from "../../api/client.js";
 import Section from "../../components/ui/Section.jsx";
 import Button from "../../components/ui/Button.jsx";
 import Card from "../../components/ui/Card.jsx";
@@ -11,8 +11,7 @@ import Alert from "../../components/ui/Alert.jsx";
 import { useToast } from "../../components/ui/Toast.jsx";
 import { sanitizeHtml } from "../../utils/sanitize.js";
 
-const BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
+const API_ORIGIN = import.meta.env.VITE_API_ORIGIN || "http://localhost:5000";
 
 export default function EventDetail() {
   const { id } = useParams();
@@ -48,29 +47,15 @@ export default function EventDetail() {
 
     setEnrolling(true);
     try {
-      const token = localStorage.getItem("access_token");
-      const res = await fetch(`${BASE_URL}/events/${id}/enroll`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          name: user.name || user.email,
-          email: user.email,
-          phone: user.phone || "",
-        }),
+      const data = await apiPost(`/events/${id}/enroll`, {
+        name: user.name || user.email,
+        email: user.email,
+        phone: user.phone || "",
       });
 
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || "Error al inscribirse");
-      }
-
-      const data = await res.json();
       toast.success(
         "¡Inscripción exitosa! " +
-          (data.message || "Revisa tu email para más detalles")
+          (data.message || "Revisa tu email para más detalles"),
       );
 
       // Reload event data to show updated enrollment status
@@ -86,16 +71,9 @@ export default function EventDetail() {
   if (loading) {
     return (
       <Section variant="default">
-        <div style={{ textAlign: "center", padding: "var(--spacing-8)" }}>
+        <div className="event-detail-loading">
           <Spinner size="lg" />
-          <p
-            style={{
-              marginTop: "var(--spacing-4)",
-              color: "var(--color-muted)",
-            }}
-          >
-            Cargando evento...
-          </p>
+          <p className="event-detail-loading-text">Cargando evento...</p>
         </div>
       </Section>
     );
@@ -113,45 +91,26 @@ export default function EventDetail() {
 
   return (
     <Section variant="default" padding="lg">
-      <Button
-        variant="outline"
-        onClick={() => navigate(-1)}
-        style={{ marginBottom: "var(--spacing-4)" }}
-      >
+      <Button variant="outline" onClick={() => navigate(-1)} className="mb-4">
         <i className="fa-solid fa-arrow-left"></i> Volver
       </Button>
 
-      <Card style={{ padding: "var(--spacing-6)" }}>
+      <Card className="event-detail-card">
         {event.image_url && (
           <img
             src={
               event.image_url.startsWith("http")
                 ? event.image_url
-                : `${BASE_URL.replace("/api", "")}${event.image_url}`
+                : `${API_ORIGIN}${event.image_url}`
             }
             alt={event.title}
-            style={{
-              width: "100%",
-              maxHeight: 400,
-              objectFit: "cover",
-              borderRadius: "var(--radius-lg)",
-              marginBottom: "var(--spacing-5)",
-            }}
+            className="event-detail-image"
           />
         )}
 
-        <div style={{ marginBottom: "var(--spacing-4)" }}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "flex-start",
-              marginBottom: "var(--spacing-3)",
-              flexWrap: "wrap",
-              gap: "var(--spacing-3)",
-            }}
-          >
-            <h1 style={{ margin: 0, flex: 1 }}>{event.title}</h1>
+        <div className="event-detail-header">
+          <div className="event-detail-title-row">
+            <h1 className="event-detail-title">{event.title}</h1>
             <Badge
               variant={event.format === "webinar" ? "info" : "secondary"}
               size="md"
@@ -160,49 +119,25 @@ export default function EventDetail() {
             </Badge>
           </div>
 
-          <p
-            style={{
-              color: "var(--color-muted)",
-              fontSize: "18px",
-              lineHeight: 1.7,
-            }}
-          >
-            {event.description}
-          </p>
+          <p className="event-detail-description">{event.description}</p>
         </div>
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-            gap: "var(--spacing-4)",
-            padding: "var(--spacing-5)",
-            background: "var(--color-bg-alt)",
-            borderRadius: "var(--radius)",
-            marginBottom: "var(--spacing-5)",
-          }}
-        >
+        <div className="event-detail-meta-grid">
           <div>
-            <strong style={{ color: "var(--color-text-secondary)" }}>
-              Instructor
-            </strong>
-            <p style={{ margin: "var(--spacing-1) 0 0" }}>
+            <strong className="event-detail-meta-label">Instructor</strong>
+            <p className="event-detail-meta-value">
               {event.instructor || "Por definir"}
             </p>
           </div>
           <div>
-            <strong style={{ color: "var(--color-text-secondary)" }}>
-              Duración
-            </strong>
-            <p style={{ margin: "var(--spacing-1) 0 0" }}>
+            <strong className="event-detail-meta-label">Duración</strong>
+            <p className="event-detail-meta-value">
               {event.duration_hours || "N/A"} horas
             </p>
           </div>
           <div>
-            <strong style={{ color: "var(--color-text-secondary)" }}>
-              Inicio
-            </strong>
-            <p style={{ margin: "var(--spacing-1) 0 0" }}>
+            <strong className="event-detail-meta-label">Inicio</strong>
+            <p className="event-detail-meta-value">
               {event.start_date
                 ? new Date(event.start_date).toLocaleDateString("es-ES", {
                     year: "numeric",
@@ -213,30 +148,19 @@ export default function EventDetail() {
             </p>
           </div>
           <div>
-            <strong style={{ color: "var(--color-text-secondary)" }}>
-              Formato
-            </strong>
-            <p style={{ margin: "var(--spacing-1) 0 0" }}>{formatType}</p>
+            <strong className="event-detail-meta-label">Formato</strong>
+            <p className="event-detail-meta-value">{formatType}</p>
           </div>
         </div>
 
         {event.content && (
           <div
             dangerouslySetInnerHTML={{ __html: sanitizeHtml(event.content) }}
-            style={{
-              lineHeight: 1.8,
-              color: "var(--color-text-secondary)",
-            }}
+            className="event-detail-content"
           />
         )}
 
-        <div
-          style={{
-            marginTop: "var(--spacing-6)",
-            paddingTop: "var(--spacing-5)",
-            borderTop: "1px solid var(--color-border)",
-          }}
-        >
+        <div className="event-detail-actions">
           <Button
             variant="primary"
             size="lg"

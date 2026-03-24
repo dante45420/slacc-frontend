@@ -200,13 +200,7 @@ export default function EditNews() {
                     <img
                       src={getImageUrl(currentImage)}
                       alt="Imagen actual"
-                      className="rounded"
-                      style={{
-                        maxWidth: "300px",
-                        maxHeight: "200px",
-                        objectFit: "cover",
-                        border: "1px solid var(--color-border)",
-                      }}
+                      className="rounded news-editor-image-preview"
                     />
                   </div>
                 )}
@@ -216,11 +210,7 @@ export default function EditNews() {
                   type="file"
                   accept="image/*"
                   onChange={e => setImageFile(e.target.files[0])}
-                  className="w-full p-2"
-                  style={{
-                    border: "1px solid var(--color-border)",
-                    borderRadius: "var(--radius-base)",
-                  }}
+                  className="w-full p-2 news-editor-file-input"
                 />
                 <p className="text-sm text-muted mt-2">
                   Deja vacío para mantener la imagen actual

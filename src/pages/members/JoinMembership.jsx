@@ -31,10 +31,7 @@ export default function JoinMembership() {
           />
 
           {appMsg && (
-            <Alert
-              variant={appSent ? "success" : "error"}
-              style={{ marginTop: "var(--spacing-4)" }}
-            >
+            <Alert variant={appSent ? "success" : "error"} className="mt-4">
               {appMsg}
             </Alert>
           )}
@@ -96,7 +93,7 @@ function ApplicationForm({ onResult }) {
     }
 
     const invalidFiles = files.filter(
-      f => !f.name.toLowerCase().endsWith(".pdf")
+      f => !f.name.toLowerCase().endsWith(".pdf"),
     );
     if (invalidFiles.length > 0) {
       setErrors(prev => ({
@@ -179,7 +176,7 @@ function ApplicationForm({ onResult }) {
 
       onResult(
         true,
-        "¡Solicitud enviada exitosamente! Será revisada por nuestro comité y te contactaremos pronto."
+        "¡Solicitud enviada exitosamente! Será revisada por nuestro comité y te contactaremos pronto.",
       );
 
       // Reset form
@@ -204,7 +201,7 @@ function ApplicationForm({ onResult }) {
     } catch (error) {
       onResult(
         false,
-        error.message || "Error de red. Por favor intenta nuevamente."
+        error.message || "Error de red. Por favor intenta nuevamente.",
       );
     } finally {
       setLoading(false);
@@ -214,15 +211,7 @@ function ApplicationForm({ onResult }) {
   return (
     <form onSubmit={send}>
       {/* Información Personal */}
-      <h3
-        style={{
-          marginTop: "var(--spacing-6)",
-          marginBottom: "var(--spacing-4)",
-          color: "var(--color-primary)",
-        }}
-      >
-        Información Personal
-      </h3>
+      <h3 className="join-section-title">Información Personal</h3>
 
       <Input
         label="Nombre Completo"
@@ -284,15 +273,7 @@ function ApplicationForm({ onResult }) {
       />
 
       {/* Información Académica */}
-      <h3
-        style={{
-          marginTop: "var(--spacing-6)",
-          marginBottom: "var(--spacing-4)",
-          color: "var(--color-primary)",
-        }}
-      >
-        Información Académica
-      </h3>
+      <h3 className="join-section-title">Información Académica</h3>
 
       <Grid columns="1fr 1fr" gap="var(--spacing-4)">
         <Input
@@ -339,15 +320,7 @@ function ApplicationForm({ onResult }) {
       </Grid>
 
       {/* Información Profesional */}
-      <h3
-        style={{
-          marginTop: "var(--spacing-6)",
-          marginBottom: "var(--spacing-4)",
-          color: "var(--color-primary)",
-        }}
-      >
-        Información Profesional
-      </h3>
+      <h3 className="join-section-title">Información Profesional</h3>
 
       <Grid columns="1fr 1fr" gap="var(--spacing-4)">
         <Input
@@ -375,15 +348,7 @@ function ApplicationForm({ onResult }) {
       />
 
       {/* Documento */}
-      <h3
-        style={{
-          marginTop: "var(--spacing-6)",
-          marginBottom: "var(--spacing-4)",
-          color: "var(--color-primary)",
-        }}
-      >
-        Documentación
-      </h3>
+      <h3 className="join-section-title">Documentación</h3>
 
       <div className="file-input-wrapper">
         <label htmlFor="application-document" className="file-input-label">
@@ -399,34 +364,16 @@ function ApplicationForm({ onResult }) {
           required
         />
         {documentFiles.length > 0 && (
-          <div style={{ marginTop: "var(--spacing-3)" }}>
+          <div className="join-files-list">
             {documentFiles.map((file, index) => (
-              <div
-                key={index}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  padding: "var(--spacing-2)",
-                  background: "var(--color-bg-alt)",
-                  borderRadius: "var(--radius-sm)",
-                  marginBottom: "var(--spacing-2)",
-                }}
-              >
-                <p className="file-selected-message" style={{ margin: 0 }}>
+              <div key={index} className="join-file-row">
+                <p className="file-selected-message join-file-name">
                   <i className="fa-solid fa-circle-check"></i> {file.name}
                 </p>
                 <button
                   type="button"
                   onClick={() => removeFile(index)}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    color: "var(--color-error)",
-                    cursor: "pointer",
-                    padding: "var(--spacing-1)",
-                    fontSize: "1.2em",
-                  }}
+                  className="join-file-remove"
                   aria-label="Eliminar archivo"
                 >
                   <i className="fa-solid fa-xmark"></i>
@@ -438,13 +385,7 @@ function ApplicationForm({ onResult }) {
         {errors.documents && (
           <p className="file-error-message">{errors.documents}</p>
         )}
-        <p
-          style={{
-            fontSize: "0.875rem",
-            color: "var(--color-muted)",
-            marginTop: "var(--spacing-2)",
-          }}
-        >
+        <p className="join-file-help">
           Puedes adjuntar hasta 3 archivos PDF (CV y certificados)
         </p>
       </div>

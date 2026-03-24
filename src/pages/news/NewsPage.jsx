@@ -32,10 +32,7 @@ export default function NewsPage() {
   return (
     <Section variant="default" padding="lg">
       <Container size="lg">
-        <div
-          className="flex justify-between align-center mb-6"
-          style={{ flexWrap: "wrap" }}
-        >
+        <div className="flex justify-between align-center mb-6 flex-wrap gap-3">
           <h1 className="mb-0">Noticias</h1>
           <Link to="/subir-noticia">
             <Button variant="primary">Enviar artículo</Button>

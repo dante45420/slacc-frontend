@@ -79,42 +79,17 @@ export default function NewsGrid({ items = [], category }) {
 
   if (loading) {
     return (
-      <div
-        style={{
-          textAlign: "center",
-          padding: "var(--spacing-8)",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: "var(--spacing-3)",
-        }}
-      >
+      <div className="news-grid-status">
         <Spinner size="lg" />
-        <p style={{ color: "var(--color-muted)", margin: 0 }}>
-          Cargando noticias...
-        </p>
+        <p className="news-grid-status-text">Cargando noticias...</p>
       </div>
     );
   }
 
   if (!news || news.length === 0) {
     return (
-      <div
-        style={{
-          textAlign: "center",
-          padding: "var(--spacing-8)",
-          background: "var(--color-bg-alt)",
-          borderRadius: "var(--radius-lg)",
-          border: "1px dashed var(--color-border)",
-        }}
-      >
-        <p
-          style={{
-            color: "var(--color-muted)",
-            fontSize: "1.1rem",
-            margin: 0,
-          }}
-        >
+      <div className="news-grid-empty-state">
+        <p className="news-grid-empty-text">
           No hay noticias disponibles en esta categoría.
         </p>
       </div>
@@ -124,11 +99,7 @@ export default function NewsGrid({ items = [], category }) {
   return (
     <Grid cols={3} gap="5">
       {(news || []).map(n => (
-        <Link
-          key={n.id}
-          to={`/noticias/${n.id}`}
-          style={{ textDecoration: "none", color: "inherit" }}
-        >
+        <Link key={n.id} to={`/noticias/${n.id}`} className="news-grid-link">
           <Card
             image={getImageUrl(n.image_url)}
             imageAlt={n.title}
@@ -140,95 +111,25 @@ export default function NewsGrid({ items = [], category }) {
               )
             }
             hoverable
-            style={{ height: "100%", display: "flex", flexDirection: "column" }}
+            className="news-grid-card"
           >
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                height: "100%",
-              }}
-            >
-              <h3
-                style={{
-                  marginBottom: "var(--spacing-3)",
-                  fontSize: "1.25rem",
-                  lineHeight: "1.4",
-                  minHeight: "2.8em",
-                  maxHeight: "2.8em",
-                  display: "-webkit-box",
-                  WebkitLineClamp: 2,
-                  WebkitBoxOrient: "vertical",
-                  overflow: "hidden",
-                }}
-              >
-                {n.title}
-              </h3>
+            <div className="news-grid-card-body">
+              <h3 className="news-grid-card-title">{n.title}</h3>
 
-              <p
-                style={{
-                  color: "var(--color-muted)",
-                  marginBottom: "var(--spacing-4)",
-                  lineHeight: "1.6",
-                  minHeight: "4.8em",
-                  maxHeight: "4.8em",
-                  display: "-webkit-box",
-                  WebkitLineClamp: 3,
-                  WebkitBoxOrient: "vertical",
-                  overflow: "hidden",
-                }}
-              >
-                {n.excerpt}
-              </p>
+              <p className="news-grid-card-excerpt">{n.excerpt}</p>
 
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginTop: "auto",
-                  paddingTop: "var(--spacing-3)",
-                  borderTop: "1px solid var(--color-border)",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "4px",
-                  }}
-                >
-                  <time
-                    style={{
-                      fontSize: "0.875rem",
-                      color: "var(--color-muted)",
-                      fontWeight: "500",
-                    }}
-                  >
+              <div className="news-grid-card-footer">
+                <div className="news-grid-card-meta">
+                  <time className="news-grid-card-time">
                     {formatDate(n.created_at)}
                   </time>
                   {n.author_name && (
-                    <span
-                      style={{
-                        fontSize: "0.8rem",
-                        color: "var(--color-text-secondary)",
-                        fontWeight: "500",
-                      }}
-                    >
+                    <span className="news-grid-card-author">
                       Por {n.author_name}
                     </span>
                   )}
                 </div>
-                <span
-                  style={{
-                    color: "var(--color-primary)",
-                    fontSize: "0.875rem",
-                    fontWeight: "600",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "4px",
-                  }}
-                >
+                <span className="news-grid-card-cta">
                   Leer más <i className="fa-solid fa-arrow-right"></i>
                 </span>
               </div>

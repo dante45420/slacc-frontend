@@ -1,20 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import { Button } from "./ui";
+import useMediaQuery from "../hooks/useMediaQuery.js";
 
 export function TeamCarousel({ members = [] }) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [itemsPerSlide, setItemsPerSlide] = useState(3);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setItemsPerSlide(window.innerWidth <= 768 ? 1 : 3);
-    };
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  const trackRef = useRef(null);
+  const isMobile = useMediaQuery("(max-width: 768px)");
+  const itemsPerSlide = isMobile ? 1 : 3;
 
   const items = members.length
     ? members
@@ -52,6 +46,17 @@ export function TeamCarousel({ members = [] }) {
       ];
 
   const totalSlides = Math.ceil(items.length / itemsPerSlide);
+  const slideKeys = Array.from({ length: totalSlides }).map((_, slideIndex) => {
+    const startIdx = slideIndex * itemsPerSlide;
+    const slideMembers = items.slice(startIdx, startIdx + itemsPerSlide);
+    return `team-slide-${slideMembers.map(member => member.name).join("-")}`;
+  });
+
+  useEffect(() => {
+    if (currentIndex >= totalSlides && totalSlides > 0) {
+      setCurrentIndex(0);
+    }
+  }, [currentIndex, totalSlides]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -59,6 +64,12 @@ export function TeamCarousel({ members = [] }) {
     }, 5000);
     return () => clearInterval(interval);
   }, [totalSlides]);
+
+  useEffect(() => {
+    if (trackRef.current) {
+      trackRef.current.style.transform = `translateX(-${currentIndex * 100}%)`;
+    }
+  }, [currentIndex]);
 
   const handlePrev = () => {
     setCurrentIndex(prev => (prev - 1 + totalSlides) % totalSlides);
@@ -69,72 +80,30 @@ export function TeamCarousel({ members = [] }) {
   };
 
   return (
-    <div style={{ position: "relative" }}>
-      <div style={{ overflow: "hidden", position: "relative" }}>
-        <div
-          style={{
-            display: "flex",
-            transform: `translateX(-${currentIndex * 100}%)`,
-            transition: "transform 0.5s ease-in-out",
-          }}
-        >
+    <div className="team-carousel">
+      <div className="team-carousel-viewport">
+        <div className="team-carousel-track" ref={trackRef}>
           {Array.from({ length: totalSlides }).map((_, slideIndex) => {
             const startIdx = slideIndex * itemsPerSlide;
             const slideMembers = items.slice(
               startIdx,
-              startIdx + itemsPerSlide
+              startIdx + itemsPerSlide,
             );
 
             return (
-              <div
-                key={`slide-${slideIndex}`}
-                className="team-carousel-slide"
-                style={{
-                  minWidth: "100%",
-                  display: "flex",
-                  gap: "2rem",
-                  justifyContent: "center",
-                  padding: "2rem 1rem",
-                }}
-              >
+              <div key={slideKeys[slideIndex]} className="team-carousel-slide">
                 {slideMembers.map((member, idx) => (
                   <div
                     key={`${member.name}-${idx}`}
-                    className="team-member-card"
-                    style={{
-                      flex: "0 0 auto",
-                      width: "280px",
-                      textAlign: "center",
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                    }}
+                    className="team-member-card team-carousel-member-card"
                   >
                     <img
                       src={member.photo}
                       alt={member.name}
-                      style={{
-                        width: "150px",
-                        height: "150px",
-                        borderRadius: "50%",
-                        objectFit: "cover",
-                        marginBottom: "1rem",
-                        boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-                        display: "block",
-                      }}
+                      className="team-carousel-member-image"
                     />
-                    <h3
-                      style={{
-                        margin: "0.5rem 0",
-                        fontSize: "1.25rem",
-                        fontWeight: "600",
-                      }}
-                    >
-                      {member.name}
-                    </h3>
-                    <p style={{ color: "var(--color-muted)", margin: "0" }}>
-                      {member.role}
-                    </p>
+                    <h3 className="team-carousel-member-name">{member.name}</h3>
+                    <p className="team-carousel-member-role">{member.role}</p>
                   </div>
                 ))}
               </div>
@@ -162,10 +131,10 @@ export function TeamCarousel({ members = [] }) {
       </div>
 
       {/* Dots */}
-      <div className="carousel-dots" style={{ marginBottom: "3rem" }}>
+      <div className="carousel-dots team-carousel-dots">
         {Array.from({ length: totalSlides }).map((_, idx) => (
           <button
-            key={`dot-team-${idx}`}
+            key={`dot-${slideKeys[idx]}`}
             className={`carousel-dot ${idx === currentIndex ? "active" : ""}`}
             onClick={() => setCurrentIndex(idx)}
             aria-label={`Ir a slide ${idx + 1}`}
@@ -174,7 +143,7 @@ export function TeamCarousel({ members = [] }) {
       </div>
 
       {/* Directorio Button */}
-      <div style={{ textAlign: "center" }}>
+      <div className="team-carousel-cta">
         <Link to="/miembros/directorio">
           <Button size="lg" variant="primary">
             Ver Directorio Completo
@@ -191,6 +160,6 @@ TeamCarousel.propTypes = {
       name: PropTypes.string,
       role: PropTypes.string,
       photo: PropTypes.string,
-    })
+    }),
   ),
 };

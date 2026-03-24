@@ -3,7 +3,6 @@ import Carousel from "../../components/Carousel.jsx";
 import EventsCarousel from "../../components/EventsCarousel.jsx";
 import InstagramFeed from "../../components/InstagramFeed.jsx";
 import NewsCarousel from "../../components/NewsCarousel.jsx";
-import { TextImage } from "../../components/ContentBlocks.jsx";
 import { TeamCarousel } from "../../components/TeamCarousel.jsx";
 import Container from "../../components/ui/Container.jsx";
 import Button from "../../components/ui/Button.jsx";

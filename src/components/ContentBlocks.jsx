@@ -3,32 +3,17 @@ import PropTypes from "prop-types";
 
 export function TextImage({ title, text, imageUrl, reverse = false, cta }) {
   return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "1fr 1fr",
-        gap: 24,
-        alignItems: "center",
-      }}
-    >
+    <div className="text-image-grid">
       {reverse ? null : (
-        <img
-          src={imageUrl}
-          alt=""
-          style={{ width: "100%", borderRadius: 12 }}
-        />
+        <img src={imageUrl} alt="" className="text-image-media" />
       )}
-      <div>
-        {title ? <h3 style={{ marginTop: 0 }}>{title}</h3> : null}
-        <p style={{ color: "var(--color-muted)" }}>{text}</p>
+      <div className="text-image-content">
+        {title ? <h3 className="text-image-title">{title}</h3> : null}
+        <p className="text-image-description">{text}</p>
         {cta ? <Button onClick={cta.onClick}>{cta.label}</Button> : null}
       </div>
       {reverse ? (
-        <img
-          src={imageUrl}
-          alt=""
-          style={{ width: "100%", borderRadius: 12 }}
-        />
+        <img src={imageUrl} alt="" className="text-image-media" />
       ) : null}
     </div>
   );
@@ -68,20 +53,10 @@ export function TeamGrid({ members = [] }) {
   return (
     <div className="cards">
       {items.map(m => (
-        <div key={m.name} className="card" style={{ textAlign: "center" }}>
-          <img
-            src={m.photo}
-            alt=""
-            style={{
-              width: 120,
-              height: 120,
-              borderRadius: "50%",
-              objectFit: "cover",
-              margin: "0 auto 12px",
-            }}
-          />
-          <h3 style={{ margin: 0 }}>{m.name}</h3>
-          <p style={{ marginTop: 6, color: "var(--color-muted)" }}>{m.role}</p>
+        <div key={m.name} className="card team-grid-card">
+          <img src={m.photo} alt="" className="team-grid-photo" />
+          <h3 className="team-grid-name">{m.name}</h3>
+          <p className="team-grid-role">{m.role}</p>
           <Button variant="outline">Conectar</Button>
         </div>
       ))}
@@ -95,6 +70,6 @@ TeamGrid.propTypes = {
       name: PropTypes.string,
       role: PropTypes.string,
       photo: PropTypes.string,
-    })
+    }),
   ),
 };

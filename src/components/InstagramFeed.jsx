@@ -1,6 +1,11 @@
+import { useState } from "react";
+
 export default function InstagramFeed() {
+  const [failedImages, setFailedImages] = useState(new Set());
+
   // For Instagram posts, you'll need to manually add the image URLs
   // Right-click on Instagram image in browser > "Open image in new tab" > Copy URL
+  // Note: Instagram CDN URLs expire - update these periodically
   const posts = [
     {
       id: "DQ21nDokegk",
@@ -25,32 +30,34 @@ export default function InstagramFeed() {
     },
   ];
 
+  const handleImageError = id => {
+    setFailedImages(prev => new Set([...prev, id]));
+  };
+
+  const visiblePosts = posts
+    .slice(0, 3)
+    .filter(post => !failedImages.has(post.id));
+
+  if (visiblePosts.length === 0) {
+    return null;
+  }
+
   return (
-    <div
-      className="instagram-grid"
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(3, 1fr)",
-        gap: "var(--spacing-4)",
-        maxHeight: "300px",
-        overflow: "hidden",
-      }}
-    >
-      {posts.slice(0, 3).map(post => (
+    <div className="instagram-grid instagram-grid-compact">
+      {visiblePosts.map(post => (
         <a
           key={post.id}
           href={post.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="card hover-lift instagram-card"
-          style={{ height: "100%", maxHeight: "280px" }}
+          className="card hover-lift instagram-card instagram-card-compact"
         >
-          <div className="instagram-image-wrapper" style={{ height: "100%" }}>
+          <div className="instagram-image-wrapper instagram-image-wrapper-full">
             <img
               src={post.image}
               alt={post.caption}
               className="instagram-image"
-              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              onError={() => handleImageError(post.id)}
             />
             <div className="instagram-overlay">
               <svg

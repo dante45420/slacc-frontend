@@ -1,135 +1,127 @@
+import { useState, useEffect } from "react";
+import { apiGet } from "../../api/client";
+import {
+  Grid,
+  Card,
+  Badge,
+  Spinner,
+  Alert,
+  Section,
+  Container,
+} from "../../components/ui";
+
 export default function MembersDirectory() {
-  const groups = [
-    {
-      name: "Cirugía de Preservación",
-      members: [
-        {
-          name: "Dra. Ana Pérez",
-          city: "Ciudad de México",
-          country: "México",
-          speciality: "Artroscopía",
-          email: "ana.perez@example.com",
-          photo: "https://i.pravatar.cc/200?img=11",
-        },
-        {
-          name: "Dr. Luis Gómez",
-          city: "Bogotá",
-          country: "Colombia",
-          speciality: "Displasia",
-          email: "luis.gomez@example.com",
-          photo: "https://i.pravatar.cc/200?img=12",
-        },
-        {
-          name: "Dra. Marta Silva",
-          city: "Santiago",
-          country: "Chile",
-          speciality: "Osteotomías",
-          email: "marta.silva@example.com",
-          photo: "https://i.pravatar.cc/200?img=13",
-        },
-      ],
-    },
-    {
-      name: "Artroplastia",
-      members: [
-        {
-          name: "Dr. Pedro Rivas",
-          city: "Lima",
-          country: "Perú",
-          speciality: "Revisión compleja",
-          email: "pedro.rivas@example.com",
-          photo: "https://i.pravatar.cc/200?img=21",
-        },
-        {
-          name: "Dra. Sofía Duarte",
-          city: "Quito",
-          country: "Ecuador",
-          speciality: "Primaria cementada",
-          email: "sofia.duarte@example.com",
-          photo: "https://i.pravatar.cc/200?img=22",
-        },
-        {
-          name: "Dr. Bruno Almeida",
-          city: "São Paulo",
-          country: "Brasil",
-          speciality: "No cementada",
-          email: "bruno.almeida@example.com",
-          photo: "https://i.pravatar.cc/200?img=23",
-        },
-      ],
-    },
-    {
-      name: "Trauma de Cadera",
-      members: [
-        {
-          name: "Dra. Paula Núñez",
-          city: "Montevideo",
-          country: "Uruguay",
-          speciality: "Fracturas acetabulares",
-          email: "paula.nunez@example.com",
-          photo: "https://i.pravatar.cc/200?img=31",
-        },
-        {
-          name: "Dr. Carlos Vega",
-          city: "Buenos Aires",
-          country: "Argentina",
-          speciality: "Fracturas de cuello femoral",
-          email: "carlos.vega@example.com",
-          photo: "https://i.pravatar.cc/200?img=32",
-        },
-        {
-          name: "Dra. Laura Paredes",
-          city: "La Paz",
-          country: "Bolivia",
-          speciality: "Politrauma",
-          email: "laura.paredes@example.com",
-          photo: "https://i.pravatar.cc/200?img=33",
-        },
-      ],
-    },
-  ];
+  const [members, setMembers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    loadMembers();
+  }, []);
+
+  async function loadMembers() {
+    try {
+      const data = await apiGet("/members");
+      setMembers(data);
+    } catch (err) {
+      console.error("Error loading members:", err);
+      setError("No se pudo cargar la lista de miembros.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const getMembershipBadge = type => {
+    const variants = {
+      joven: "info",
+      normal: "primary",
+      gratuito: "success",
+    };
+    const labels = {
+      joven: "Nex Gen",
+      normal: "Socio",
+      gratuito: "Emérito",
+    };
+    return {
+      variant: variants[type] || "neutral",
+      label: labels[type] || type,
+    };
+  };
+
+  const getInitials = name => {
+    return name
+      .split(" ")
+      .map(n => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  const renderContent = () => {
+    if (loading) {
+      return (
+        <div className="flex-center min-h-300px">
+          <Spinner size="lg" />
+        </div>
+      );
+    }
+
+    if (error) {
+      return <Alert variant="error">{error}</Alert>;
+    }
+
+    if (members.length === 0) {
+      return (
+        <Alert variant="info">
+          No hay miembros registrados en este momento.
+        </Alert>
+      );
+    }
+
+    return (
+      <>
+        <p className="text-muted mb-5">
+          {members.length}{" "}
+          {members.length === 1 ? "miembro activo" : "miembros activos"}
+        </p>
+        <Grid cols={3} gap={4}>
+          {members.map(member => {
+            const badge = getMembershipBadge(member.membership_type);
+            return (
+              <Card key={member.id} hoverable>
+                <div className="flex flex-col align-center text-center gap-3">
+                  <div className="flex-center socios-avatar">
+                    {getInitials(member.name)}
+                  </div>
+                  <div>
+                    <h4 className="mb-2">{member.name}</h4>
+                    <Badge variant={badge.variant}>{badge.label}</Badge>
+                  </div>
+                  <a
+                    href={`mailto:${member.email}`}
+                    className="btn btn-outline btn-sm"
+                  >
+                    Contactar
+                  </a>
+                </div>
+              </Card>
+            );
+          })}
+        </Grid>
+      </>
+    );
+  };
+
   return (
-    <section className="section">
-      <div className="container">
-        <h1>Directorio</h1>
-        <p
-          style={{
-            color: "var(--color-muted)",
-            marginBottom: "var(--spacing-6)",
-            fontSize: "1.1rem",
-          }}
-        >
+    <Section>
+      <Container>
+        <h1 className="mb-2">Directorio de Miembros</h1>
+        <p className="text-muted mb-6 socios-intro">
           Conéctate con cirujanos cardiovasculares de toda Latinoamérica
         </p>
-        {groups.map(g => (
-          <div key={g.name} className="directory-group">
-            <h3 className="directory-group-title">{g.name}</h3>
-            <div className="cards">
-              {g.members.map(m => (
-                <div key={m.email} className="card directory-member-card">
-                  <img
-                    src={m.photo}
-                    alt={m.name}
-                    className="directory-member-photo"
-                  />
-                  <div>
-                    <h4 className="directory-member-name">{m.name}</h4>
-                    <div className="directory-member-location">
-                      {m.city}, {m.country}
-                    </div>
-                    <div className="directory-member-specialty">
-                      Especialidad: <strong>{m.speciality}</strong>
-                    </div>
-                    <a href={`mailto:${m.email}`} className="btn btn-outline">
-                      Contactar
-                    </a>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-    </section>
+
+        {renderContent()}
+      </Container>
+    </Section>
   );
 }

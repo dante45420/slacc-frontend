@@ -60,7 +60,7 @@ export default function SociosActivos() {
   const renderContent = () => {
     if (loading) {
       return (
-        <div className="flex-center" style={{ minHeight: "300px" }}>
+        <div className="flex-center min-h-300px">
           <Spinner size="lg" />
         </div>
       );
@@ -90,18 +90,7 @@ export default function SociosActivos() {
             return (
               <Card key={member.id} hoverable>
                 <div className="flex flex-col align-center text-center gap-3">
-                  <div
-                    className="flex-center"
-                    style={{
-                      width: "80px",
-                      height: "80px",
-                      borderRadius: "50%",
-                      background: "var(--color-primary)",
-                      color: "white",
-                      fontSize: "1.5rem",
-                      fontWeight: "600",
-                    }}
-                  >
+                  <div className="flex-center socios-avatar">
                     {getInitials(member.name)}
                   </div>
                   <div>
@@ -127,7 +116,7 @@ export default function SociosActivos() {
     <Section>
       <Container>
         <h1 className="mb-2">Socios Activos</h1>
-        <p className="text-muted mb-6" style={{ fontSize: "1.1rem" }}>
+        <p className="text-muted mb-6 socios-intro">
           Cirujanos cardiovasculares activos en nuestra plataforma
         </p>
 

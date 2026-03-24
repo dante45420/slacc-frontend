@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Card, Badge, Spinner } from "./ui";
 import PropTypes from "prop-types";
+import useMediaQuery from "../hooks/useMediaQuery.js";
 
 const BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
@@ -50,20 +51,13 @@ function formatDate(dateString) {
   }
 }
 
-export default function NewsCarousel({ limit = 9, category }) {
+export default function NewsCarousel({ limit = 9, category, excludeId }) {
   const [news, setNews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [index, setIndex] = useState(0);
-  const [itemsPerSlide, setItemsPerSlide] = useState(3);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setItemsPerSlide(window.innerWidth <= 768 ? 1 : 3);
-    };
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  const trackRef = useRef(null);
+  const isMobile = useMediaQuery("(max-width: 768px)");
+  const itemsPerSlide = isMobile ? 1 : 3;
 
   useEffect(() => {
     setLoading(true);
@@ -73,8 +67,11 @@ export default function NewsCarousel({ limit = 9, category }) {
     fetch(url)
       .then(r => r.json())
       .then(data => {
-        const filtered = (data || []).slice(0, limit);
-        setNews(filtered);
+        let filtered = data || [];
+        if (excludeId) {
+          filtered = filtered.filter(article => article.id !== excludeId);
+        }
+        setNews(filtered.slice(0, limit));
       })
       .catch(() => {
         setNews([]);
@@ -82,51 +79,7 @@ export default function NewsCarousel({ limit = 9, category }) {
       .finally(() => {
         setLoading(false);
       });
-  }, [category, limit]);
-
-  if (loading) {
-    return (
-      <div
-        style={{
-          textAlign: "center",
-          padding: "var(--spacing-8)",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: "var(--spacing-3)",
-        }}
-      >
-        <Spinner size="lg" />
-        <p style={{ color: "var(--color-muted)", margin: 0 }}>
-          Cargando noticias...
-        </p>
-      </div>
-    );
-  }
-
-  if (!news || news.length === 0) {
-    return (
-      <div
-        style={{
-          textAlign: "center",
-          padding: "var(--spacing-8)",
-          background: "var(--color-bg-alt)",
-          borderRadius: "var(--radius-lg)",
-          border: "1px dashed var(--color-border)",
-        }}
-      >
-        <p
-          style={{
-            color: "var(--color-muted)",
-            fontSize: "1.1rem",
-            margin: 0,
-          }}
-        >
-          No hay noticias disponibles.
-        </p>
-      </div>
-    );
-  }
+  }, [category, limit, excludeId]);
 
   // Group news into slides (1 on mobile, 3 on desktop)
   const slides = [];
@@ -134,54 +87,59 @@ export default function NewsCarousel({ limit = 9, category }) {
     slides.push(news.slice(i, i + itemsPerSlide));
   }
 
+  useEffect(() => {
+    if (index >= slides.length && slides.length > 0) {
+      setIndex(0);
+    }
+  }, [index, slides.length]);
+
+  useEffect(() => {
+    if (trackRef.current) {
+      trackRef.current.style.transform = `translateX(-${index * 100}%)`;
+    }
+  }, [index]);
+
+  const slideKeys = slides.map(
+    slideNews => `news-slide-${slideNews.map(article => article.id).join("-")}`,
+  );
+
+  if (loading) {
+    return (
+      <div className="news-grid-status">
+        <Spinner size="lg" />
+        <p className="news-grid-status-text">Cargando noticias...</p>
+      </div>
+    );
+  }
+
+  if (!news || news.length === 0) {
+    return (
+      <div className="news-grid-empty-state">
+        <p className="news-grid-empty-text">No hay noticias disponibles.</p>
+      </div>
+    );
+  }
+
   const go = i => setIndex((i + slides.length) % slides.length);
 
   return (
-    <div className="carousel" style={{ height: "auto", minHeight: "500px" }}>
-      <div
-        className="carousel-track"
-        style={{ transform: `translateX(-${index * 100}%)` }}
-      >
+    <div className="carousel news-carousel">
+      <div className="carousel-track" ref={trackRef}>
         {slides.map((slideNews, slideIdx) => (
           <div
-            key={`slide-${slideIdx}`}
-            className="carousel-slide"
-            style={{
-              height: "auto",
-              minHeight: "500px",
-              background: "transparent",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: "var(--spacing-6) var(--spacing-4)",
-            }}
+            key={slideKeys[slideIdx]}
+            className="carousel-slide news-carousel-slide"
           >
-            <div
-              className="news-carousel-container"
-              style={{
-                display: "flex",
-                gap: "var(--spacing-5)",
-                width: "100%",
-                maxWidth: "1200px",
-                justifyContent: slideNews.length < 3 ? "center" : "flex-start",
-              }}
-            >
+            <div className="news-carousel-container">
               {slideNews.map(article => (
                 <Link
                   key={article.id}
                   to={`/noticias/${article.id}`}
-                  style={{
-                    textDecoration: "none",
-                    color: "inherit",
-                    flex:
-                      slideNews.length === 3
-                        ? "1"
-                        : "0 0 calc(33.333% - var(--spacing-5))",
-                    maxWidth:
-                      slideNews.length === 3
-                        ? "none"
-                        : "calc(33.333% - var(--spacing-5))",
-                  }}
+                  className={`news-grid-link news-carousel-link ${
+                    slideNews.length === 3
+                      ? "news-carousel-link-fill"
+                      : "news-carousel-link-fixed"
+                  }`}
                 >
                   <Card
                     image={getImageUrl(article.image_url)}
@@ -198,99 +156,27 @@ export default function NewsCarousel({ limit = 9, category }) {
                       )
                     }
                     hoverable
-                    style={{
-                      height: "100%",
-                      display: "flex",
-                      flexDirection: "column",
-                    }}
+                    className="news-grid-card"
                   >
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        height: "100%",
-                      }}
-                    >
-                      <h3
-                        style={{
-                          marginBottom: "var(--spacing-3)",
-                          fontSize: "1.25rem",
-                          lineHeight: "1.4",
-                          minHeight: "2.8em",
-                          maxHeight: "2.8em",
-                          display: "-webkit-box",
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: "vertical",
-                          overflow: "hidden",
-                        }}
-                      >
-                        {article.title}
-                      </h3>
+                    <div className="news-grid-card-body">
+                      <h3 className="news-grid-card-title">{article.title}</h3>
 
-                      <p
-                        style={{
-                          color: "var(--color-muted)",
-                          marginBottom: "var(--spacing-4)",
-                          lineHeight: "1.6",
-                          minHeight: "4.8em",
-                          maxHeight: "4.8em",
-                          display: "-webkit-box",
-                          WebkitLineClamp: 3,
-                          WebkitBoxOrient: "vertical",
-                          overflow: "hidden",
-                        }}
-                      >
+                      <p className="news-grid-card-excerpt">
                         {article.excerpt}
                       </p>
 
-                      <div
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                          marginTop: "auto",
-                          paddingTop: "var(--spacing-3)",
-                          borderTop: "1px solid var(--color-border)",
-                        }}
-                      >
-                        <div
-                          style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            gap: "4px",
-                          }}
-                        >
-                          <time
-                            style={{
-                              fontSize: "0.875rem",
-                              color: "var(--color-muted)",
-                              fontWeight: "500",
-                            }}
-                          >
+                      <div className="news-grid-card-footer">
+                        <div className="news-grid-card-meta">
+                          <time className="news-grid-card-time">
                             {formatDate(article.created_at)}
                           </time>
                           {article.author_name && (
-                            <span
-                              style={{
-                                fontSize: "0.8rem",
-                                color: "var(--color-text-secondary)",
-                                fontWeight: "500",
-                              }}
-                            >
+                            <span className="news-grid-card-author">
                               Por {article.author_name}
                             </span>
                           )}
                         </div>
-                        <span
-                          style={{
-                            color: "var(--color-primary)",
-                            fontSize: "0.875rem",
-                            fontWeight: "600",
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "4px",
-                          }}
-                        >
+                        <span className="news-grid-card-cta">
                           Leer más <i className="fa-solid fa-arrow-right"></i>
                         </span>
                       </div>
@@ -321,7 +207,7 @@ export default function NewsCarousel({ limit = 9, category }) {
       <div className="carousel-dots">
         {slides.map((slideNews, i) => (
           <button
-            key={`dot-slide-${slideNews[0]?.id || i}`}
+            key={`dot-${slideKeys[i]}`}
             className={`carousel-dot ${i === index ? "active" : ""}`}
             onClick={() => setIndex(i)}
             aria-label={`Ir a slide ${i + 1}`}
@@ -335,4 +221,5 @@ export default function NewsCarousel({ limit = 9, category }) {
 NewsCarousel.propTypes = {
   limit: PropTypes.number,
   category: PropTypes.string,
+  excludeId: PropTypes.number,
 };

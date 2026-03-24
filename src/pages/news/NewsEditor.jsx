@@ -288,23 +288,14 @@ export default function NewsEditor() {
                   type="file"
                   accept="image/*"
                   onChange={handleImageChange}
-                  className="w-full p-2 rounded"
-                  style={{
-                    border: "1px solid var(--color-border)",
-                  }}
+                  className="w-full p-2 rounded news-editor-file-input"
                 />
                 {formData.image_url && (
                   <div className="mt-3">
                     <img
                       src={formData.image_url}
                       alt="Preview"
-                      className="rounded"
-                      style={{
-                        maxWidth: "300px",
-                        maxHeight: "200px",
-                        objectFit: "cover",
-                        border: "1px solid var(--color-border)",
-                      }}
+                      className="rounded news-editor-image-preview"
                     />
                   </div>
                 )}

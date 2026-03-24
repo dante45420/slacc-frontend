@@ -146,10 +146,7 @@ export default function AdminUserView() {
             </div>
           </div>
 
-          <div
-            className="flex gap-3 pt-4"
-            style={{ borderTop: "1px solid var(--color-border)" }}
-          >
+          <div className="flex gap-3 pt-4 border-t">
             <Button
               variant="outline"
               onClick={() => navigate("/admin?tab=users")}

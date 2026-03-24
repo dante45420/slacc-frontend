@@ -7,24 +7,20 @@ export default function Grid({
   className,
   ...props
 }) {
-  // Support both number presets and custom grid template strings
-  const isCustomTemplate = typeof columns === "string";
-
-  let finalClassName;
-  let style;
-
-  if (isCustomTemplate) {
-    const gapClass = typeof gap === "number" ? `grid-gap-${gap}` : "";
-    finalClassName = `grid ${gapClass} ${className || ""}`;
-    style = { gridTemplateColumns: columns };
-  } else {
-    const colsClass = `grid-cols-${columns}`;
-    const gapClass = `grid-gap-${gap}`;
-    finalClassName = `grid ${colsClass} ${gapClass} ${className || ""}`;
+  let colsClass = `grid-cols-${columns}`;
+  if (typeof columns === "string") {
+    if (columns.trim() === "1fr 1fr") {
+      colsClass = "grid-cols-equal-2";
+    } else if (columns.trim() === "1fr") {
+      colsClass = "grid-cols-single";
+    }
   }
 
+  const gapClass = typeof gap === "number" ? `grid-gap-${gap}` : "";
+  const finalClassName = `grid ${colsClass} ${gapClass} ${className || ""}`;
+
   return (
-    <div className={finalClassName} style={style} {...props}>
+    <div className={finalClassName} {...props}>
       {children}
     </div>
   );
@@ -34,7 +30,7 @@ Grid.propTypes = {
   children: PropTypes.node.isRequired,
   columns: PropTypes.oneOfType([
     PropTypes.oneOf([1, 2, 3, 4]),
-    PropTypes.string,
+    PropTypes.oneOf(["1fr 1fr", "1fr"]),
   ]),
   gap: PropTypes.oneOfType([
     PropTypes.oneOf([1, 2, 3, 4, 5, 6]),

@@ -97,51 +97,34 @@ export default function EventsPage() {
   }
 
   return (
-    <section className="section">
-      <div className="container">
-        <div style={{ textAlign: "center", marginBottom: 48 }}>
-          <h1>Eventos y Educación Continua</h1>
-          <p
-            style={{
-              fontSize: "1.2em",
-              color: "var(--color-muted)",
-              maxWidth: 600,
-              margin: "0 auto",
-            }}
-          >
+    <section className="section events-page">
+      <div className="container events-page-container">
+        <div className="events-page-header">
+          <h1 className="events-page-title">Eventos y Educación Continua</h1>
+          <p className="events-page-subtitle">
             Amplía tus conocimientos con nuestros eventos especializados en
             cirugía de cadera
           </p>
         </div>
 
         {events.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "48px 0" }}>
-            <div
-              style={{
-                fontSize: "1.2em",
-                color: "var(--color-muted)",
-                marginBottom: 16,
-              }}
-            >
+          <div className="events-empty-state">
+            <div className="events-empty-title">
               No hay eventos disponibles en este momento
             </div>
-            <p style={{ color: "var(--color-muted)" }}>
+            <p className="events-empty-description">
               Pronto tendremos nuevos eventos disponibles. ¡Mantente atento!
             </p>
           </div>
         ) : (
-          <div className="cards">
+          <div className="cards events-grid">
             {events.map(event => {
               const userPrice = getPriceForUser(event);
               const discount = getDiscountPercentage(event);
               const isOpen = isRegistrationOpen(event);
 
               return (
-                <div
-                  key={event.id}
-                  className="card"
-                  style={{ position: "relative" }}
-                >
+                <div key={event.id} className="card event-list-card">
                   {event.image_url && (
                     <img
                       src={
@@ -150,65 +133,39 @@ export default function EventsPage() {
                           : `${BASE_URL.replace("/api", "")}${event.image_url}`
                       }
                       alt={event.title}
-                      style={{
-                        width: "100%",
-                        height: "200px",
-                        objectFit: "cover",
-                        borderRadius: "var(--radius)",
-                        marginBottom: 16,
-                      }}
+                      className="event-list-card-image"
                     />
                   )}
 
-                  <div style={{ marginBottom: 16 }}>
-                    <h3 style={{ marginBottom: 8 }}>{event.title}</h3>
-                    <p
-                      style={{ color: "var(--color-muted)", marginBottom: 12 }}
-                    >
+                  <div className="event-list-card-body">
+                    <h3 className="event-list-card-title">{event.title}</h3>
+                    <p className="event-list-card-description">
                       {event.description}
                     </p>
                   </div>
 
-                  <div style={{ marginBottom: 16 }}>
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        marginBottom: 8,
-                      }}
-                    >
-                      <span style={{ fontWeight: "500" }}>Instructor:</span>
-                      <span>{event.instructor || "Por definir"}</span>
+                  <div className="event-list-meta">
+                    <div className="event-list-meta-row">
+                      <span className="event-list-meta-label">Instructor:</span>
+                      <span className="event-list-meta-value">
+                        {event.instructor || "Por definir"}
+                      </span>
                     </div>
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        marginBottom: 8,
-                      }}
-                    >
-                      <span style={{ fontWeight: "500" }}>Duración:</span>
-                      <span>{event.duration_hours || "N/A"} horas</span>
+                    <div className="event-list-meta-row">
+                      <span className="event-list-meta-label">Duración:</span>
+                      <span className="event-list-meta-value">
+                        {event.duration_hours || "N/A"} horas
+                      </span>
                     </div>
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        marginBottom: 8,
-                      }}
-                    >
-                      <span style={{ fontWeight: "500" }}>Inicio:</span>
-                      <span>{formatDate(event.start_date)}</span>
+                    <div className="event-list-meta-row">
+                      <span className="event-list-meta-label">Inicio:</span>
+                      <span className="event-list-meta-value">
+                        {formatDate(event.start_date)}
+                      </span>
                     </div>
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        marginBottom: 8,
-                      }}
-                    >
-                      <span style={{ fontWeight: "500" }}>Cupos:</span>
-                      <span>
+                    <div className="event-list-meta-row">
+                      <span className="event-list-meta-label">Cupos:</span>
+                      <span className="event-list-meta-value">
                         {event.max_students
                           ? `${event.max_students} estudiantes`
                           : "Sin límite"}
@@ -216,74 +173,41 @@ export default function EventsPage() {
                     </div>
                   </div>
 
-                  <div
-                    style={{
-                      background: "#f8f9fa",
-                      padding: 16,
-                      borderRadius: 8,
-                      marginBottom: 16,
-                      border: "1px solid #e9ecef",
-                    }}
-                  >
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                      }}
-                    >
-                      <div>
-                        <div
-                          style={{
-                            fontSize: "1.5em",
-                            fontWeight: "bold",
-                            color: "var(--color-primary)",
-                          }}
-                        >
+                  <div className="event-list-pricing-box">
+                    <div className="event-list-pricing-row">
+                      <div className="event-list-price-main-block">
+                        <div className="event-list-price-main">
                           ${userPrice}
                         </div>
                         {discount > 0 && (
-                          <div
-                            style={{
-                              fontSize: "0.9em",
-                              color: "var(--color-secondary)",
-                            }}
-                          >
+                          <div className="event-list-discount-badge">
                             {discount}% descuento para socios
                           </div>
                         )}
                       </div>
-                      <div
-                        style={{
-                          textAlign: "right",
-                          fontSize: "0.9em",
-                          color: "var(--color-muted)",
-                        }}
-                      >
+                      <div className="event-list-price-context">
                         {user ? (
                           <div>
-                            <div>Valor socio</div>
-                            <div
-                              style={{
-                                textDecoration: "line-through",
-                                color: "var(--color-muted)",
-                              }}
-                            >
+                            <div className="event-list-price-context-label">
+                              Valor socio
+                            </div>
+                            <div className="event-list-price-reference">
                               ${event.price_non_member}
                             </div>
                           </div>
                         ) : (
-                          <div>Valor general</div>
+                          <div className="event-list-price-context-label">
+                            Valor general
+                          </div>
                         )}
                       </div>
                     </div>
                   </div>
 
-                  <div style={{ display: "flex", gap: 8 }}>
+                  <div className="event-list-actions">
                     <button
                       className="btn btn-outline"
                       onClick={() => navigate(`/eventos/${event.id}`)}
-                      style={{ flex: 1 }}
                     >
                       Ver Detalles
                     </button>
@@ -291,7 +215,6 @@ export default function EventsPage() {
                       className="btn btn-primary"
                       onClick={() => handleEnrollClick(event)}
                       disabled={!isOpen || event.is_enrolled}
-                      style={{ flex: 1 }}
                     >
                       {(() => {
                         if (event.is_enrolled) return "Ya inscrito";
@@ -302,21 +225,7 @@ export default function EventsPage() {
                   </div>
 
                   {!isOpen && (
-                    <div
-                      style={{
-                        position: "absolute",
-                        top: 16,
-                        right: 16,
-                        background: "crimson",
-                        color: "white",
-                        padding: "4px 8px",
-                        borderRadius: 12,
-                        fontSize: "0.8em",
-                        fontWeight: "bold",
-                      }}
-                    >
-                      CERRADO
-                    </div>
+                    <div className="event-list-closed-badge">CERRADO</div>
                   )}
                 </div>
               );
@@ -397,80 +306,30 @@ function EnrollmentModal({ event, user, onClose, onSuccess }) {
   }
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: "rgba(0,0,0,0.5)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        zIndex: 1000,
-        padding: 20,
-      }}
-    >
-      <div
-        style={{
-          background: "var(--color-bg)",
-          borderRadius: 12,
-          padding: 32,
-          maxWidth: 500,
-          width: "100%",
-          maxHeight: "90vh",
-          overflow: "auto",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: 24,
-          }}
-        >
-          <h2>Inscribirse al Curso</h2>
+    <div className="enrollment-modal-overlay">
+      <div className="enrollment-modal-card">
+        <div className="enrollment-modal-header">
+          <h2 className="enrollment-modal-title">Inscribirse al Curso</h2>
           <button
             onClick={onClose}
-            style={{
-              background: "none",
-              border: "none",
-              fontSize: "1.5em",
-              cursor: "pointer",
-            }}
+            className="enrollment-modal-close"
+            aria-label="Cerrar modal"
           >
             <i className="fa-solid fa-xmark"></i>
           </button>
         </div>
 
-        {error && (
-          <div
-            style={{
-              background: "#f8d7da",
-              color: "#721c24",
-              padding: 12,
-              borderRadius: 6,
-              marginBottom: 16,
-              textAlign: "center",
-            }}
-          >
-            {error}
-          </div>
-        )}
+        {error && <div className="enrollment-modal-error">{error}</div>}
 
         {step === 1 && (
-          <div>
-            <h3 style={{ marginBottom: 16 }}>{event.title}</h3>
-            <p style={{ color: "var(--color-muted)", marginBottom: 24 }}>
-              {event.description}
-            </p>
+          <div className="enrollment-modal-content">
+            <h3 className="enrollment-event-title">{event.title}</h3>
+            <p className="enrollment-event-description">{event.description}</p>
 
-            <div style={{ marginBottom: 16 }}>
+            <div className="enrollment-field">
               <label
                 htmlFor="enrollment-student-name"
-                style={{ display: "block", marginBottom: 8, fontWeight: "500" }}
+                className="enrollment-label"
               >
                 Nombre Completo *
               </label>
@@ -481,19 +340,14 @@ function EnrollmentModal({ event, user, onClose, onSuccess }) {
                 value={formData.student_name}
                 onChange={handleInputChange}
                 required
-                style={{
-                  width: "100%",
-                  padding: 12,
-                  border: "1px solid #ddd",
-                  borderRadius: 6,
-                }}
+                className="enrollment-input"
               />
             </div>
 
-            <div style={{ marginBottom: 16 }}>
+            <div className="enrollment-field">
               <label
                 htmlFor="enrollment-student-email"
-                style={{ display: "block", marginBottom: 8, fontWeight: "500" }}
+                className="enrollment-label"
               >
                 Email *
               </label>
@@ -504,19 +358,14 @@ function EnrollmentModal({ event, user, onClose, onSuccess }) {
                 value={formData.student_email}
                 onChange={handleInputChange}
                 required
-                style={{
-                  width: "100%",
-                  padding: 12,
-                  border: "1px solid #ddd",
-                  borderRadius: 6,
-                }}
+                className="enrollment-input"
               />
             </div>
 
-            <div style={{ marginBottom: 24 }}>
+            <div className="enrollment-field">
               <label
                 htmlFor="enrollment-student-phone"
-                style={{ display: "block", marginBottom: 8, fontWeight: "500" }}
+                className="enrollment-label"
               >
                 Teléfono
               </label>
@@ -526,50 +375,17 @@ function EnrollmentModal({ event, user, onClose, onSuccess }) {
                 name="student_phone"
                 value={formData.student_phone}
                 onChange={handleInputChange}
-                style={{
-                  width: "100%",
-                  padding: 12,
-                  border: "1px solid #ddd",
-                  borderRadius: 6,
-                }}
+                className="enrollment-input"
               />
             </div>
 
-            <div
-              style={{
-                background: "#f8f9fa",
-                padding: 16,
-                borderRadius: 8,
-                marginBottom: 24,
-                border: "1px solid #e9ecef",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <span style={{ fontWeight: "500" }}>Valor:</span>
-                <span
-                  style={{
-                    fontSize: "1.5em",
-                    fontWeight: "bold",
-                    color: "var(--color-primary)",
-                  }}
-                >
-                  ${userPrice}
-                </span>
+            <div className="enrollment-price-panel">
+              <div className="enrollment-price-row">
+                <span>Valor:</span>
+                <span className="enrollment-price-value">${userPrice}</span>
               </div>
               {user && (
-                <div
-                  style={{
-                    fontSize: "0.9em",
-                    color: "var(--color-secondary)",
-                    marginTop: 4,
-                  }}
-                >
+                <div className="enrollment-price-note">
                   Descuento para socios aplicado
                 </div>
               )}
@@ -578,17 +394,19 @@ function EnrollmentModal({ event, user, onClose, onSuccess }) {
         )}
 
         {step === 2 && (
-          <div style={{ textAlign: "center" }}>
-            <div style={{ fontSize: "3em", marginBottom: 16 }}>🎉</div>
-            <h3 style={{ marginBottom: 16 }}>¡Inscripción Exitosa!</h3>
-            <p style={{ color: "var(--color-muted)", marginBottom: 24 }}>
+          <div className="enrollment-success">
+            <div className="enrollment-success-icon">
+              Inscripción confirmada
+            </div>
+            <h3 className="enrollment-success-title">Inscripción exitosa</h3>
+            <p className="enrollment-success-text">
               Te has inscrito correctamente al curso. Recibirás un email de
               confirmación con los detalles.
             </p>
           </div>
         )}
 
-        <div style={{ display: "flex", gap: 12, justifyContent: "flex-end" }}>
+        <div className="enrollment-actions">
           {step === 1 && (
             <>
               <button className="btn btn-outline" onClick={onClose}>

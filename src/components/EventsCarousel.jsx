@@ -49,10 +49,7 @@ export default function EventsCarousel() {
 
   if (loading) {
     return (
-      <div
-        className="container"
-        style={{ padding: "24px 0", textAlign: "center" }}
-      >
+      <div className="container events-carousel-loader">
         Cargando eventos...
       </div>
     );

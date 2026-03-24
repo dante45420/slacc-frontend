@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext.jsx";
 import PropTypes from "prop-types";
 import { useState, useEffect } from "react";
@@ -57,7 +57,7 @@ SubLink.propTypes = {
 function SubMenuGroup({ label, children }) {
   return (
     <div className="submenu-item">
-      <span style={{ cursor: "default" }}>{label}</span>
+      <span className="submenu-label">{label}</span>
       <div className="submenu-nested">{children}</div>
     </div>
   );
@@ -71,23 +71,73 @@ SubMenuGroup.propTypes = {
 export default function Header() {
   const { user, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
-    const updateHeaderHeight = () => {
+    const updateViewportAndHeader = () => {
       const header = document.getElementById("site-header");
+      const viewportHeight = window.visualViewport
+        ? window.visualViewport.height
+        : window.innerHeight;
+
+      document.documentElement.style.setProperty(
+        "--app-height",
+        `${viewportHeight}px`,
+      );
+
       if (header) {
         const height = header.offsetHeight;
         document.documentElement.style.setProperty(
           "--header-height",
-          `${height}px`
+          `${height}px`,
         );
       }
     };
 
-    updateHeaderHeight();
-    window.addEventListener("resize", updateHeaderHeight);
-    return () => window.removeEventListener("resize", updateHeaderHeight);
+    updateViewportAndHeader();
+
+    window.addEventListener("resize", updateViewportAndHeader);
+    globalThis.addEventListener("orientationchange", updateViewportAndHeader);
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", updateViewportAndHeader);
+    }
+
+    return () => {
+      window.removeEventListener("resize", updateViewportAndHeader);
+      globalThis.removeEventListener(
+        "orientationchange",
+        updateViewportAndHeader,
+      );
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener(
+          "resize",
+          updateViewportAndHeader,
+        );
+      }
+    };
   }, []);
+
+  useEffect(() => {
+    const body = document.body;
+    const html = document.documentElement;
+
+    if (mobileMenuOpen) {
+      body.style.overflow = "hidden";
+      html.style.overflow = "hidden";
+    } else {
+      body.style.overflow = "";
+      html.style.overflow = "";
+    }
+
+    return () => {
+      body.style.overflow = "";
+      html.style.overflow = "";
+    };
+  }, [mobileMenuOpen]);
+
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
@@ -104,8 +154,9 @@ export default function Header() {
           <img
             src="/LOGO SLACC_ROJO_HORIZONTAL.png"
             alt="SLACC Logo"
-            className="logo-image"
-            style={{ height: "60px", width: "auto" }}
+            className="logo-image header-logo-image"
+            width="149"
+            height="60"
           />
         </Link>
 
@@ -113,6 +164,7 @@ export default function Header() {
           className="hamburger-menu"
           onClick={toggleMobileMenu}
           aria-label="Toggle menu"
+          aria-expanded={mobileMenuOpen}
         >
           <i
             className={
@@ -121,42 +173,20 @@ export default function Header() {
           ></i>
         </button>
 
+        {mobileMenuOpen ? (
+          <button
+            type="button"
+            className="menu-backdrop"
+            aria-label="Cerrar menu"
+            onClick={closeMobileMenu}
+          />
+        ) : null}
+
         <ul className={`menu ${mobileMenuOpen ? "menu-open" : ""}`}>
           {user?.role === "admin" && (
             <MenuItem label="Admin" to="/admin" onClick={closeMobileMenu} />
           )}
-          <MenuItem label="Comités" to="/comites" onClick={closeMobileMenu}>
-            <SubLink
-              to="/comites#etica"
-              label="Ética"
-              onClick={closeMobileMenu}
-            />
-            <SubLink
-              to="/comites#cientifico"
-              label="Científico"
-              onClick={closeMobileMenu}
-            />
-            <SubLink
-              to="/comites#comite-a"
-              label="Comité A"
-              onClick={closeMobileMenu}
-            />
-            <SubLink
-              to="/comites#comite-b"
-              label="Comité B"
-              onClick={closeMobileMenu}
-            />
-            <SubLink
-              to="/comites#comite-c"
-              label="Comité C"
-              onClick={closeMobileMenu}
-            />
-            <SubLink
-              to="/comites#subespecialidades"
-              label="Subespecialidades"
-              onClick={closeMobileMenu}
-            />
-          </MenuItem>
+          <MenuItem label="Comités" to="/comites" onClick={closeMobileMenu} />
           <MenuItem label="Contacto" to="/contacto" onClick={closeMobileMenu} />
           <MenuItem label="Eventos" to="/eventos" onClick={closeMobileMenu}>
             <SubLink

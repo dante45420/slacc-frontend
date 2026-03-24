@@ -79,13 +79,7 @@ export default function Comites() {
           </p>
         </div>
 
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "var(--spacing-8)",
-          }}
-        >
+        <div className="comites-list">
           {committees.map(committee => (
             <div key={committee.id} id={committee.id}>
               <Card className="p-6">
@@ -97,25 +91,8 @@ export default function Comites() {
                 </h3>
                 <Grid cols={3} gap={4}>
                   {committee.members.map(member => (
-                    <Card
-                      key={member.name}
-                      className="p-4"
-                      style={{ background: "var(--color-bg-alt)" }}
-                    >
-                      <div
-                        style={{
-                          width: "80px",
-                          height: "80px",
-                          borderRadius: "50%",
-                          background: "var(--color-primary)",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          margin: "0 auto var(--spacing-3)",
-                          fontSize: "2rem",
-                          color: "white",
-                        }}
-                      >
+                    <Card key={member.name} className="p-4 comites-member-card">
+                      <div className="comites-member-initials">
                         {member.name
                           .split(" ")
                           .map(n => n[0])

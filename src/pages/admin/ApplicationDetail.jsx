@@ -23,24 +23,16 @@ function InfoField({ label, value, link, fullWidth }) {
   const displayValue = value || "No especificado";
 
   return (
-    <div style={{ gridColumn: fullWidth ? "1 / -1" : "auto" }}>
-      <div
-        style={{
-          marginBottom: "var(--spacing-1)",
-          fontWeight: "600",
-          color: "var(--color-text-secondary)",
-        }}
-      >
+    <div>
+      <div >
         {label}
       </div>
-      <div style={{ color: "var(--color-text)" }}>
+      <div>
         {link && value ? (
           <a
             href={value}
             target="_blank"
-            rel="noopener noreferrer"
-            style={{ color: "var(--color-primary)" }}
-          >
+            rel="noopener noreferrer" >
             {displayValue}
           </a>
         ) : (
@@ -172,14 +164,9 @@ export default function ApplicationDetail() {
     return (
       <Section variant="default" padding="lg">
         <Container>
-          <div style={{ textAlign: "center" }}>
+          <div>
             <Spinner size="lg" />
-            <p
-              style={{
-                marginTop: "var(--spacing-4)",
-                color: "var(--color-muted)",
-              }}
-            >
+            <p >
               Cargando aplicación...
             </p>
           </div>
@@ -192,13 +179,12 @@ export default function ApplicationDetail() {
     return (
       <Section variant="default" padding="lg">
         <Container>
-          <Alert variant="error" style={{ marginBottom: "var(--spacing-4)" }}>
+          <Alert variant="error">
             {error || "Postulación no encontrada"}
           </Alert>
           <Button
             variant="outline"
-            onClick={() => navigate("/admin?tab=applications")}
-          >
+            onClick={() => navigate("/admin?tab=applications")} >
             <i className="fa-solid fa-arrow-left"></i> Volver al Panel Admin
           </Button>
         </Container>
@@ -242,28 +228,18 @@ export default function ApplicationDetail() {
       <Container size="lg">
         <Button
           variant="outline"
-          onClick={() => navigate("/admin?tab=applications")}
-          style={{ marginBottom: "var(--spacing-5)" }}
-        >
+          onClick={() => navigate("/admin?tab=applications")} >
           <i className="fa-solid fa-arrow-left"></i> Volver al Panel Admin
         </Button>
 
         {/* Header Card */}
-        <Card style={{ marginBottom: "var(--spacing-5)" }}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "flex-start",
-              gap: "var(--spacing-4)",
-              flexWrap: "wrap",
-            }}
-          >
+        <Card>
+          <div >
             <div>
-              <h1 style={{ margin: 0, marginBottom: "var(--spacing-2)" }}>
+              <h1>
                 {application.name}
               </h1>
-              <p style={{ color: "var(--color-muted)", margin: 0 }}>
+              <p>
                 Fecha de solicitud:{" "}
                 {new Date(application.created_at).toLocaleDateString("es-ES", {
                   year: "numeric",
@@ -279,26 +255,21 @@ export default function ApplicationDetail() {
         </Card>
 
         {msg && (
-          <Alert variant="success" style={{ marginBottom: "var(--spacing-5)" }}>
+          <Alert variant="success">
             {msg}
           </Alert>
         )}
         {error && (
-          <Alert variant="error" style={{ marginBottom: "var(--spacing-5)" }}>
+          <Alert variant="error">
             {error}
           </Alert>
         )}
 
         {/* Personal Information */}
-        <h2
-          style={{
-            marginBottom: "var(--spacing-4)",
-            color: "var(--color-primary)",
-          }}
-        >
+        <h2 >
           Información Personal
         </h2>
-        <Card style={{ marginBottom: "var(--spacing-5)" }}>
+        <Card>
           <Grid columns="1fr 1fr" gap="var(--spacing-4)">
             <InfoField label="Nombre Completo" value={application.name} />
             <InfoField label="Correo Electrónico" value={application.email} />
@@ -310,15 +281,10 @@ export default function ApplicationDetail() {
         </Card>
 
         {/* Academic Information */}
-        <h2
-          style={{
-            marginBottom: "var(--spacing-4)",
-            color: "var(--color-primary)",
-          }}
-        >
+        <h2 >
           Información Académica
         </h2>
-        <Card style={{ marginBottom: "var(--spacing-5)" }}>
+        <Card>
           <Grid columns="1fr 1fr" gap="var(--spacing-4)">
             <InfoField
               label="Especialidad"
@@ -357,15 +323,10 @@ export default function ApplicationDetail() {
         </Card>
 
         {/* Professional Information */}
-        <h2
-          style={{
-            marginBottom: "var(--spacing-4)",
-            color: "var(--color-primary)",
-          }}
-        >
+        <h2 >
           Información Profesional
         </h2>
-        <Card style={{ marginBottom: "var(--spacing-5)" }}>
+        <Card>
           <Grid columns="1fr 1fr" gap="var(--spacing-4)">
             <InfoField
               label="Hospital Actual"
@@ -386,56 +347,29 @@ export default function ApplicationDetail() {
         {/* Documents */}
         {application.attachments && application.attachments.length > 0 && (
           <>
-            <h2
-              style={{
-                marginBottom: "var(--spacing-4)",
-                color: "var(--color-primary)",
-              }}
-            >
+            <h2 >
               Documentos Adjuntos
             </h2>
-            <Card style={{ marginBottom: "var(--spacing-5)" }}>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "var(--spacing-3)",
-                }}
-              >
+            <Card>
+              <div >
                 {application.attachments.map((att, idx) => (
                   <a
                     key={att.id}
                     href={`${BASE_URL.replace("/api", "")}${att.file_url}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "var(--spacing-2)",
-                      padding: "var(--spacing-3)",
-                      background: "var(--color-bg-alt)",
-                      borderRadius: "var(--radius)",
-                      textDecoration: "none",
-                      color: "var(--color-text)",
-                      transition: "all var(--transition-fast)",
-                    }}
                     onMouseOver={e =>
                       (e.currentTarget.style.background =
                         "var(--color-primary-light)")
                     }
                     onMouseOut={e =>
                       (e.currentTarget.style.background = "var(--color-bg-alt)")
-                    }
-                  >
+                    } >
                     <i
-                      className="fa-solid fa-file-pdf"
-                      style={{ fontSize: "1.5em", color: "var(--color-error)" }}
-                    ></i>
+                      className="fa-solid fa-file-pdf" ></i>
                     <span>Documento {idx + 1}</span>
                     <i
-                      className="fa-solid fa-external-link"
-                      style={{ marginLeft: "auto", fontSize: "0.9em" }}
-                    ></i>
+                      className="fa-solid fa-external-link" ></i>
                   </a>
                 ))}
               </div>
@@ -445,39 +379,20 @@ export default function ApplicationDetail() {
 
         {/* Decision Section */}
         {application.status === "pending" && (
-          <Card style={{ marginBottom: "var(--spacing-5)" }}>
-            <h2
-              style={{
-                marginBottom: "var(--spacing-4)",
-                color: "var(--color-primary)",
-              }}
-            >
+          <Card>
+            <h2 >
               Decisión de la Solicitud
             </h2>
 
-            <div style={{ marginBottom: "var(--spacing-4)" }}>
+            <div>
               <label
-                htmlFor="membership-type-select"
-                style={{
-                  display: "block",
-                  marginBottom: "var(--spacing-2)",
-                  fontWeight: "600",
-                }}
-              >
+                htmlFor="membership-type-select" >
                 Tipo de Membresía a Asignar:
               </label>
               <select
                 id="membership-type-select"
                 value={selectedMembershipType}
-                onChange={e => setSelectedMembershipType(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "var(--spacing-3)",
-                  border: "1px solid var(--color-border)",
-                  borderRadius: "var(--radius)",
-                  fontSize: "1em",
-                }}
-              >
+                onChange={e => setSelectedMembershipType(e.target.value)} >
                 <option value="joven">
                   Nex Gen ($30/año) - Recién egresados
                 </option>
@@ -490,15 +405,9 @@ export default function ApplicationDetail() {
               </select>
             </div>
 
-            <div style={{ marginBottom: "var(--spacing-5)" }}>
+            <div>
               <label
-                htmlFor="resolution-note-textarea"
-                style={{
-                  display: "block",
-                  marginBottom: "var(--spacing-2)",
-                  fontWeight: "600",
-                }}
-              >
+                htmlFor="resolution-note-textarea" >
                 Nota de Resolución:
               </label>
               <textarea
@@ -506,34 +415,13 @@ export default function ApplicationDetail() {
                 value={resolutionNote}
                 onChange={e => setResolutionNote(e.target.value)}
                 placeholder="Nota opcional para el postulante..."
-                style={{
-                  width: "100%",
-                  padding: "var(--spacing-3)",
-                  border: "1px solid var(--color-border)",
-                  borderRadius: "var(--radius)",
-                  minHeight: "100px",
-                  resize: "vertical",
-                  fontFamily: "inherit",
-                }}
               />
             </div>
 
-            <div
-              style={{
-                display: "flex",
-                gap: "var(--spacing-3)",
-                justifyContent: "flex-end",
-              }}
-            >
+            <div >
               <Button
                 variant="outline"
-                onClick={rejectApplication}
-                style={{
-                  background: "var(--color-error)",
-                  color: "white",
-                  border: "none",
-                }}
-              >
+                onClick={rejectApplication} >
                 Rechazar
               </Button>
               <Button variant="primary" onClick={approveApplication}>
@@ -545,26 +433,11 @@ export default function ApplicationDetail() {
 
         {/* Payment Pending */}
         {application.status === "payment_pending" && (
-          <Card
-            style={{
-              marginBottom: "var(--spacing-5)",
-              border: "2px solid var(--color-warning)",
-            }}
-          >
-            <h2
-              style={{
-                marginBottom: "var(--spacing-4)",
-                color: "var(--color-warning)",
-              }}
-            >
+          <Card >
+            <h2 >
               Esperando Confirmación de Pago
             </h2>
-            <p
-              style={{
-                marginBottom: "var(--spacing-4)",
-                color: "var(--color-muted)",
-              }}
-            >
+            <p >
               La postulación fue aprobada como{" "}
               <strong>
                 {getMembershipTypeLabel(application.membership_type)}
@@ -574,9 +447,7 @@ export default function ApplicationDetail() {
             </p>
             <Button
               variant="primary"
-              onClick={confirmPayment}
-              style={{ background: "var(--color-success)" }}
-            >
+              onClick={confirmPayment} >
               Confirmar Pago y Crear Socio
             </Button>
           </Card>
@@ -584,23 +455,11 @@ export default function ApplicationDetail() {
 
         {/* Resolution Note */}
         {application.resolution_note && application.status !== "pending" && (
-          <Card style={{ marginBottom: "var(--spacing-5)" }}>
-            <h2
-              style={{
-                marginBottom: "var(--spacing-4)",
-                color: "var(--color-primary)",
-              }}
-            >
+          <Card>
+            <h2 >
               Nota de Resolución
             </h2>
-            <div
-              style={{
-                background: "var(--color-bg-alt)",
-                padding: "var(--spacing-4)",
-                borderRadius: "var(--radius)",
-                border: "1px solid var(--color-border)",
-              }}
-            >
+            <div >
               {application.resolution_note}
             </div>
           </Card>
@@ -608,85 +467,44 @@ export default function ApplicationDetail() {
 
         {/* Credentials */}
         {application.status === "paid" && application.initial_password && (
-          <Card
-            style={{
-              marginBottom: "var(--spacing-5)",
-              border: "2px solid var(--color-success)",
-            }}
-          >
-            <h2
-              style={{
-                marginBottom: "var(--spacing-4)",
-                color: "var(--color-success)",
-              }}
-            >
+          <Card >
+            <h2 >
               Credenciales del Socio
             </h2>
             <Grid columns="1fr" gap="var(--spacing-4)">
               <div>
-                <label
-                  style={{
-                    display: "block",
-                    fontWeight: "600",
-                    marginBottom: "var(--spacing-2)",
-                  }}
-                >
+                <label >
                   Email:
                 </label>
-                <div style={{ display: "flex", gap: "var(--spacing-2)" }}>
+                <div>
                   <input
                     type="text"
                     value={application.email}
                     readOnly
-                    style={{
-                      flex: 1,
-                      padding: "var(--spacing-2)",
-                      border: "1px solid var(--color-border)",
-                      borderRadius: "var(--radius)",
-                      background: "var(--color-bg-alt)",
-                    }}
                   />
                   <Button
                     variant="primary"
-                    onClick={() => copyToClipboard(application.email)}
-                  >
+                    onClick={() => copyToClipboard(application.email)} >
                     Copiar
                   </Button>
                 </div>
               </div>
 
               <div>
-                <label
-                  style={{
-                    display: "block",
-                    fontWeight: "600",
-                    marginBottom: "var(--spacing-2)",
-                  }}
-                >
+                <label >
                   Contraseña Inicial:
                 </label>
-                <div style={{ display: "flex", gap: "var(--spacing-2)" }}>
+                <div>
                   <input
                     type="text"
                     value={application.initial_password}
                     readOnly
-                    style={{
-                      flex: 1,
-                      padding: "var(--spacing-2)",
-                      border: "1px solid var(--color-border)",
-                      borderRadius: "var(--radius)",
-                      background: "var(--color-bg-alt)",
-                      fontFamily: "monospace",
-                      fontSize: "1.1rem",
-                      fontWeight: "bold",
-                    }}
                   />
                   <Button
                     variant="primary"
                     onClick={() =>
                       copyToClipboard(application.initial_password)
-                    }
-                  >
+                    } >
                     Copiar
                   </Button>
                 </div>
@@ -700,8 +518,7 @@ export default function ApplicationDetail() {
       <Modal
         isOpen={showCredentialsModal}
         onClose={handleCloseCredentialsModal}
-        title="Credenciales de Socio Creadas"
-      >
+        title="Credenciales de Socio Creadas" >
         <Alert variant="warning" className="mb-4">
           <strong>⚠️ IMPORTANTE:</strong> Esta información se muestra una sola
           vez. Copia estas credenciales y envíalas al socio de forma segura.
@@ -724,8 +541,7 @@ export default function ApplicationDetail() {
                 <Button
                   onClick={() => copyToClipboard(credentials.email)}
                   variant="primary"
-                  size="sm"
-                >
+                  size="sm" >
                   Copiar
                 </Button>
               </div>
@@ -734,8 +550,7 @@ export default function ApplicationDetail() {
             <div>
               <label
                 htmlFor="modal-password"
-                className="font-semibold mb-2 block"
-              >
+                className="font-semibold mb-2 block" >
                 Contraseña Temporal:
               </label>
               <div className="flex gap-2">
@@ -745,13 +560,11 @@ export default function ApplicationDetail() {
                   value={credentials.password}
                   readOnly
                   className="flex-1"
-                  style={{ fontFamily: "monospace", fontSize: "1.1rem" }}
                 />
                 <Button
                   onClick={() => copyToClipboard(credentials.password)}
                   variant="primary"
-                  size="sm"
-                >
+                  size="sm" >
                   Copiar
                 </Button>
               </div>
@@ -760,8 +573,7 @@ export default function ApplicationDetail() {
             <div>
               <label
                 htmlFor="modal-membership"
-                className="font-semibold mb-2 block"
-              >
+                className="font-semibold mb-2 block" >
                 Tipo de Membresía:
               </label>
               <Input
@@ -783,8 +595,7 @@ export default function ApplicationDetail() {
                 );
               }
             }}
-            variant="secondary"
-          >
+            variant="secondary" >
             Copiar Todo
           </Button>
           <Button onClick={handleCloseCredentialsModal} variant="primary">

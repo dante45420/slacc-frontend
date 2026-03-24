@@ -5,25 +5,10 @@ export default function NotFound() {
   return (
     <Section variant="light">
       <Container>
-        <div style={{ textAlign: "center", padding: "var(--spacing-8) 0" }}>
-          <h1
-            style={{
-              fontSize: "6rem",
-              marginBottom: "var(--spacing-4)",
-              color: "var(--color-primary)",
-            }}
-          >
-            404
-          </h1>
-          <h2 style={{ marginBottom: "var(--spacing-3)" }}>
-            Página no encontrada
-          </h2>
-          <p
-            style={{
-              marginBottom: "var(--spacing-6)",
-              color: "var(--text-muted)",
-            }}
-          >
+        <div className="not-found-wrap">
+          <h1 className="not-found-code">404</h1>
+          <h2 className="not-found-title">Página no encontrada</h2>
+          <p className="not-found-description">
             Lo sentimos, la página que buscas no existe o ha sido movida.
           </p>
           <Link to="/">

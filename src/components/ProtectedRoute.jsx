@@ -9,14 +9,7 @@ export function ProtectedRoute({ children, requireAdmin = false }) {
   // If user is not loaded yet, show loading spinner
   if (user === undefined) {
     return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          minHeight: "60vh",
-        }}
-      >
+      <div className="flex-center min-h-60vh">
         <Spinner />
       </div>
     );

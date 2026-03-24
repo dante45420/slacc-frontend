@@ -179,16 +179,9 @@ export default function NewsDetail() {
     return (
       <Section variant="default" padding="lg">
         <Container size="default">
-          <div style={{ textAlign: "center", padding: "var(--spacing-8)" }}>
+          <div className="news-detail-loading">
             <Spinner size="lg" />
-            <p
-              style={{
-                marginTop: "var(--spacing-4)",
-                color: "var(--color-muted)",
-              }}
-            >
-              Cargando noticia...
-            </p>
+            <p className="news-detail-loading-text">Cargando noticia...</p>
           </div>
         </Container>
       </Section>
@@ -200,8 +193,8 @@ export default function NewsDetail() {
       <Section variant="default" padding="lg">
         <Container size="default">
           <Card>
-            <h2 style={{ color: "var(--color-error)" }}>Error</h2>
-            <p style={{ marginBottom: "var(--spacing-4)" }}>{error}</p>
+            <h2 className="news-detail-error-title">Error</h2>
+            <p className="news-detail-error-text">{error}</p>
             <Button
               variant="outline"
               onClick={() => globalThis.location.reload()}
@@ -220,7 +213,7 @@ export default function NewsDetail() {
         <Container size="default">
           <Card>
             <h2>Noticia no encontrada</h2>
-            <p style={{ marginBottom: "var(--spacing-4)" }}>
+            <p className="news-detail-error-text">
               La noticia que buscas no existe o ha sido eliminada.
             </p>
             <Link to="/noticias">
@@ -235,57 +228,37 @@ export default function NewsDetail() {
   return (
     <Section variant="default" padding="lg">
       <Container size="lg">
-        <article style={{ maxWidth: "900px", margin: "0 auto" }}>
+        <article className="news-detail-article">
           {/* Header */}
-          <header style={{ marginBottom: "var(--spacing-6)" }}>
-            <div
-              className="flex justify-between align-start gap-4 mb-5"
-              style={{ flexWrap: "wrap" }}
-            >
-              <div style={{ flex: "1 1 auto" }}>
+          <header className="news-detail-header">
+            <div className="flex justify-between align-start gap-4 mb-5 flex-wrap">
+              <div className="news-detail-title-wrap">
                 {/* Category Badge */}
                 {news.category && (
                   <Badge
                     variant={getCategoryBadgeVariant(news.category)}
-                    style={{ marginBottom: "var(--spacing-3)" }}
+                    className="mb-3"
                   >
                     {getCategoryLabel(news.category)}
                   </Badge>
                 )}
 
                 {/* Title */}
-                <h1
-                  style={{
-                    fontSize: "2.5rem",
-                    lineHeight: "1.2",
-                    marginBottom: "var(--spacing-3)",
-                    color: "var(--color-text)",
-                  }}
-                >
-                  {news.title}
-                </h1>
+                <h1 className="news-detail-title">{news.title}</h1>
 
                 {/* Meta information */}
-                <div
-                  className="flex align-center gap-3"
-                  style={{ flexWrap: "wrap" }}
-                >
+                <div className="flex align-center gap-3 flex-wrap">
                   <Badge variant={getStatusBadgeVariant(news.status)}>
                     {getStatusLabel(news.status)}
                   </Badge>
                   <time
                     dateTime={news.created_at}
-                    style={{ color: "var(--color-muted)", fontSize: "0.95rem" }}
+                    className="news-detail-meta-text"
                   >
                     {formatDate(news.created_at)}
                   </time>
                   {news.author_name && (
-                    <span
-                      style={{
-                        color: "var(--color-muted)",
-                        fontSize: "0.95rem",
-                      }}
-                    >
+                    <span className="news-detail-meta-text">
                       Por {news.author_name}
                     </span>
                   )}
@@ -294,10 +267,7 @@ export default function NewsDetail() {
 
               {/* Admin actions */}
               {user?.role === "admin" && (
-                <div
-                  className="flex gap-2"
-                  style={{ flexShrink: 0, alignSelf: "flex-start" }}
-                >
+                <div className="flex gap-2 news-detail-admin-actions">
                   {news.status === "pending" && (
                     <>
                       <Button variant="primary" size="sm" onClick={approveNews}>
@@ -324,82 +294,37 @@ export default function NewsDetail() {
 
           {/* Featured image */}
           {news.image_url && (
-            <div
-              style={{
-                marginBottom: "var(--spacing-7)",
-                borderRadius: "var(--radius-lg)",
-                overflow: "hidden",
-                boxShadow: "var(--shadow-md)",
-              }}
-            >
+            <div className="news-detail-image-wrap">
               <img
                 src={getImageUrl(news.image_url)}
                 alt={news.title}
-                style={{
-                  width: "100%",
-                  maxHeight: "500px",
-                  objectFit: "cover",
-                  display: "block",
-                }}
+                className="news-detail-image"
               />
             </div>
           )}
 
           {/* Excerpt */}
           {news.excerpt && (
-            <div
-              style={{
-                marginBottom: "var(--spacing-7)",
-                padding: "var(--spacing-5)",
-                background: "var(--color-bg-alt)",
-                borderLeft: "4px solid var(--color-primary)",
-                borderRadius: "var(--radius-base)",
-              }}
-            >
-              <p
-                style={{
-                  fontSize: "1.25rem",
-                  lineHeight: "1.7",
-                  margin: 0,
-                  color: "var(--color-text)",
-                  fontWeight: "500",
-                }}
-              >
-                {news.excerpt}
-              </p>
+            <div className="news-detail-excerpt-wrap">
+              <p className="news-detail-excerpt">{news.excerpt}</p>
             </div>
           )}
 
           {/* Content */}
-          <div
-            className="news-content-body"
-            style={{
-              fontSize: "1.1rem",
-              lineHeight: "1.8",
-              color: "var(--color-text)",
-              marginBottom: "var(--spacing-7)",
-            }}
-          >
+          <div className="news-content-body news-detail-content">
             {news.content ? (
               <div
                 dangerouslySetInnerHTML={{ __html: sanitizeHtml(news.content) }}
               />
             ) : (
-              <p style={{ color: "var(--color-muted)" }}>
+              <p className="text-muted">
                 Contenido de la noticia no disponible.
               </p>
             )}
           </div>
 
           {/* Navigation */}
-          <div
-            className="flex justify-between gap-4 mb-7"
-            style={{
-              paddingTop: "var(--spacing-6)",
-              borderTop: "1px solid var(--color-border)",
-              flexWrap: "wrap",
-            }}
-          >
+          <div className="flex justify-between gap-4 mb-7 news-detail-nav flex-wrap">
             <div>
               {prevNext.prev && (
                 <Link to={`/noticias/${prevNext.prev.id}`}>
@@ -428,21 +353,9 @@ export default function NewsDetail() {
 
           {/* Related news */}
           {more.length > 0 && (
-            <div
-              style={{
-                paddingTop: "var(--spacing-6)",
-                borderTop: "1px solid var(--color-border)",
-              }}
-            >
-              <h2
-                style={{
-                  marginBottom: "var(--spacing-5)",
-                  fontSize: "1.75rem",
-                }}
-              >
-                Más noticias
-              </h2>
-              <NewsCarousel limit={9} category={news?.category} />
+            <div className="news-detail-more">
+              <h2 className="news-detail-more-title">Más noticias</h2>
+              <NewsCarousel limit={9} excludeId={news?.id} />
             </div>
           )}
         </article>

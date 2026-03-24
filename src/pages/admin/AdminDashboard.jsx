@@ -70,7 +70,7 @@ export default function AdminDashboard() {
           total: applications.length,
           pending: applications.filter(a => a.status === "pending").length,
           payment_pending: applications.filter(
-            a => a.status === "payment_pending"
+            a => a.status === "payment_pending",
           ).length,
           paid: applications.filter(a => a.status === "paid").length,
           rejected: applications.filter(a => a.status === "rejected").length,
@@ -159,7 +159,6 @@ EventFormatBadge.propTypes = {
 };
 
 function EventsTab() {
-  const toast = useToast();
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -177,7 +176,7 @@ function EventsTab() {
         "/admin/events",
       {
         headers: { Authorization: `Bearer ${token}` },
-      }
+      },
     );
     const data = await res.json();
     // Sort by start_date descending (upcoming first)
@@ -209,33 +208,6 @@ function EventsTab() {
   const handleModalClose = () => {
     setShowCreateModal(false);
     setEditingEvent(null);
-  };
-
-  const handleDelete = async eventId => {
-    if (!confirm("¿Estás seguro de que deseas eliminar este evento?")) return;
-
-    try {
-      const token = localStorage.getItem("access_token");
-      const res = await fetch(
-        `${
-          import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api"
-        }/admin/events/${eventId}`,
-        {
-          method: "DELETE",
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
-      if (res.ok) {
-        toast.success("Evento eliminado correctamente");
-        load();
-      } else {
-        toast.error("Error al eliminar el evento");
-      }
-    } catch (err) {
-      toast.error("Error al eliminar el evento");
-      console.error(err);
-    }
   };
 
   const isUpcoming = dateString => {
@@ -310,16 +282,16 @@ function EventsTab() {
           <Button
             variant="outline"
             size="sm"
+            onClick={() => window.open(`/eventos/${row.id}`, "_blank")}
+          >
+            Ver
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
             onClick={() => handleEditClick(row)}
           >
             Editar
-          </Button>
-          <Button
-            variant="danger"
-            size="sm"
-            onClick={() => handleDelete(row.id)}
-          >
-            Eliminar
           </Button>
         </div>
       ),
@@ -424,7 +396,7 @@ function EventForm({ event, onSuccess, onCancel }) {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },
           body: fd,
-        }
+        },
       );
 
       if (res.ok) {
@@ -457,7 +429,7 @@ function EventForm({ event, onSuccess, onCancel }) {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },
           body: fd,
-        }
+        },
       );
 
       if (res.ok) {
@@ -517,7 +489,7 @@ function EventForm({ event, onSuccess, onCancel }) {
         toast.success(
           event
             ? "Evento actualizado correctamente"
-            : "Evento creado correctamente"
+            : "Evento creado correctamente",
         );
 
         if (!event && data.id) {
@@ -541,6 +513,12 @@ function EventForm({ event, onSuccess, onCancel }) {
     } finally {
       setLoading(false);
     }
+  };
+
+  const getImageButtonLabel = () => {
+    if (uploadingImage) return "Subiendo...";
+    if (pendingImageFile) return "Cambiar imagen";
+    return "Subir imagen";
   };
 
   return (
@@ -645,9 +623,7 @@ function EventForm({ event, onSuccess, onCancel }) {
         />
       </div>
 
-      <h3 className="mb-3" style={{ fontSize: "1.1rem" }}>
-        Precios
-      </h3>
+      <h3 className="mb-3">Precios</h3>
       <div className="grid grid-2 gap-4 mb-4">
         <Input
           label="Valor Socio"
@@ -683,7 +659,7 @@ function EventForm({ event, onSuccess, onCancel }) {
       </div>
 
       <div className="mb-4">
-        <h3 className="mb-3" style={{ fontSize: "1.1rem" }}>
+        <h3 className="mb-3">
           Imagen del evento{" "}
           {!event && (
             <span className="text-muted text-sm font-normal">(Opcional)</span>
@@ -691,16 +667,7 @@ function EventForm({ event, onSuccess, onCancel }) {
         </h3>
         {imageUrl && (
           <div className="mb-3">
-            <img
-              src={getImageUrl(imageUrl)}
-              alt="Preview"
-              style={{
-                maxWidth: "100%",
-                maxHeight: "300px",
-                borderRadius: "var(--radius-base)",
-                border: "1px solid var(--color-border)",
-              }}
-            />
+            <img src={getImageUrl(imageUrl)} alt="Preview" />
           </div>
         )}
         <Button
@@ -710,21 +677,11 @@ function EventForm({ event, onSuccess, onCancel }) {
           disabled={uploadingImage}
           asChild
         >
-          <label
-            style={{
-              cursor: uploadingImage ? "not-allowed" : "pointer",
-              margin: 0,
-            }}
-          >
-            {uploadingImage
-              ? "Subiendo..."
-              : pendingImageFile
-              ? "Cambiar imagen"
-              : "Subir imagen"}
+          <label>
+            {getImageButtonLabel()}
             <input
               type="file"
               accept="image/*"
-              style={{ display: "none" }}
               disabled={uploadingImage}
               onChange={e => {
                 const file = e.target.files?.[0];
@@ -814,27 +771,19 @@ function OverviewTab({ stats }) {
         <div className="flex-column-gap-8">
           <div className="status-row">
             <span>Pendientes</span>
-            <span style={{ fontWeight: "bold", color: "var(--color-accent)" }}>
-              {stats.applications?.pending || 0}
-            </span>
+            <span>{stats.applications?.pending || 0}</span>
           </div>
           <div className="status-row">
             <span>Esperando Pago</span>
-            <span style={{ fontWeight: "bold", color: "var(--color-warning)" }}>
-              {stats.applications?.payment_pending || 0}
-            </span>
+            <span>{stats.applications?.payment_pending || 0}</span>
           </div>
           <div className="status-row">
             <span>Pagadas</span>
-            <span style={{ fontWeight: "bold", color: "var(--color-success)" }}>
-              {stats.applications?.paid || 0}
-            </span>
+            <span>{stats.applications?.paid || 0}</span>
           </div>
           <div className="status-row-last">
             <span>Rechazadas</span>
-            <span style={{ fontWeight: "bold", color: "var(--color-error)" }}>
-              {stats.applications?.rejected || 0}
-            </span>
+            <span>{stats.applications?.rejected || 0}</span>
           </div>
         </div>
       </div>
@@ -911,7 +860,7 @@ function UsersTab() {
 
   if (loading) {
     return (
-      <div className="flex-center" style={{ minHeight: "300px" }}>
+      <div className="flex-center">
         <Spinner size="lg" />
       </div>
     );
@@ -923,12 +872,8 @@ function UsersTab() {
       label: "Socio",
       render: row => (
         <div>
-          <div style={{ fontWeight: "600", marginBottom: "4px" }}>
-            {row.name}
-          </div>
-          <div style={{ fontSize: "0.875rem", color: "var(--color-muted)" }}>
-            {row.email}
-          </div>
+          <div>{row.name}</div>
+          <div>{row.email}</div>
         </div>
       ),
     },
@@ -944,11 +889,7 @@ function UsersTab() {
     {
       key: "membership_type",
       label: "Membresía",
-      render: row => (
-        <span style={{ fontSize: "0.875rem" }}>
-          {getMembershipTypeLabel(row.membership_type)}
-        </span>
-      ),
+      render: row => <span>{getMembershipTypeLabel(row.membership_type)}</span>,
     },
     {
       key: "payment_status",
@@ -996,8 +937,8 @@ function UsersTab() {
     <div>
       <div className="flex justify-between align-center mb-5">
         <div>
-          <h2 style={{ margin: 0, marginBottom: "4px" }}>Socios</h2>
-          <p style={{ margin: 0, color: "var(--color-muted)" }}>
+          <h2>Socios</h2>
+          <p>
             {users.length} {users.length === 1 ? "socio" : "socios"} en total
           </p>
         </div>
@@ -1060,7 +1001,7 @@ function ApplicationsTab() {
 
   if (loading) {
     return (
-      <div className="flex-center" style={{ minHeight: "300px" }}>
+      <div className="flex-center">
         <Spinner size="lg" />
       </div>
     );
@@ -1072,23 +1013,15 @@ function ApplicationsTab() {
       label: "Solicitante",
       render: row => (
         <div>
-          <div style={{ fontWeight: "600", marginBottom: "4px" }}>
-            {row.name}
-          </div>
-          <div style={{ fontSize: "0.875rem", color: "var(--color-muted)" }}>
-            {row.email}
-          </div>
+          <div>{row.name}</div>
+          <div>{row.email}</div>
         </div>
       ),
     },
     {
       key: "specialization",
       label: "Especialización",
-      render: row => (
-        <span style={{ fontSize: "0.875rem" }}>
-          {row.specialization || "No especificada"}
-        </span>
-      ),
+      render: row => <span>{row.specialization || "No especificada"}</span>,
     },
     {
       key: "status",
@@ -1103,9 +1036,7 @@ function ApplicationsTab() {
       key: "created_at",
       label: "Fecha",
       render: row => (
-        <span style={{ fontSize: "0.875rem", color: "var(--color-muted)" }}>
-          {formatDateHelper(row.created_at, "Sin fecha")}
-        </span>
+        <span>{formatDateHelper(row.created_at, "Sin fecha")}</span>
       ),
     },
     {
@@ -1127,8 +1058,8 @@ function ApplicationsTab() {
     <div>
       <div className="flex justify-between align-center mb-5">
         <div>
-          <h2 style={{ margin: 0, marginBottom: "4px" }}>Postulaciones</h2>
-          <p style={{ margin: 0, color: "var(--color-muted)" }}>
+          <h2>Postulaciones</h2>
+          <p>
             {applications.length}{" "}
             {applications.length === 1 ? "postulación" : "postulaciones"} en
             total
@@ -1206,7 +1137,7 @@ function NewsTab() {
 
   if (loading) {
     return (
-      <div className="flex-center" style={{ minHeight: "300px" }}>
+      <div className="flex-center">
         <Spinner size="lg" />
       </div>
     );
@@ -1227,12 +1158,8 @@ function NewsTab() {
 
         return (
           <div>
-            <div style={{ fontWeight: "600", marginBottom: "4px" }}>
-              {row.title}
-            </div>
-            <div style={{ fontSize: "0.875rem", color: "var(--color-muted)" }}>
-              {excerpt}
-            </div>
+            <div>{row.title}</div>
+            <div>{excerpt}</div>
           </div>
         );
       },
@@ -1256,17 +1183,13 @@ function NewsTab() {
     {
       key: "order_index",
       label: "Orden",
-      render: row => (
-        <span style={{ fontSize: "0.875rem" }}>{row.order_index}</span>
-      ),
+      render: row => <span>{row.order_index}</span>,
     },
     {
       key: "created_at",
       label: "Fecha",
       render: row => (
-        <span style={{ fontSize: "0.875rem", color: "var(--color-muted)" }}>
-          {formatDateHelper(row.created_at, "Sin fecha")}
-        </span>
+        <span>{formatDateHelper(row.created_at, "Sin fecha")}</span>
       ),
     },
     {
@@ -1297,8 +1220,8 @@ function NewsTab() {
     <div>
       <div className="flex justify-between align-center mb-5">
         <div>
-          <h2 style={{ margin: 0, marginBottom: "4px" }}>Noticias</h2>
-          <p style={{ margin: 0, color: "var(--color-muted)" }}>
+          <h2>Noticias</h2>
+          <p>
             {news.length} {news.length === 1 ? "noticia" : "noticias"} en total
           </p>
         </div>
@@ -1430,10 +1353,6 @@ function SimpleNewsForm({ onSuccess }) {
           type="file"
           accept="image/*"
           className="w-full p-2"
-          style={{
-            border: "1px solid var(--color-border)",
-            borderRadius: "var(--radius-base)",
-          }}
         />
       </div>
       <div className="flex justify-center gap-2">

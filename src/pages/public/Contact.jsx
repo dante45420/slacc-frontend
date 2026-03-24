@@ -13,33 +13,21 @@ export default function Contact() {
       </Section>
 
       <Section variant="default" padding="lg" containerSize="sm">
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            marginBottom: "var(--spacing-6)",
-          }}
-        >
+        <div className="contact-logo-wrap">
           <img
             src="/LOGO SLACC_ROJO_HORIZONTAL.png"
             alt="SLACC Logo"
-            style={{ maxWidth: "400px", height: "auto" }}
+            className="contact-logo"
           />
         </div>
 
-        <Card
-          className="contact-card"
-          style={{ textAlign: "center", padding: "var(--spacing-7)" }}
-        >
+        <Card className="contact-card contact-card-centered">
           <h2 className="contact-section-title">Información de Contacto</h2>
           <p className="contact-description">
             Correo oficial de la Secretaría SLACC
           </p>
 
-          <div
-            className="contact-email-box"
-            style={{ margin: "var(--spacing-5) 0" }}
-          >
+          <div className="contact-email-box contact-email-box-spaced">
             <p className="contact-email-label">Email</p>
             <a href="mailto:Slacc@cadera.cl" className="contact-email-link">
               Slacc@cadera.cl

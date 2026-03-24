@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Button from "./ui/Button.jsx";
 import PropTypes from "prop-types";
 
 export default function Carousel({ items = [], intervalMs = 9000 }) {
   const [index, setIndex] = useState(0);
+  const trackRef = useRef(null);
   const slides = useMemo(
     () =>
       items.length
@@ -33,39 +34,43 @@ export default function Carousel({ items = [], intervalMs = 9000 }) {
               ctaHref: "/solicitar-membresia",
             },
           ],
-    [items]
+    [items],
   );
 
   useEffect(() => {
     const id = setInterval(
       () => setIndex(i => (i + 1) % slides.length),
-      intervalMs
+      intervalMs,
     );
     return () => clearInterval(id);
   }, [slides.length, intervalMs]);
+
+  useEffect(() => {
+    if (trackRef.current) {
+      trackRef.current.style.transform = `translateX(-${index * 100}%)`;
+    }
+  }, [index]);
 
   const go = i => setIndex((i + slides.length) % slides.length);
 
   return (
     <div className="carousel">
-      <div
-        className="carousel-track"
-        style={{ transform: `translateX(-${index * 100}%)` }}
-      >
+      <div className="carousel-track" ref={trackRef}>
         {slides.map(s => (
           <div
             key={s.title}
-            className="carousel-slide"
-            style={{
-              backgroundImage: `url(${s.imageUrl})`,
-              cursor: "pointer",
-            }}
+            className="carousel-slide carousel-slide-interactive"
             onClick={() => {
               if (s.ctaHref) {
                 globalThis.location.href = s.ctaHref;
               }
             }}
           >
+            <img
+              src={s.imageUrl}
+              alt={s.title}
+              className="carousel-slide-image"
+            />
             <div className="carousel-overlay" />
             <div className="carousel-content">
               <h2 className="carousel-title">{s.title}</h2>
@@ -120,7 +125,7 @@ Carousel.propTypes = {
       description: PropTypes.string,
       ctaText: PropTypes.string,
       ctaHref: PropTypes.string,
-    })
+    }),
   ),
   intervalMs: PropTypes.number,
 };

@@ -29,7 +29,7 @@ export default function Login() {
     } catch (err) {
       console.error("Login error:", err);
       setError(
-        "Credenciales inválidas. Por favor verifica tu email y contraseña."
+        "Credenciales inválidas. Por favor verifica tu email y contraseña.",
       );
     } finally {
       setLoading(false);
@@ -38,22 +38,12 @@ export default function Login() {
 
   return (
     <Section variant="primary" padding="lg" containerSize="sm">
-      <div style={{ textAlign: "center", marginBottom: "var(--spacing-6)" }}>
-        <h1 style={{ marginBottom: "var(--spacing-2)" }}>Iniciar Sesión</h1>
-        <p style={{ color: "var(--color-muted)", fontSize: "16px" }}>
-          Accede a tu cuenta de socio SLACC
-        </p>
+      <div className="login-header">
+        <h1 className="login-title">Iniciar Sesión</h1>
+        <p className="login-subtitle">Accede a tu cuenta de socio SLACC</p>
       </div>
 
-      <div
-        style={{
-          background: "var(--color-bg)",
-          padding: "var(--spacing-6)",
-          borderRadius: "var(--radius-lg)",
-          boxShadow: "var(--shadow-md)",
-          border: "1px solid var(--color-border)",
-        }}
-      >
+      <div className="login-form-shell">
         <form onSubmit={submit}>
           <Input
             label="Email"
@@ -74,7 +64,7 @@ export default function Login() {
           />
 
           {error && (
-            <Alert variant="error" style={{ marginBottom: "var(--spacing-4)" }}>
+            <Alert variant="error" className="mb-4">
               {error}
             </Alert>
           )}

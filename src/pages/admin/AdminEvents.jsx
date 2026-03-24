@@ -192,7 +192,7 @@ export default function AdminEvents() {
     return (
       <Section variant="default" padding="lg">
         <Container>
-          <div className="flex-center" style={{ minHeight: "400px" }}>
+          <div className="flex-center min-h-400px">
             <Spinner size="lg" />
           </div>
         </Container>
@@ -386,19 +386,9 @@ function EventCard({
       <div className="flex-between align-center">
         <button
           type="button"
-          className="flex-1"
+          className="flex-1 event-card-toggle"
           onClick={() => setExpanded(!expanded)}
           aria-expanded={expanded}
-          style={{
-            background: "none",
-            border: "none",
-            padding: 0,
-            textAlign: "left",
-            cursor: "pointer",
-            font: "inherit",
-            color: "inherit",
-            width: "100%",
-          }}
         >
           <div className="flex align-center gap-3 mb-2">
             <h3 className="mb-0">{localEvent.title || "Sin título"}</h3>
@@ -447,25 +437,14 @@ function EventCard({
       {/* Expanded view */}
       {expanded && (
         <>
-          <hr
-            style={{
-              margin: "var(--spacing-4) 0",
-              border: "none",
-              borderTop: "1px solid var(--color-border)",
-            }}
-          />
+          <hr className="event-card-divider" />
 
           {localEvent.image_url && (
             <div className="mb-5">
               <img
                 src={getImageUrl(localEvent.image_url)}
                 alt={localEvent.title}
-                style={{
-                  width: "100%",
-                  height: "200px",
-                  objectFit: "cover",
-                  borderRadius: "var(--radius-base)",
-                }}
+                className="event-card-image"
               />
             </div>
           )}
@@ -584,12 +563,12 @@ function EventCard({
               Eliminar
             </Button>
             <Button variant="outline" size="sm" asChild>
-              <label style={{ cursor: "pointer", margin: 0 }}>
+              <label className="event-upload-label">
                 Subir imagen{" "}
                 <input
                   type="file"
                   accept="image/*"
-                  style={{ display: "none" }}
+                  className="event-upload-input"
                   onChange={e => {
                     const file = e.target.files?.[0];
                     if (file) onUploadImage(event.id, file);
@@ -622,7 +601,7 @@ function EnrollmentsModal({ modal, onClose }) {
   const event = data.event || {};
   const enrollments = Array.isArray(data.enrollments) ? data.enrollments : [];
   const validEnrollments = enrollments.filter(
-    e => e.payment_status !== "cancelled"
+    e => e.payment_status !== "cancelled",
   );
   const capacity = event.max_students || null;
   const seatsLeft = capacity

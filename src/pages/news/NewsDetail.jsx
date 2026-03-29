@@ -229,6 +229,18 @@ export default function NewsDetail() {
     <Section variant="default" padding="lg">
       <Container size="lg">
         <article className="news-detail-article">
+          {/* Back to Admin button for admins */}
+          {user?.role === "admin" && (
+            <div className="mb-4">
+              <Button
+                variant="outline"
+                onClick={() => navigate("/admin?tab=news")}
+              >
+                <i className="fa-solid fa-arrow-left"></i> Volver al Panel Admin
+              </Button>
+            </div>
+          )}
+
           {/* Header */}
           <header className="news-detail-header">
             <div className="flex justify-between align-start gap-4 mb-5 flex-wrap">

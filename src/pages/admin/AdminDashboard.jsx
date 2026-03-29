@@ -159,6 +159,7 @@ EventFormatBadge.propTypes = {
 };
 
 function EventsTab() {
+  const navigate = useNavigate();
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -282,7 +283,7 @@ function EventsTab() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => window.open(`/eventos/${row.id}`, "_blank")}
+            onClick={() => navigate(`/eventos/${row.id}`)}
           >
             Ver
           </Button>
@@ -819,6 +820,8 @@ function UsersTab() {
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [editingUser, setEditingUser] = useState(null);
 
   useEffect(() => {
     loadUsers();
@@ -834,6 +837,27 @@ function UsersTab() {
       setLoading(false);
     }
   }
+
+  const handleCreateSuccess = () => {
+    setShowCreateModal(false);
+    loadUsers();
+  };
+
+  const handleEditClick = user => {
+    setEditingUser(user);
+    setShowCreateModal(true);
+  };
+
+  const handleEditSuccess = () => {
+    setShowCreateModal(false);
+    setEditingUser(null);
+    loadUsers();
+  };
+
+  const handleModalClose = () => {
+    setShowCreateModal(false);
+    setEditingUser(null);
+  };
 
   const getMembershipTypeLabel = type => {
     if (!type) return "N/A";
@@ -924,7 +948,7 @@ function UsersTab() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => navigate(`/admin/users/${row.id}/edit`)}
+            onClick={() => handleEditClick(row)}
           >
             Editar
           </Button>
@@ -942,7 +966,7 @@ function UsersTab() {
             {users.length} {users.length === 1 ? "socio" : "socios"} en total
           </p>
         </div>
-        <Button variant="primary" onClick={() => navigate("/admin/users/new")}>
+        <Button variant="primary" onClick={() => setShowCreateModal(true)}>
           + Crear Socio
         </Button>
       </div>
@@ -952,9 +976,212 @@ function UsersTab() {
       ) : (
         <Table columns={columns} data={users} hoverable />
       )}
+
+      <Modal
+        isOpen={showCreateModal}
+        onClose={handleModalClose}
+        title={editingUser ? "Editar Socio" : "Crear Nuevo Socio"}
+        size="lg"
+      >
+        <UserForm
+          user={editingUser}
+          onSuccess={editingUser ? handleEditSuccess : handleCreateSuccess}
+          onCancel={handleModalClose}
+        />
+      </Modal>
     </div>
   );
 }
+
+function UserForm({ user, onSuccess, onCancel }) {
+  const toast = useToast();
+  const [loading, setLoading] = useState(false);
+  const [form, setForm] = useState({
+    email: user?.email || "",
+    name: user?.name || "",
+    password: "",
+    membership_type: user?.membership_type || "normal",
+    payment_status: user?.payment_status || "due",
+    is_active: user?.is_active === undefined ? true : user.is_active,
+  });
+
+  const BASE_URL =
+    import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const token = localStorage.getItem("access_token");
+
+      if (user) {
+        // Edit existing user
+        const res = await fetch(`${BASE_URL}/admin/users/${user.id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            name: form.name,
+            is_active: form.is_active,
+            membership_type: form.membership_type,
+            payment_status: form.payment_status,
+          }),
+        });
+
+        if (!res.ok) throw new Error("No se pudo actualizar");
+        toast.success("Socio actualizado correctamente");
+      } else {
+        // Create new user
+        const res = await fetch(`${BASE_URL}/admin/users/member`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            email: form.email,
+            name: form.name,
+            password: form.password || undefined,
+            membership_type: form.membership_type,
+            payment_status: form.payment_status,
+          }),
+        });
+
+        if (!res.ok) throw new Error("No se pudo crear");
+        const data = await res.json();
+        toast.success(
+          `Socio creado correctamente. Contraseña inicial: ${data.initial_password}`,
+        );
+      }
+
+      onSuccess();
+    } catch (err) {
+      toast.error(
+        user ? "Error al actualizar el socio" : "Error al crear el socio",
+      );
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      {!user && (
+        <div className="mb-4">
+          <Input
+            label="Email *"
+            id="user-form-email"
+            type="email"
+            placeholder="correo@ejemplo.com"
+            value={form.email}
+            onChange={e => setForm({ ...form, email: e.target.value })}
+            required
+          />
+        </div>
+      )}
+
+      <div className="mb-4">
+        <Input
+          label="Nombre completo *"
+          id="user-form-name"
+          type="text"
+          placeholder="Nombre del socio"
+          value={form.name}
+          onChange={e => setForm({ ...form, name: e.target.value })}
+          required
+        />
+      </div>
+
+      {!user && (
+        <div className="mb-4">
+          <Input
+            label="Contraseña (opcional)"
+            id="user-form-password"
+            type="password"
+            placeholder="Dejar vacío para generar automáticamente"
+            value={form.password}
+            onChange={e => setForm({ ...form, password: e.target.value })}
+          />
+          <p className="text-muted text-sm mt-2">
+            Si no especificas una contraseña, se generará una automáticamente
+          </p>
+        </div>
+      )}
+
+      <div className="grid grid-2 gap-4 mb-4">
+        <Select
+          label="Tipo de membresía *"
+          id="user-form-membership-type"
+          value={form.membership_type}
+          onChange={e => setForm({ ...form, membership_type: e.target.value })}
+          required
+        >
+          <option value="joven">Nex Gen</option>
+          <option value="normal">Normal</option>
+          <option value="gratuito">Socio Emérito</option>
+        </Select>
+
+        <Select
+          label="Estado de pago *"
+          id="user-form-payment-status"
+          value={form.payment_status}
+          onChange={e => setForm({ ...form, payment_status: e.target.value })}
+          required
+        >
+          <option value="paid">Pagado</option>
+          <option value="due">Pendiente</option>
+        </Select>
+      </div>
+
+      {user && (
+        <div className="mb-4">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={form.is_active}
+              onChange={e => setForm({ ...form, is_active: e.target.checked })}
+              className="w-auto cursor-pointer"
+            />
+            <span className="font-medium">Socio activo</span>
+          </label>
+          <p className="text-muted text-sm mt-1 mb-0">
+            Los socios inactivos no pueden acceder al sistema
+          </p>
+        </div>
+      )}
+
+      <div className="flex justify-end gap-3 mt-5 pt-4 border-t">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onCancel}
+          disabled={loading}
+        >
+          Cancelar
+        </Button>
+        <Button type="submit" variant="primary" disabled={loading}>
+          {loading
+            ? user
+              ? "Actualizando..."
+              : "Creando..."
+            : user
+              ? "Actualizar Socio"
+              : "Crear Socio"}
+        </Button>
+      </div>
+    </form>
+  );
+}
+
+UserForm.propTypes = {
+  user: PropTypes.object,
+  onSuccess: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
+};
 
 function ApplicationsTab() {
   const navigate = useNavigate();
@@ -1082,6 +1309,7 @@ function NewsTab() {
   const [news, setNews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [editingNews, setEditingNews] = useState(null);
 
   useEffect(() => {
     loadNews();
@@ -1133,6 +1361,22 @@ function NewsTab() {
   const handleCreateSuccess = () => {
     setShowCreateModal(false);
     loadNews();
+  };
+
+  const handleEditClick = newsItem => {
+    setEditingNews(newsItem);
+    setShowCreateModal(true);
+  };
+
+  const handleEditSuccess = () => {
+    setShowCreateModal(false);
+    setEditingNews(null);
+    loadNews();
+  };
+
+  const handleModalClose = () => {
+    setShowCreateModal(false);
+    setEditingNews(null);
   };
 
   if (loading) {
@@ -1207,7 +1451,7 @@ function NewsTab() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => navigate(`/admin/news/${row.id}/edit`)}
+            onClick={() => handleEditClick(row)}
           >
             Editar
           </Button>
@@ -1241,22 +1485,30 @@ function NewsTab() {
 
       <Modal
         isOpen={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
-        title="Crear nueva noticia"
+        onClose={handleModalClose}
+        title={editingNews ? "Editar Noticia" : "Crear nueva noticia"}
         size="lg"
       >
-        <SimpleNewsForm onSuccess={handleCreateSuccess} />
+        <NewsForm
+          news={editingNews}
+          onSuccess={editingNews ? handleEditSuccess : handleCreateSuccess}
+          onCancel={handleModalClose}
+        />
       </Modal>
     </div>
   );
 }
 
-function SimpleNewsForm({ onSuccess }) {
+function NewsForm({ news, onSuccess, onCancel }) {
   const toast = useToast();
-  const [title, setTitle] = useState("");
-  const [excerpt, setExcerpt] = useState("");
-  const [content, setContent] = useState("");
-  const [category, setCategory] = useState("articulos-cientificos");
+  const [title, setTitle] = useState(news?.title || "");
+  const [excerpt, setExcerpt] = useState(news?.excerpt || "");
+  const [content, setContent] = useState(news?.content || "");
+  const [category, setCategory] = useState(
+    news?.category || "articulos-cientificos",
+  );
+  const [status, setStatus] = useState(news?.status || "pending");
+  const [orderIndex, setOrderIndex] = useState(news?.order_index || 0);
   const [loading, setLoading] = useState(false);
   const BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
 
@@ -1265,41 +1517,73 @@ function SimpleNewsForm({ onSuccess }) {
     setLoading(true);
 
     try {
-      const form = new FormData();
-      if (title) form.append("title", title);
-      if (excerpt) form.append("excerpt", excerpt);
-      if (content) form.append("content", content);
-      if (category) form.append("category", category);
-      const file = e.currentTarget.image?.files?.[0];
-      if (file) form.append("image", file);
-
       const token = localStorage.getItem("access_token");
-      const res = await fetch(`${BASE}/news`, {
-        method: "POST",
-        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-        body: form,
-      });
 
-      if (!res.ok) {
-        toast.error("Error al crear la noticia");
-        return;
-      }
+      if (news) {
+        // Update existing news
+        const res = await fetch(`${BASE}/admin/news/${news.id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            title,
+            excerpt,
+            content,
+            category,
+            status,
+            order_index: orderIndex,
+          }),
+        });
 
-      toast.success("Noticia creada correctamente");
-      setTitle("");
-      setExcerpt("");
-      setContent("");
-      setCategory("articulos-cientificos");
+        if (!res.ok) {
+          toast.error("Error al actualizar la noticia");
+          return;
+        }
 
-      // Reset file input if form exists
-      if (e.currentTarget) {
-        const fileInput = e.currentTarget.querySelector('input[type="file"]');
-        if (fileInput) fileInput.value = "";
+        // Handle image upload if a new file is selected
+        const file = e.currentTarget.image?.files?.[0];
+        if (file) {
+          const form = new FormData();
+          form.append("image", file);
+          await fetch(`${BASE}/admin/news/${news.id}/image`, {
+            method: "POST",
+            headers: { Authorization: `Bearer ${token}` },
+            body: form,
+          });
+        }
+
+        toast.success("Noticia actualizada correctamente");
+      } else {
+        // Create new news
+        const form = new FormData();
+        if (title) form.append("title", title);
+        if (excerpt) form.append("excerpt", excerpt);
+        if (content) form.append("content", content);
+        if (category) form.append("category", category);
+        const file = e.currentTarget.image?.files?.[0];
+        if (file) form.append("image", file);
+
+        const res = await fetch(`${BASE}/news`, {
+          method: "POST",
+          headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+          body: form,
+        });
+
+        if (!res.ok) {
+          toast.error("Error al crear la noticia");
+          return;
+        }
+
+        toast.success("Noticia creada correctamente");
       }
 
       if (onSuccess) onSuccess();
     } catch (err) {
-      toast.error("Error al crear la noticia");
+      toast.error(
+        news ? "Error al actualizar la noticia" : "Error al crear la noticia",
+      );
       console.error(err);
     } finally {
       setLoading(false);
@@ -1310,7 +1594,7 @@ function SimpleNewsForm({ onSuccess }) {
     <form onSubmit={submit}>
       <div className="grid grid-2 gap-4 mb-4">
         <Input
-          label="Título"
+          label="Título *"
           placeholder="Título de la noticia"
           value={title}
           onChange={e => setTitle(e.target.value)}
@@ -1326,6 +1610,27 @@ function SimpleNewsForm({ onSuccess }) {
           <option value="editoriales">Editoriales</option>
         </Select>
       </div>
+
+      {news && (
+        <div className="grid grid-2 gap-4 mb-4">
+          <Select
+            label="Estado"
+            value={status}
+            onChange={e => setStatus(e.target.value)}
+          >
+            <option value="pending">Pendiente</option>
+            <option value="published">Publicada</option>
+            <option value="rejected">Rechazada</option>
+          </Select>
+          <Input
+            label="Orden"
+            type="number"
+            value={orderIndex}
+            onChange={e => setOrderIndex(parseInt(e.target.value) || 0)}
+          />
+        </div>
+      )}
+
       <div className="mb-4">
         <Input
           label="Resumen"
@@ -1344,26 +1649,42 @@ function SimpleNewsForm({ onSuccess }) {
         />
       </div>
       <div className="mb-4">
-        <label htmlFor="news-image-quick" className="block mb-2 font-medium">
-          Imagen (opcional)
+        <label htmlFor="news-image-form" className="block mb-2 font-medium">
+          Imagen {news ? "(dejar vacío para mantener actual)" : "(opcional)"}
         </label>
         <input
-          id="news-image-quick"
+          id="news-image-form"
           name="image"
           type="file"
           accept="image/*"
           className="w-full p-2"
         />
       </div>
-      <div className="flex justify-center gap-2">
+      <div className="flex justify-end gap-3 mt-5 pt-4 border-t">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onCancel}
+          disabled={loading}
+        >
+          Cancelar
+        </Button>
         <Button type="submit" variant="primary" disabled={loading}>
-          {loading ? "Creando..." : "Crear noticia"}
+          {loading
+            ? news
+              ? "Actualizando..."
+              : "Creando..."
+            : news
+              ? "Actualizar Noticia"
+              : "Crear Noticia"}
         </Button>
       </div>
     </form>
   );
 }
 
-SimpleNewsForm.propTypes = {
+NewsForm.propTypes = {
+  news: PropTypes.object,
   onSuccess: PropTypes.func,
+  onCancel: PropTypes.func,
 };

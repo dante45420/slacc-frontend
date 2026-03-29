@@ -89,6 +89,11 @@ export default function EventDetail() {
 
   const formatType = event.format === "webinar" ? "Webinar" : "Presencial";
 
+  // Check if registration deadline has passed
+  const isRegistrationClosed = event.registration_deadline
+    ? new Date(event.registration_deadline) < new Date()
+    : false;
+
   return (
     <Section variant="default" padding="lg">
       <Button variant="outline" onClick={() => navigate(-1)} className="mb-4">
@@ -151,6 +156,19 @@ export default function EventDetail() {
             <strong className="event-detail-meta-label">Formato</strong>
             <p className="event-detail-meta-value">{formatType}</p>
           </div>
+          {event.registration_deadline && (
+            <div>
+              <strong className="event-detail-meta-label">Límite de inscripción</strong>
+              <p className="event-detail-meta-value" style={isRegistrationClosed ? { color: 'var(--color-error)' } : {}}>
+                {new Date(event.registration_deadline).toLocaleDateString("es-ES", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+                {isRegistrationClosed && " (cerrado)"}
+              </p>
+            </div>
+          )}
         </div>
 
         {event.content && (
@@ -165,11 +183,12 @@ export default function EventDetail() {
             variant="primary"
             size="lg"
             onClick={handleEnroll}
-            disabled={enrolling || event.is_enrolled}
+            disabled={enrolling || event.is_enrolled || isRegistrationClosed}
           >
-            {event.is_enrolled && "Ya estás inscrito"}
-            {!event.is_enrolled && enrolling && "Procesando..."}
-            {!event.is_enrolled && !enrolling && "Inscribirse al evento"}
+            {isRegistrationClosed && "La inscripción ya cerró"}
+            {!isRegistrationClosed && event.is_enrolled && "Ya estás inscrito"}
+            {!isRegistrationClosed && !event.is_enrolled && enrolling && "Procesando..."}
+            {!isRegistrationClosed && !event.is_enrolled && !enrolling && "Inscribirse al evento"}
           </Button>
         </div>
       </Card>

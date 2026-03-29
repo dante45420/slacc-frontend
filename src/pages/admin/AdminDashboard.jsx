@@ -1164,17 +1164,18 @@ function UserForm({ user, onSuccess, onCancel }) {
           Cancelar
         </Button>
         <Button type="submit" variant="primary" disabled={loading}>
-          {loading
-            ? user
-              ? "Actualizando..."
-              : "Creando..."
-            : user
-              ? "Actualizar Socio"
-              : "Crear Socio"}
+          {getButtonText(loading, user, "Actualizando...", "Creando...", "Actualizar Socio", "Crear Socio")}
         </Button>
       </div>
     </form>
   );
+}
+
+function getButtonText(loading, entity, loadingEditText, loadingCreateText, editText, createText) {
+  if (loading) {
+    return entity ? loadingEditText : loadingCreateText;
+  }
+  return entity ? editText : createText;
 }
 
 UserForm.propTypes = {
@@ -1512,78 +1513,85 @@ function NewsForm({ news, onSuccess, onCancel }) {
   const [loading, setLoading] = useState(false);
   const BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
 
+  async function updateNews(token, imageFile) {
+    const res = await fetch(`${BASE}/admin/news/${news.id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        title,
+        excerpt,
+        content,
+        category,
+        status,
+        order_index: orderIndex,
+      }),
+    });
+
+    if (!res.ok) {
+      toast.error("Error al actualizar la noticia");
+      return false;
+    }
+
+    if (imageFile) {
+      const form = new FormData();
+      form.append("image", imageFile);
+      await fetch(`${BASE}/admin/news/${news.id}/image`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: form,
+      });
+    }
+
+    toast.success("Noticia actualizada correctamente");
+    return true;
+  }
+
+  async function createNews(token, imageFile) {
+    const form = new FormData();
+    if (title) form.append("title", title);
+    if (excerpt) form.append("excerpt", excerpt);
+    if (content) form.append("content", content);
+    if (category) form.append("category", category);
+    if (imageFile) form.append("image", imageFile);
+
+    const res = await fetch(`${BASE}/news`, {
+      method: "POST",
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      body: form,
+    });
+
+    if (!res.ok) {
+      toast.error("Error al crear la noticia");
+      return false;
+    }
+
+    toast.success("Noticia creada correctamente");
+    return true;
+  }
+
   async function submit(e) {
     e.preventDefault();
     setLoading(true);
 
     try {
       const token = localStorage.getItem("access_token");
+      const imageFile = e.currentTarget.image?.files?.[0];
 
-      if (news) {
-        // Update existing news
-        const res = await fetch(`${BASE}/admin/news/${news.id}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            title,
-            excerpt,
-            content,
-            category,
-            status,
-            order_index: orderIndex,
-          }),
-        });
+      const success = news
+        ? await updateNews(token, imageFile)
+        : await createNews(token, imageFile);
 
-        if (!res.ok) {
-          toast.error("Error al actualizar la noticia");
-          return;
-        }
-
-        // Handle image upload if a new file is selected
-        const file = e.currentTarget.image?.files?.[0];
-        if (file) {
-          const form = new FormData();
-          form.append("image", file);
-          await fetch(`${BASE}/admin/news/${news.id}/image`, {
-            method: "POST",
-            headers: { Authorization: `Bearer ${token}` },
-            body: form,
-          });
-        }
-
-        toast.success("Noticia actualizada correctamente");
-      } else {
-        // Create new news
-        const form = new FormData();
-        if (title) form.append("title", title);
-        if (excerpt) form.append("excerpt", excerpt);
-        if (content) form.append("content", content);
-        if (category) form.append("category", category);
-        const file = e.currentTarget.image?.files?.[0];
-        if (file) form.append("image", file);
-
-        const res = await fetch(`${BASE}/news`, {
-          method: "POST",
-          headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-          body: form,
-        });
-
-        if (!res.ok) {
-          toast.error("Error al crear la noticia");
-          return;
-        }
-
-        toast.success("Noticia creada correctamente");
+      if (success && onSuccess) {
+        onSuccess();
       }
-
-      if (onSuccess) onSuccess();
     } catch (err) {
-      toast.error(
-        news ? "Error al actualizar la noticia" : "Error al crear la noticia",
-      );
+      const errorMsg = news
+        ? "Error al actualizar la noticia"
+        : "Error al crear la noticia";
+      toast.error(errorMsg);
       console.error(err);
     } finally {
       setLoading(false);
@@ -1626,7 +1634,7 @@ function NewsForm({ news, onSuccess, onCancel }) {
             label="Orden"
             type="number"
             value={orderIndex}
-            onChange={e => setOrderIndex(parseInt(e.target.value) || 0)}
+            onChange={e => setOrderIndex(Number.parseInt(e.target.value, 10) || 0)}
           />
         </div>
       )}
@@ -1670,13 +1678,7 @@ function NewsForm({ news, onSuccess, onCancel }) {
           Cancelar
         </Button>
         <Button type="submit" variant="primary" disabled={loading}>
-          {loading
-            ? news
-              ? "Actualizando..."
-              : "Creando..."
-            : news
-              ? "Actualizar Noticia"
-              : "Crear Noticia"}
+          {getButtonText(loading, news, "Actualizando...", "Creando...", "Actualizar Noticia", "Crear Noticia")}
         </Button>
       </div>
     </form>

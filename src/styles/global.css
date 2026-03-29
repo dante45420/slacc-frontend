@@ -780,6 +780,7 @@ img {
 .badge {
   display: inline-flex;
   align-items: center;
+  gap: var(--spacing-2);
   padding: 4px 12px;
   border-radius: 12px;
   font-size: 0.85rem;
@@ -4074,7 +4075,14 @@ img {
   color: var(--color-muted);
 }
 
-.event-detail-card {
+/* Single column layout - details below main card */
+.event-detail-layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
+}
+
+.event-detail-main {
   padding: var(--spacing-6);
 }
 
@@ -4087,7 +4095,214 @@ img {
 }
 
 .event-detail-header {
+  margin-bottom: var(--spacing-5);
+}
+
+.event-detail-header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--spacing-4);
+  margin-bottom: var(--spacing-3);
+  flex-wrap: wrap;
+}
+
+.event-detail-badges {
+  display: flex;
+  gap: var(--spacing-2);
+  flex-wrap: wrap;
+}
+
+.event-detail-spots {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  background: var(--color-bg-alt);
+  padding: var(--spacing-2) var(--spacing-3);
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.event-detail-spots i {
+  color: var(--color-primary);
+}
+
+.event-detail-title {
+  margin: 0 0 var(--spacing-3);
+  font-size: 2rem;
+  line-height: 1.3;
+}
+
+.event-detail-description {
+  color: var(--color-muted);
+  font-size: 1.125rem;
+  line-height: 1.7;
+  margin: 0;
+}
+
+.event-detail-content-section,
+.event-detail-instructor-section {
+  margin-top: var(--spacing-6);
+  padding-top: var(--spacing-5);
+  border-top: 1px solid var(--color-border);
+}
+
+.event-detail-section-title {
+  font-size: 1.25rem;
+  margin: 0 0 var(--spacing-4);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.event-detail-section-title i {
+  color: var(--color-primary);
+}
+
+.event-detail-content {
+  line-height: 1.8;
+  color: var(--color-text-secondary);
+}
+
+.event-detail-content p {
   margin-bottom: var(--spacing-4);
+}
+
+.event-detail-instructor {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+}
+
+.event-detail-instructor-avatar {
+  width: 64px;
+  height: 64px;
+  background: var(--color-bg-alt);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: var(--color-muted);
+}
+
+.event-detail-instructor-info strong {
+  font-size: 1.125rem;
+}
+
+/* Sidebar - now below main card */
+.event-detail-sidebar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-4);
+}
+
+.event-detail-sidebar-card {
+  padding: var(--spacing-4);
+}
+
+.event-detail-sidebar-title {
+  font-size: 1rem;
+  margin: 0 0 var(--spacing-3);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  color: var(--color-text-secondary);
+}
+
+.event-detail-sidebar-title i {
+  color: var(--color-primary);
+}
+
+.event-detail-info-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.event-detail-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.event-detail-info-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-muted);
+}
+
+.event-detail-info-value {
+  font-weight: 500;
+}
+
+/* Pricing */
+.event-detail-pricing {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.event-detail-price-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.event-detail-price-label {
+  color: var(--color-text-secondary);
+}
+
+.event-detail-price-value {
+  font-weight: 600;
+  font-size: 1.125rem;
+}
+
+.event-detail-price-member {
+  color: var(--color-success);
+}
+
+/* Capacity */
+.event-detail-capacity {
+  text-align: center;
+  padding: var(--spacing-2) 0;
+}
+
+.event-detail-capacity-number {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.event-detail-capacity-label {
+  font-size: 0.875rem;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Enroll button */
+/* Enroll button container */
+.event-detail-enroll-container {
+  display: flex;
+  justify-content: center;
+  padding-top: var(--spacing-4);
+}
+
+.event-detail-enroll-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-2);
+}
+
+/* Legacy classes kept for compatibility */
+.event-detail-card {
+  padding: var(--spacing-6);
 }
 
 .event-detail-title-row {
@@ -4097,17 +4312,6 @@ img {
   margin-bottom: var(--spacing-3);
   flex-wrap: wrap;
   gap: var(--spacing-3);
-}
-
-.event-detail-title {
-  margin: 0;
-  flex: 1;
-}
-
-.event-detail-description {
-  color: var(--color-muted);
-  font-size: 18px;
-  line-height: 1.7;
 }
 
 .event-detail-meta-grid {
@@ -4126,11 +4330,6 @@ img {
 
 .event-detail-meta-value {
   margin: var(--spacing-1) 0 0;
-}
-
-.event-detail-content {
-  line-height: 1.8;
-  color: var(--color-text-secondary);
 }
 
 .event-detail-actions {
@@ -4733,3 +4932,96 @@ img {
     word-break: break-all;
   }
 }
+
+/* Credentials Card Styles */
+.credentials-card {
+  border: 2px solid var(--color-success);
+  background: linear-gradient(135deg, var(--color-bg) 0%, rgba(var(--color-success-rgb, 34, 197, 94), 0.05) 100%);
+}
+
+.credentials-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+  margin-bottom: var(--spacing-5);
+  padding-bottom: var(--spacing-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.credentials-icon {
+  width: 56px;
+  height: 56px;
+  background: var(--color-success);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: white;
+  flex-shrink: 0;
+}
+
+.credentials-title {
+  margin: 0 0 var(--spacing-1);
+  font-size: 1.25rem;
+}
+
+.credentials-subtitle {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.875rem;
+}
+
+.credentials-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.credential-item {
+  background: var(--color-bg-alt);
+  border-radius: var(--radius);
+  padding: var(--spacing-4);
+}
+
+.credential-label {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-muted);
+  margin-bottom: var(--spacing-2);
+}
+
+.credential-label i {
+  color: var(--color-primary);
+}
+
+.credential-value-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+}
+
+.credential-value {
+  flex: 1;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, monospace;
+  font-size: 1rem;
+  font-weight: 500;
+  background: var(--color-bg);
+  padding: var(--spacing-3) var(--spacing-4);
+  border-radius: var(--radius);
+  border: 1px solid var(--color-border);
+  word-break: break-all;
+}
+
+.credentials-actions {
+  margin-top: var(--spacing-5);
+  padding-top: var(--spacing-4);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  justify-content: flex-end;
+}
+

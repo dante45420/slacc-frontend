@@ -984,6 +984,7 @@ function UsersTab() {
         size="lg"
       >
         <UserForm
+          key={editingUser ? `edit-${editingUser.id}` : "create"}
           user={editingUser}
           onSuccess={editingUser ? handleEditSuccess : handleCreateSuccess}
           onCancel={handleModalClose}
@@ -1491,6 +1492,7 @@ function NewsTab() {
         size="lg"
       >
         <NewsForm
+          key={editingNews ? `edit-${editingNews.id}` : "create"}
           news={editingNews}
           onSuccess={editingNews ? handleEditSuccess : handleCreateSuccess}
           onCancel={handleModalClose}

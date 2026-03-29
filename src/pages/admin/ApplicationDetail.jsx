@@ -24,15 +24,10 @@ function InfoField({ label, value, link, fullWidth }) {
 
   return (
     <div>
-      <div >
-        {label}
-      </div>
+      <div>{label}</div>
       <div>
         {link && value ? (
-          <a
-            href={value}
-            target="_blank"
-            rel="noopener noreferrer" >
+          <a href={value} target="_blank" rel="noopener noreferrer">
             {displayValue}
           </a>
         ) : (
@@ -92,7 +87,7 @@ export default function ApplicationDetail() {
         note: resolutionNote,
       });
       setMsg(
-        "Postulación aprobada. El socio quedó en estado de pago pendiente."
+        "Postulación aprobada. El socio quedó en estado de pago pendiente.",
       );
       setTimeout(() => {
         loadApplication(); // Recargar para ver el nuevo estado
@@ -108,7 +103,7 @@ export default function ApplicationDetail() {
 
     try {
       const result = await apiPost(
-        `/admin/applications/${application.id}/confirm-payment`
+        `/admin/applications/${application.id}/confirm-payment`,
       );
 
       if (result.credentials) {
@@ -166,9 +161,7 @@ export default function ApplicationDetail() {
         <Container>
           <div>
             <Spinner size="lg" />
-            <p >
-              Cargando aplicación...
-            </p>
+            <p>Cargando aplicación...</p>
           </div>
         </Container>
       </Section>
@@ -179,12 +172,11 @@ export default function ApplicationDetail() {
     return (
       <Section variant="default" padding="lg">
         <Container>
-          <Alert variant="error">
-            {error || "Postulación no encontrada"}
-          </Alert>
+          <Alert variant="error">{error || "Postulación no encontrada"}</Alert>
           <Button
             variant="outline"
-            onClick={() => navigate("/admin?tab=applications")} >
+            onClick={() => navigate("/admin?tab=applications")}
+          >
             <i className="fa-solid fa-arrow-left"></i> Volver al Panel Admin
           </Button>
         </Container>
@@ -228,17 +220,16 @@ export default function ApplicationDetail() {
       <Container size="lg">
         <Button
           variant="outline"
-          onClick={() => navigate("/admin?tab=applications")} >
+          onClick={() => navigate("/admin?tab=applications")}
+        >
           <i className="fa-solid fa-arrow-left"></i> Volver al Panel Admin
         </Button>
 
         {/* Header Card */}
         <Card>
-          <div >
+          <div>
             <div>
-              <h1>
-                {application.name}
-              </h1>
+              <h1>{application.name}</h1>
               <p>
                 Fecha de solicitud:{" "}
                 {new Date(application.created_at).toLocaleDateString("es-ES", {
@@ -254,21 +245,11 @@ export default function ApplicationDetail() {
           </div>
         </Card>
 
-        {msg && (
-          <Alert variant="success">
-            {msg}
-          </Alert>
-        )}
-        {error && (
-          <Alert variant="error">
-            {error}
-          </Alert>
-        )}
+        {msg && <Alert variant="success">{msg}</Alert>}
+        {error && <Alert variant="error">{error}</Alert>}
 
         {/* Personal Information */}
-        <h2 >
-          Información Personal
-        </h2>
+        <h2>Información Personal</h2>
         <Card>
           <Grid columns="1fr 1fr" gap="var(--spacing-4)">
             <InfoField label="Nombre Completo" value={application.name} />
@@ -281,9 +262,7 @@ export default function ApplicationDetail() {
         </Card>
 
         {/* Academic Information */}
-        <h2 >
-          Información Académica
-        </h2>
+        <h2>Información Académica</h2>
         <Card>
           <Grid columns="1fr 1fr" gap="var(--spacing-4)">
             <InfoField
@@ -295,7 +274,7 @@ export default function ApplicationDetail() {
               value={
                 application.residency_end_date
                   ? new Date(application.residency_end_date).toLocaleDateString(
-                      "es-ES"
+                      "es-ES",
                     )
                   : null
               }
@@ -310,7 +289,7 @@ export default function ApplicationDetail() {
               value={
                 application.fellowship_date
                   ? new Date(application.fellowship_date).toLocaleDateString(
-                      "es-ES"
+                      "es-ES",
                     )
                   : null
               }
@@ -323,9 +302,7 @@ export default function ApplicationDetail() {
         </Card>
 
         {/* Professional Information */}
-        <h2 >
-          Información Profesional
-        </h2>
+        <h2>Información Profesional</h2>
         <Card>
           <Grid columns="1fr 1fr" gap="var(--spacing-4)">
             <InfoField
@@ -347,11 +324,9 @@ export default function ApplicationDetail() {
         {/* Documents */}
         {application.attachments && application.attachments.length > 0 && (
           <>
-            <h2 >
-              Documentos Adjuntos
-            </h2>
+            <h2>Documentos Adjuntos</h2>
             <Card>
-              <div >
+              <div>
                 {application.attachments.map((att, idx) => (
                   <a
                     key={att.id}
@@ -364,12 +339,11 @@ export default function ApplicationDetail() {
                     }
                     onMouseOut={e =>
                       (e.currentTarget.style.background = "var(--color-bg-alt)")
-                    } >
-                    <i
-                      className="fa-solid fa-file-pdf" ></i>
+                    }
+                  >
+                    <i className="fa-solid fa-file-pdf"></i>
                     <span>Documento {idx + 1}</span>
-                    <i
-                      className="fa-solid fa-external-link" ></i>
+                    <i className="fa-solid fa-external-link"></i>
                   </a>
                 ))}
               </div>
@@ -380,19 +354,17 @@ export default function ApplicationDetail() {
         {/* Decision Section */}
         {application.status === "pending" && (
           <Card>
-            <h2 >
-              Decisión de la Solicitud
-            </h2>
+            <h2>Decisión de la Solicitud</h2>
 
             <div>
-              <label
-                htmlFor="membership-type-select" >
+              <label htmlFor="membership-type-select">
                 Tipo de Membresía a Asignar:
               </label>
               <select
                 id="membership-type-select"
                 value={selectedMembershipType}
-                onChange={e => setSelectedMembershipType(e.target.value)} >
+                onChange={e => setSelectedMembershipType(e.target.value)}
+              >
                 <option value="joven">
                   Nex Gen ($30/año) - Recién egresados
                 </option>
@@ -406,8 +378,7 @@ export default function ApplicationDetail() {
             </div>
 
             <div>
-              <label
-                htmlFor="resolution-note-textarea" >
+              <label htmlFor="resolution-note-textarea">
                 Nota de Resolución:
               </label>
               <textarea
@@ -418,10 +389,8 @@ export default function ApplicationDetail() {
               />
             </div>
 
-            <div >
-              <Button
-                variant="outline"
-                onClick={rejectApplication} >
+            <div>
+              <Button variant="outline" onClick={rejectApplication}>
                 Rechazar
               </Button>
               <Button variant="primary" onClick={approveApplication}>
@@ -433,11 +402,9 @@ export default function ApplicationDetail() {
 
         {/* Payment Pending */}
         {application.status === "payment_pending" && (
-          <Card >
-            <h2 >
-              Esperando Confirmación de Pago
-            </h2>
-            <p >
+          <Card>
+            <h2>Esperando Confirmación de Pago</h2>
+            <p>
               La postulación fue aprobada como{" "}
               <strong>
                 {getMembershipTypeLabel(application.membership_type)}
@@ -445,9 +412,7 @@ export default function ApplicationDetail() {
               . Una vez que el socio complete el pago, confirma aquí para crear
               las credenciales.
             </p>
-            <Button
-              variant="primary"
-              onClick={confirmPayment} >
+            <Button variant="primary" onClick={confirmPayment}>
               Confirmar Pago y Crear Socio
             </Button>
           </Card>
@@ -456,60 +421,65 @@ export default function ApplicationDetail() {
         {/* Resolution Note */}
         {application.resolution_note && application.status !== "pending" && (
           <Card>
-            <h2 >
-              Nota de Resolución
-            </h2>
-            <div >
-              {application.resolution_note}
-            </div>
+            <h2>Nota de Resolución</h2>
+            <div>{application.resolution_note}</div>
           </Card>
         )}
 
         {/* Credentials */}
         {application.status === "paid" && application.initial_password && (
-          <Card >
-            <h2 >
-              Credenciales del Socio
-            </h2>
-            <Grid columns="1fr" gap="var(--spacing-4)">
+          <Card className="credentials-card">
+            <div className="credentials-header">
+              <div className="credentials-icon">
+                <i className="fa-solid fa-key"></i>
+              </div>
               <div>
-                <label >
-                  Email:
-                </label>
-                <div>
-                  <input
-                    type="text"
-                    value={application.email}
-                    readOnly
-                  />
+                <h2 className="credentials-title">Credenciales del Socio</h2>
+                <p className="credentials-subtitle">
+                  Información de acceso para {application.name}
+                </p>
+              </div>
+            </div>
+
+            <div className="credentials-list">
+              <div className="credential-item">
+                <div className="credential-label">
+                  <i className="fa-solid fa-envelope"></i>
+                  Email
+                </div>
+                <div className="credential-value-row">
+                  <code className="credential-value">{application.email}</code>
                   <Button
-                    variant="primary"
-                    onClick={() => copyToClipboard(application.email)} >
-                    Copiar
+                    variant="outline"
+                    size="sm"
+                    onClick={() => copyToClipboard(application.email)}
+                  >
+                    <i className="fa-solid fa-copy"></i>
                   </Button>
                 </div>
               </div>
 
-              <div>
-                <label >
-                  Contraseña Inicial:
-                </label>
-                <div>
-                  <input
-                    type="text"
-                    value={application.initial_password}
-                    readOnly
-                  />
+              <div className="credential-item">
+                <div className="credential-label">
+                  <i className="fa-solid fa-lock"></i>
+                  Contraseña Inicial
+                </div>
+                <div className="credential-value-row">
+                  <code className="credential-value">
+                    {application.initial_password}
+                  </code>
                   <Button
-                    variant="primary"
+                    variant="outline"
+                    size="sm"
                     onClick={() =>
                       copyToClipboard(application.initial_password)
-                    } >
-                    Copiar
+                    }
+                  >
+                    <i className="fa-solid fa-copy"></i>
                   </Button>
                 </div>
               </div>
-            </Grid>
+            </div>
           </Card>
         )}
       </Container>
@@ -518,7 +488,8 @@ export default function ApplicationDetail() {
       <Modal
         isOpen={showCredentialsModal}
         onClose={handleCloseCredentialsModal}
-        title="Credenciales de Socio Creadas" >
+        title="Credenciales de Socio Creadas"
+      >
         <Alert variant="warning" className="mb-4">
           <strong>⚠️ IMPORTANTE:</strong> Esta información se muestra una sola
           vez. Copia estas credenciales y envíalas al socio de forma segura.
@@ -541,7 +512,8 @@ export default function ApplicationDetail() {
                 <Button
                   onClick={() => copyToClipboard(credentials.email)}
                   variant="primary"
-                  size="sm" >
+                  size="sm"
+                >
                   Copiar
                 </Button>
               </div>
@@ -550,7 +522,8 @@ export default function ApplicationDetail() {
             <div>
               <label
                 htmlFor="modal-password"
-                className="font-semibold mb-2 block" >
+                className="font-semibold mb-2 block"
+              >
                 Contraseña Temporal:
               </label>
               <div className="flex gap-2">
@@ -564,7 +537,8 @@ export default function ApplicationDetail() {
                 <Button
                   onClick={() => copyToClipboard(credentials.password)}
                   variant="primary"
-                  size="sm" >
+                  size="sm"
+                >
                   Copiar
                 </Button>
               </div>
@@ -573,7 +547,8 @@ export default function ApplicationDetail() {
             <div>
               <label
                 htmlFor="modal-membership"
-                className="font-semibold mb-2 block" >
+                className="font-semibold mb-2 block"
+              >
                 Tipo de Membresía:
               </label>
               <Input
@@ -591,11 +566,12 @@ export default function ApplicationDetail() {
             onClick={() => {
               if (credentials) {
                 copyToClipboard(
-                  `Email: ${credentials.email}\nContraseña: ${credentials.password}\nMembresía: ${credentials.membership_type}`
+                  `Email: ${credentials.email}\nContraseña: ${credentials.password}\nMembresía: ${credentials.membership_type}`,
                 );
               }
             }}
-            variant="secondary" >
+            variant="secondary"
+          >
             Copiar Todo
           </Button>
           <Button onClick={handleCloseCredentialsModal} variant="primary">

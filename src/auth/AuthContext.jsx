@@ -5,15 +5,23 @@ import PropTypes from "prop-types";
 const AuthCtx = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(undefined); // undefined = loading, null = not logged in
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem("access_token");
-    if (token)
+    if (token) {
       apiGet("/me")
         .then(setUser)
-        .catch(() => logout());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        .catch(() => {
+          localStorage.removeItem("access_token");
+          setUser(null);
+        })
+        .finally(() => setLoading(false));
+    } else {
+      setUser(null);
+      setLoading(false);
+    }
   }, []);
 
   async function login(email, password) {
@@ -28,7 +36,10 @@ export function AuthProvider({ children }) {
     setUser(null);
   }
 
-  const value = useMemo(() => ({ user, login, logout }), [user]);
+  const value = useMemo(
+    () => ({ user, loading, login, logout }),
+    [user, loading],
+  );
 
   return <AuthCtx.Provider value={value}>{children}</AuthCtx.Provider>;
 }

@@ -4,10 +4,10 @@ import { useAuth } from "../auth/AuthContext.jsx";
 import { Spinner } from "../components/ui";
 
 export function ProtectedRoute({ children, requireAdmin = false }) {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
 
-  // If user is not loaded yet, show loading spinner
-  if (user === undefined) {
+  // If still loading auth state, show loading spinner
+  if (loading || user === undefined) {
     return (
       <div className="flex-center min-h-60vh">
         <Spinner />

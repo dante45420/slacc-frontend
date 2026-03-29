@@ -13,6 +13,29 @@ import { sanitizeHtml } from "../../utils/sanitize.js";
 
 const API_ORIGIN = import.meta.env.VITE_API_ORIGIN || "http://localhost:5000";
 
+function formatDate(dateString, options = {}) {
+  if (!dateString) return null;
+  const defaultOpts = { year: "numeric", month: "long", day: "numeric" };
+  return new Date(dateString).toLocaleDateString("es-ES", { ...defaultOpts, ...options });
+}
+
+function formatDateTime(dateString) {
+  if (!dateString) return null;
+  return new Date(dateString).toLocaleDateString("es-ES", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function formatPrice(price) {
+  if (price === 0) return "Gratis";
+  if (!price) return null;
+  return `$${price.toLocaleString("es-CL")}`;
+}
+
 export default function EventDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -58,7 +81,6 @@ export default function EventDetail() {
           (data.message || "Revisa tu email para más detalles"),
       );
 
-      // Reload event data to show updated enrollment status
       const eventData = await apiGet(`/events/${id}`);
       setEvent(eventData);
     } catch (err) {
@@ -88,11 +110,12 @@ export default function EventDetail() {
   }
 
   const formatType = event.format === "webinar" ? "Webinar" : "Presencial";
-
-  // Check if registration deadline has passed
   const isRegistrationClosed = event.registration_deadline
     ? new Date(event.registration_deadline) < new Date()
     : false;
+
+  const hasPricing = event.price_member > 0 || event.price_non_member > 0;
+  const hasCapacity = event.max_students && event.max_students > 0;
 
   return (
     <Section variant="default" padding="lg">
@@ -100,98 +123,222 @@ export default function EventDetail() {
         <i className="fa-solid fa-arrow-left"></i> Volver
       </Button>
 
-      <Card className="event-detail-card">
-        {event.image_url && (
-          <img
-            src={
-              event.image_url.startsWith("http")
-                ? event.image_url
-                : `${API_ORIGIN}${event.image_url}`
-            }
-            alt={event.title}
-            className="event-detail-image"
-          />
-        )}
+      <div className="event-detail-layout">
+        {/* Main Content */}
+        <Card className="event-detail-main">
+          {event.image_url && (
+            <img
+              src={
+                event.image_url.startsWith("http")
+                  ? event.image_url
+                  : `${API_ORIGIN}${event.image_url}`
+              }
+              alt={event.title}
+              className="event-detail-image"
+            />
+          )}
 
-        <div className="event-detail-header">
-          <div className="event-detail-title-row">
-            <h1 className="event-detail-title">{event.title}</h1>
-            <Badge
-              variant={event.format === "webinar" ? "info" : "secondary"}
-              size="md"
-            >
-              {formatType}
-            </Badge>
-          </div>
-
-          <p className="event-detail-description">{event.description}</p>
-        </div>
-
-        <div className="event-detail-meta-grid">
-          <div>
-            <strong className="event-detail-meta-label">Instructor</strong>
-            <p className="event-detail-meta-value">
-              {event.instructor || "Por definir"}
-            </p>
-          </div>
-          <div>
-            <strong className="event-detail-meta-label">Duración</strong>
-            <p className="event-detail-meta-value">
-              {event.duration_hours || "N/A"} horas
-            </p>
-          </div>
-          <div>
-            <strong className="event-detail-meta-label">Inicio</strong>
-            <p className="event-detail-meta-value">
-              {event.start_date
-                ? new Date(event.start_date).toLocaleDateString("es-ES", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })
-                : "Por confirmar"}
-            </p>
-          </div>
-          <div>
-            <strong className="event-detail-meta-label">Formato</strong>
-            <p className="event-detail-meta-value">{formatType}</p>
-          </div>
-          {event.registration_deadline && (
-            <div>
-              <strong className="event-detail-meta-label">Límite de inscripción</strong>
-              <p className="event-detail-meta-value" style={isRegistrationClosed ? { color: 'var(--color-error)' } : {}}>
-                {new Date(event.registration_deadline).toLocaleDateString("es-ES", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-                {isRegistrationClosed && " (cerrado)"}
-              </p>
+          <div className="event-detail-header">
+            <div className="event-detail-header-top">
+              <div className="event-detail-badges">
+                <Badge
+                  variant={event.format === "webinar" ? "info" : "secondary"}
+                  size="md"
+                >
+                  <i className={`fa-solid ${event.format === "webinar" ? "fa-video" : "fa-location-dot"}`}></i>
+                  {formatType}
+                </Badge>
+                {isRegistrationClosed && (
+                  <Badge variant="error" size="md">
+                    <i className="fa-solid fa-lock"></i>
+                    Inscripción cerrada
+                  </Badge>
+                )}
+                {event.is_enrolled && (
+                  <Badge variant="success" size="md">
+                    <i className="fa-solid fa-check"></i>
+                    Inscrito
+                  </Badge>
+                )}
+              </div>
+              {hasCapacity && (
+                <div className="event-detail-spots">
+                  <i className="fa-solid fa-users"></i>
+                  <span>
+                    {event.enrollment_count !== undefined
+                      ? `${event.enrollment_count} / ${event.max_students}`
+                      : event.max_students}{" "}
+                    cupos
+                  </span>
+                </div>
+              )}
             </div>
+
+            <h1 className="event-detail-title">{event.title}</h1>
+
+            {event.description && (
+              <p className="event-detail-description">{event.description}</p>
+            )}
+          </div>
+
+          {event.content && (
+            <div className="event-detail-content-section">
+              <h2 className="event-detail-section-title">
+                <i className="fa-solid fa-info-circle"></i> Descripción del evento
+              </h2>
+              <div
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(event.content) }}
+                className="event-detail-content"
+              />
+            </div>
+          )}
+
+          {event.instructor && (
+            <div className="event-detail-instructor-section">
+              <h2 className="event-detail-section-title">
+                <i className="fa-solid fa-chalkboard-user"></i> Instructor
+              </h2>
+              <div className="event-detail-instructor">
+                <div className="event-detail-instructor-avatar">
+                  <i className="fa-solid fa-user"></i>
+                </div>
+                <div className="event-detail-instructor-info">
+                  <strong>{event.instructor}</strong>
+                </div>
+              </div>
+            </div>
+          )}
+        </Card>
+
+        {/* Sidebar */}
+        <div className="event-detail-sidebar">
+          {/* Date & Time Card */}
+          <Card className="event-detail-sidebar-card">
+            <h3 className="event-detail-sidebar-title">
+              <i className="fa-solid fa-calendar"></i> Fecha y Hora
+            </h3>
+            <div className="event-detail-info-list">
+              <div className="event-detail-info-item">
+                <span className="event-detail-info-label">Inicio</span>
+                <span className="event-detail-info-value">
+                  {formatDateTime(event.start_date) || "Por confirmar"}
+                </span>
+              </div>
+              {event.end_date && (
+                <div className="event-detail-info-item">
+                  <span className="event-detail-info-label">Término</span>
+                  <span className="event-detail-info-value">
+                    {formatDateTime(event.end_date)}
+                  </span>
+                </div>
+              )}
+              {event.duration_hours && (
+                <div className="event-detail-info-item">
+                  <span className="event-detail-info-label">Duración</span>
+                  <span className="event-detail-info-value">
+                    {event.duration_hours} {event.duration_hours === 1 ? "hora" : "horas"}
+                  </span>
+                </div>
+              )}
+              {event.registration_deadline && (
+                <div className="event-detail-info-item">
+                  <span className="event-detail-info-label">Inscripciones hasta</span>
+                  <span
+                    className="event-detail-info-value"
+                    style={isRegistrationClosed ? { color: "var(--color-error)" } : {}}
+                  >
+                    {formatDate(event.registration_deadline)}
+                    {isRegistrationClosed && " (cerrado)"}
+                  </span>
+                </div>
+              )}
+            </div>
+          </Card>
+
+          {/* Location Card */}
+          <Card className="event-detail-sidebar-card">
+            <h3 className="event-detail-sidebar-title">
+              <i className="fa-solid fa-location-dot"></i> Ubicación
+            </h3>
+            <div className="event-detail-info-list">
+              <div className="event-detail-info-item">
+                <span className="event-detail-info-label">Formato</span>
+                <span className="event-detail-info-value">{formatType}</span>
+              </div>
+              {event.location && (
+                <div className="event-detail-info-item">
+                  <span className="event-detail-info-label">
+                    {event.format === "webinar" ? "Plataforma" : "Dirección"}
+                  </span>
+                  <span className="event-detail-info-value">{event.location}</span>
+                </div>
+              )}
+            </div>
+          </Card>
+
+          {/* Pricing Card */}
+          {hasPricing && (
+            <Card className="event-detail-sidebar-card">
+              <h3 className="event-detail-sidebar-title">
+                <i className="fa-solid fa-ticket"></i> Precios
+              </h3>
+              <div className="event-detail-pricing">
+                <div className="event-detail-price-item">
+                  <span className="event-detail-price-label">Socios</span>
+                  <span className="event-detail-price-value event-detail-price-member">
+                    {formatPrice(event.price_member)}
+                  </span>
+                </div>
+                <div className="event-detail-price-item">
+                  <span className="event-detail-price-label">No socios</span>
+                  <span className="event-detail-price-value">
+                    {formatPrice(event.price_non_member)}
+                  </span>
+                </div>
+                {event.price_joven > 0 && (
+                  <div className="event-detail-price-item">
+                    <span className="event-detail-price-label">Socios jóvenes</span>
+                    <span className="event-detail-price-value event-detail-price-member">
+                      {formatPrice(event.price_joven)}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </Card>
           )}
         </div>
 
-        {event.content && (
-          <div
-            dangerouslySetInnerHTML={{ __html: sanitizeHtml(event.content) }}
-            className="event-detail-content"
-          />
-        )}
-
-        <div className="event-detail-actions">
+        {/* Enroll Button - centered below all content */}
+        <div className="event-detail-enroll-container">
           <Button
             variant="primary"
-            size="lg"
             onClick={handleEnroll}
             disabled={enrolling || event.is_enrolled || isRegistrationClosed}
+            className="event-detail-enroll-btn"
           >
-            {isRegistrationClosed && "La inscripción ya cerró"}
-            {!isRegistrationClosed && event.is_enrolled && "Ya estás inscrito"}
-            {!isRegistrationClosed && !event.is_enrolled && enrolling && "Procesando..."}
-            {!isRegistrationClosed && !event.is_enrolled && !enrolling && "Inscribirse al evento"}
+            {isRegistrationClosed && (
+              <>
+                <i className="fa-solid fa-lock"></i> La inscripción ya cerró
+              </>
+            )}
+            {!isRegistrationClosed && event.is_enrolled && (
+              <>
+                <i className="fa-solid fa-check"></i> Ya estás inscrito
+              </>
+            )}
+            {!isRegistrationClosed && !event.is_enrolled && enrolling && (
+              <>
+                <Spinner size="sm" /> Procesando...
+              </>
+            )}
+            {!isRegistrationClosed && !event.is_enrolled && !enrolling && (
+              <>
+                <i className="fa-solid fa-pen-to-square"></i> Inscribirse al evento
+              </>
+            )}
           </Button>
         </div>
-      </Card>
+      </div>
     </Section>
   );
 }

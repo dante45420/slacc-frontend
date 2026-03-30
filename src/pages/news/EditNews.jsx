@@ -77,7 +77,7 @@ export default function EditNews() {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    if (!user || user.role !== "admin") return;
+    if (!user?.role || user.role !== "admin") return;
 
     setSaving(true);
     try {

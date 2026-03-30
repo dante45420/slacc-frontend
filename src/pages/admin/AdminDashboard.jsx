@@ -1165,14 +1165,28 @@ function UserForm({ user, onSuccess, onCancel }) {
           Cancelar
         </Button>
         <Button type="submit" variant="primary" disabled={loading}>
-          {getButtonText(loading, user, "Actualizando...", "Creando...", "Actualizar Socio", "Crear Socio")}
+          {getButtonText(
+            loading,
+            user,
+            "Actualizando...",
+            "Creando...",
+            "Actualizar Socio",
+            "Crear Socio",
+          )}
         </Button>
       </div>
     </form>
   );
 }
 
-function getButtonText(loading, entity, loadingEditText, loadingCreateText, editText, createText) {
+function getButtonText(
+  loading,
+  entity,
+  loadingEditText,
+  loadingCreateText,
+  editText,
+  createText,
+) {
   if (loading) {
     return entity ? loadingEditText : loadingCreateText;
   }
@@ -1636,7 +1650,9 @@ function NewsForm({ news, onSuccess, onCancel }) {
             label="Orden"
             type="number"
             value={orderIndex}
-            onChange={e => setOrderIndex(Number.parseInt(e.target.value, 10) || 0)}
+            onChange={e =>
+              setOrderIndex(Number.parseInt(e.target.value, 10) || 0)
+            }
           />
         </div>
       )}
@@ -1680,7 +1696,14 @@ function NewsForm({ news, onSuccess, onCancel }) {
           Cancelar
         </Button>
         <Button type="submit" variant="primary" disabled={loading}>
-          {getButtonText(loading, news, "Actualizando...", "Creando...", "Actualizar Noticia", "Crear Noticia")}
+          {getButtonText(
+            loading,
+            news,
+            "Actualizando...",
+            "Creando...",
+            "Actualizar Noticia",
+            "Crear Noticia",
+          )}
         </Button>
       </div>
     </form>

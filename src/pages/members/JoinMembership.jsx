@@ -366,7 +366,10 @@ function ApplicationForm({ onResult }) {
         {documentFiles.length > 0 && (
           <div className="join-files-list">
             {documentFiles.map((file, index) => (
-              <div key={index} className="join-file-row">
+              <div
+                key={`${file.name}-${file.size}-${file.lastModified}`}
+                className="join-file-row"
+              >
                 <p className="file-selected-message join-file-name">
                   <i className="fa-solid fa-circle-check"></i> {file.name}
                 </p>

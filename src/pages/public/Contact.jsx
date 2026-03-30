@@ -1,4 +1,4 @@
-import { Section, Card, Button, Grid } from "../../components/ui";
+import { Section, Card, Button } from "../../components/ui";
 
 export default function Contact() {
   return (

@@ -337,7 +337,14 @@ export default function ApplicationDetail() {
                       (e.currentTarget.style.background =
                         "var(--color-primary-light)")
                     }
+                    onFocus={e =>
+                      (e.currentTarget.style.background =
+                        "var(--color-primary-light)")
+                    }
                     onMouseOut={e =>
+                      (e.currentTarget.style.background = "var(--color-bg-alt)")
+                    }
+                    onBlur={e =>
                       (e.currentTarget.style.background = "var(--color-bg-alt)")
                     }
                   >
@@ -444,8 +451,7 @@ export default function ApplicationDetail() {
             <div className="credentials-list">
               <div className="credential-item">
                 <div className="credential-label">
-                  <i className="fa-solid fa-envelope"></i>
-                  Email
+                  <i className="fa-solid fa-envelope"></i> Email
                 </div>
                 <div className="credential-value-row">
                   <code className="credential-value">{application.email}</code>
@@ -461,8 +467,7 @@ export default function ApplicationDetail() {
 
               <div className="credential-item">
                 <div className="credential-label">
-                  <i className="fa-solid fa-lock"></i>
-                  Contraseña Inicial
+                  <i className="fa-solid fa-lock"></i> Contraseña Inicial
                 </div>
                 <div className="credential-value-row">
                   <code className="credential-value">

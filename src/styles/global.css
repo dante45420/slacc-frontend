@@ -814,12 +814,12 @@ img {
 }
 
 .badge-success {
-  background-color: #059669;
+  background-color: #047857;
   color: #fff;
 }
 
 .badge-warning {
-  background-color: #d97706;
+  background-color: #b45309;
   color: #fff;
 }
 
@@ -4936,7 +4936,11 @@ img {
 /* Credentials Card Styles */
 .credentials-card {
   border: 2px solid var(--color-success);
-  background: linear-gradient(135deg, var(--color-bg) 0%, rgba(var(--color-success-rgb, 34, 197, 94), 0.05) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-bg) 0%,
+    rgba(var(--color-success-rgb, 34, 197, 94), 0.05) 100%
+  );
 }
 
 .credentials-header {
@@ -5007,7 +5011,8 @@ img {
 
 .credential-value {
   flex: 1;
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, monospace;
+  font-family:
+    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, monospace;
   font-size: 1rem;
   font-weight: 500;
   background: var(--color-bg);
@@ -5024,4 +5029,3 @@ img {
   display: flex;
   justify-content: flex-end;
 }
-

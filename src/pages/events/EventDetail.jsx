@@ -16,7 +16,10 @@ const API_ORIGIN = import.meta.env.VITE_API_ORIGIN || "http://localhost:5000";
 function formatDate(dateString, options = {}) {
   if (!dateString) return null;
   const defaultOpts = { year: "numeric", month: "long", day: "numeric" };
-  return new Date(dateString).toLocaleDateString("es-ES", { ...defaultOpts, ...options });
+  return new Date(dateString).toLocaleDateString("es-ES", {
+    ...defaultOpts,
+    ...options,
+  });
 }
 
 function formatDateTime(dateString) {
@@ -145,19 +148,19 @@ export default function EventDetail() {
                   variant={event.format === "webinar" ? "info" : "secondary"}
                   size="md"
                 >
-                  <i className={`fa-solid ${event.format === "webinar" ? "fa-video" : "fa-location-dot"}`}></i>
+                  <i
+                    className={`fa-solid ${event.format === "webinar" ? "fa-video" : "fa-location-dot"}`}
+                  ></i>
                   {formatType}
                 </Badge>
                 {isRegistrationClosed && (
                   <Badge variant="error" size="md">
-                    <i className="fa-solid fa-lock"></i>
-                    Inscripción cerrada
+                    <i className="fa-solid fa-lock"></i> Inscripción cerrada
                   </Badge>
                 )}
                 {event.is_enrolled && (
                   <Badge variant="success" size="md">
-                    <i className="fa-solid fa-check"></i>
-                    Inscrito
+                    <i className="fa-solid fa-check"></i> Inscrito
                   </Badge>
                 )}
               </div>
@@ -165,9 +168,9 @@ export default function EventDetail() {
                 <div className="event-detail-spots">
                   <i className="fa-solid fa-users"></i>
                   <span>
-                    {event.enrollment_count !== undefined
-                      ? `${event.enrollment_count} / ${event.max_students}`
-                      : event.max_students}{" "}
+                    {event.enrollment_count === undefined
+                      ? event.max_students
+                      : `${event.enrollment_count} / ${event.max_students}`}{" "}
                     cupos
                   </span>
                 </div>
@@ -184,10 +187,13 @@ export default function EventDetail() {
           {event.content && (
             <div className="event-detail-content-section">
               <h2 className="event-detail-section-title">
-                <i className="fa-solid fa-info-circle"></i> Descripción del evento
+                <i className="fa-solid fa-info-circle"></i> Descripción del
+                evento
               </h2>
               <div
-                dangerouslySetInnerHTML={{ __html: sanitizeHtml(event.content) }}
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHtml(event.content),
+                }}
                 className="event-detail-content"
               />
             </div>
@@ -236,16 +242,23 @@ export default function EventDetail() {
                 <div className="event-detail-info-item">
                   <span className="event-detail-info-label">Duración</span>
                   <span className="event-detail-info-value">
-                    {event.duration_hours} {event.duration_hours === 1 ? "hora" : "horas"}
+                    {event.duration_hours}{" "}
+                    {event.duration_hours === 1 ? "hora" : "horas"}
                   </span>
                 </div>
               )}
               {event.registration_deadline && (
                 <div className="event-detail-info-item">
-                  <span className="event-detail-info-label">Inscripciones hasta</span>
+                  <span className="event-detail-info-label">
+                    Inscripciones hasta
+                  </span>
                   <span
                     className="event-detail-info-value"
-                    style={isRegistrationClosed ? { color: "var(--color-error)" } : {}}
+                    style={
+                      isRegistrationClosed
+                        ? { color: "var(--color-error)" }
+                        : {}
+                    }
                   >
                     {formatDate(event.registration_deadline)}
                     {isRegistrationClosed && " (cerrado)"}
@@ -270,7 +283,9 @@ export default function EventDetail() {
                   <span className="event-detail-info-label">
                     {event.format === "webinar" ? "Plataforma" : "Dirección"}
                   </span>
-                  <span className="event-detail-info-value">{event.location}</span>
+                  <span className="event-detail-info-value">
+                    {event.location}
+                  </span>
                 </div>
               )}
             </div>
@@ -297,7 +312,9 @@ export default function EventDetail() {
                 </div>
                 {event.price_joven > 0 && (
                   <div className="event-detail-price-item">
-                    <span className="event-detail-price-label">Socios jóvenes</span>
+                    <span className="event-detail-price-label">
+                      Socios jóvenes
+                    </span>
                     <span className="event-detail-price-value event-detail-price-member">
                       {formatPrice(event.price_joven)}
                     </span>
@@ -333,7 +350,8 @@ export default function EventDetail() {
             )}
             {!isRegistrationClosed && !event.is_enrolled && !enrolling && (
               <>
-                <i className="fa-solid fa-pen-to-square"></i> Inscribirse al evento
+                <i className="fa-solid fa-pen-to-square"></i> Inscribirse al
+                evento
               </>
             )}
           </Button>

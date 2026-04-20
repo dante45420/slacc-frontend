@@ -1,6 +1,5 @@
 import { lazy, Suspense } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import PropTypes from "prop-types";
 import Header from "./components/Header.jsx";
 import { ProtectedRoute } from "./components/ProtectedRoute.jsx";
 
@@ -8,7 +7,14 @@ import { ProtectedRoute } from "./components/ProtectedRoute.jsx";
 const Home = lazy(() => import("./pages/public/Home.jsx"));
 const Contact = lazy(() => import("./pages/public/Contact.jsx"));
 const Estatutos = lazy(() => import("./pages/public/Estatutos.jsx"));
+const EstatutosDocumento = lazy(
+  () => import("./pages/public/EstatutosDocumento.jsx"),
+);
 const Comites = lazy(() => import("./pages/public/Comites.jsx"));
+const Historia = lazy(() => import("./pages/public/Historia.jsx"));
+const Directiva = lazy(() => import("./pages/public/Directiva.jsx"));
+const Alianzas = lazy(() => import("./pages/public/Alianzas.jsx"));
+const Educacion = lazy(() => import("./pages/public/Educacion.jsx"));
 const NotFound = lazy(() => import("./pages/public/NotFound.jsx"));
 
 // Auth pages
@@ -48,19 +54,6 @@ const ApplicationDetail = lazy(
 
 import { AuthProvider } from "./auth/AuthContext.jsx";
 import { ToastProvider, Spinner } from "./components/ui";
-
-function Placeholder({ title }) {
-  return (
-    <div className="container section">
-      <h2>{title}</h2>
-      <p>Hello world</p>
-    </div>
-  );
-}
-
-Placeholder.propTypes = {
-  title: PropTypes.string.isRequired,
-};
 
 export default function App() {
   return (
@@ -118,16 +111,28 @@ export default function App() {
               <Route path="/eventos/:id" element={<EventDetail />} />
               <Route path="/cursos" element={<EventsPage />} />
               <Route path="/cursos/:id" element={<EventDetail />} />
+              <Route path="/nosotros" element={<Estatutos />} />
+              <Route path="/nosotros/historia" element={<Historia />} />
+              <Route path="/nosotros/directiva" element={<Directiva />} />
               <Route
-                path="/nosotros"
-                element={<Placeholder title="Nosotros" />}
-              />
-              <Route
-                path="/nosotros/historia"
-                element={<Placeholder title="Nosotros - Historia" />}
+                path="/nosotros/estatutos"
+                element={<EstatutosDocumento />}
               />
               <Route path="/nosotros/mision" element={<Estatutos />} />
               <Route path="/comites" element={<Comites />} />
+              <Route path="/alianzas" element={<Alianzas />} />
+              <Route path="/sociedades-nacionales" element={<Alianzas />} />
+              <Route path="/educacion" element={<Educacion />} />
+              <Route
+                path="/educacion/aval-certificacion"
+                element={<Educacion />}
+              />
+              <Route path="/educacion/becas" element={<Educacion />} />
+              <Route path="/educacion/videoteca" element={<Educacion />} />
+              <Route
+                path="/programa-de-becas"
+                element={<Navigate to="/educacion/becas" replace />}
+              />
               <Route path="/miembros" element={<MembersBenefits />} />
               <Route
                 path="/miembros/beneficios"

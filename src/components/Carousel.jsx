@@ -16,7 +16,7 @@ export default function Carousel({ items = [], intervalMs = 9000 }) {
               description:
                 "Sociedad Latinoamericana de Cadera – colaboración para la excelencia clínica.",
               ctaText: "Quiénes somos",
-              ctaHref: "/miembros/beneficios",
+              ctaHref: "/nosotros",
             },
             {
               imageUrl: "/carrusel_2.png",
@@ -60,18 +60,6 @@ export default function Carousel({ items = [], intervalMs = 9000 }) {
           <div
             key={s.title}
             className="carousel-slide carousel-slide-interactive"
-            role="button"
-            tabIndex={0}
-            onClick={() => {
-              if (s.ctaHref) {
-                globalThis.location.href = s.ctaHref;
-              }
-            }}
-            onKeyDown={e => {
-              if ((e.key === "Enter" || e.key === " ") && s.ctaHref) {
-                globalThis.location.href = s.ctaHref;
-              }
-            }}
           >
             <img
               src={s.imageUrl}

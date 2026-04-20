@@ -15,7 +15,36 @@ export default function Home() {
       </section>
 
       <Container size="lg">
+        <div className="home-welcome-banner">
+          <h1 className="home-welcome-title">
+            Uniendo la excelencia en Cirugia de Cadera en toda Latinoamerica
+          </h1>
+          <p className="home-welcome-subtitle">
+            Integracion cientifica, formacion continua y colaboracion regional
+            para elevar los estandares de calidad en el cuidado del paciente.
+          </p>
+        </div>
+      </Container>
+
+      <Container size="lg">
         <div className="home-main-card">
+          <div className="home-section">
+            <h2 className="home-section-title">Accesos rapidos</h2>
+            <div className="home-quick-actions">
+              <Link to="/solicitar-membresia" className="btn btn-primary">
+                Hazte Miembro
+              </Link>
+              <Link to="/eventos/proximos" className="btn btn-outline">
+                Proximo Congreso / Evento
+              </Link>
+              <Link to="/educacion/becas" className="btn btn-outline">
+                Programa de Becas
+              </Link>
+            </div>
+          </div>
+
+          <hr className="home-divider" />
+
           <div className="home-section">
             <h2 className="home-section-title">Síguenos en Instagram</h2>
             <InstagramFeed />
@@ -40,7 +69,7 @@ export default function Home() {
           <hr className="home-divider" />
 
           <div className="home-section">
-            <h2 className="home-section-title">Noticias destacadas</h2>
+            <h2 className="home-section-title">Noticias recientes</h2>
             <NewsCarousel limit={9} />
           </div>
 

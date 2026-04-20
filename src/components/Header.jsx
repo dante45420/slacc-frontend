@@ -186,8 +186,51 @@ export default function Header() {
           {user?.role === "admin" && (
             <MenuItem label="Admin" to="/admin" onClick={closeMobileMenu} />
           )}
-          <MenuItem label="Comités" to="/comites" onClick={closeMobileMenu} />
-          <MenuItem label="Contacto" to="/contacto" onClick={closeMobileMenu} />
+          <MenuItem
+            label="La Sociedad"
+            to="/nosotros"
+            onClick={closeMobileMenu}
+          >
+            <SubLink
+              to="/nosotros/mision"
+              label="Misión, Visión y Valores"
+              onClick={closeMobileMenu}
+            />
+            <SubLink
+              to="/nosotros/directiva"
+              label="Mesa Directiva"
+              onClick={closeMobileMenu}
+            />
+            <SubLink
+              to="/nosotros/historia"
+              label="Historia"
+              onClick={closeMobileMenu}
+            />
+            <SubLink
+              to="/nosotros/estatutos"
+              label="Estatutos"
+              onClick={closeMobileMenu}
+            />
+            <SubLink to="/comites" label="Comités" onClick={closeMobileMenu} />
+          </MenuItem>
+          <MenuItem label="Alianzas" to="/alianzas" onClick={closeMobileMenu} />
+          <MenuItem label="Educación" to="/educacion" onClick={closeMobileMenu}>
+            <SubLink
+              to="/educacion/aval-certificacion"
+              label="Aval y Certificación"
+              onClick={closeMobileMenu}
+            />
+            <SubLink
+              to="/educacion/becas"
+              label="Becas y Pasantías"
+              onClick={closeMobileMenu}
+            />
+            <SubLink
+              to="/educacion/videoteca"
+              label="Aula Virtual"
+              onClick={closeMobileMenu}
+            />
+          </MenuItem>
           <MenuItem label="Eventos" to="/eventos" onClick={closeMobileMenu}>
             <SubLink
               to="/eventos/pasados"
@@ -197,6 +240,11 @@ export default function Header() {
             <SubLink
               to="/eventos/proximos"
               label="Próximos"
+              onClick={closeMobileMenu}
+            />
+            <SubLink
+              to="/eventos/proximos"
+              label="Congreso Latinoamericano"
               onClick={closeMobileMenu}
             />
             <SubLink to="/eventos" label="Todos" onClick={closeMobileMenu} />
@@ -228,18 +276,6 @@ export default function Header() {
               onClick={closeMobileMenu}
             />
           </MenuItem>
-          <MenuItem label="Nosotros" to="/nosotros" onClick={closeMobileMenu}>
-            <SubLink
-              to="/nosotros/mision"
-              label="Estatutos, Misión, Visión"
-              onClick={closeMobileMenu}
-            />
-            <SubLink
-              to="/nosotros/historia"
-              label="Historia"
-              onClick={closeMobileMenu}
-            />
-          </MenuItem>
           <MenuItem
             label="Noticias"
             to="/noticias/articulos-cientificos"
@@ -268,6 +304,7 @@ export default function Header() {
               />
             )}
           </MenuItem>
+          <MenuItem label="Contacto" to="/contacto" onClick={closeMobileMenu} />
           <MenuItem
             label={<i className="fa-solid fa-user"></i>}
             ariaLabel={user ? "Perfil" : "Iniciar sesión"}

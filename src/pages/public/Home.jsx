@@ -23,6 +23,19 @@ export default function Home() {
             Integracion cientifica, formacion continua y colaboracion regional
             para elevar los estandares de calidad en el cuidado del paciente.
           </p>
+
+          <div className="home-language-switch">
+            <span className="home-language-label">Idioma:</span>
+            <Link to="/" className="home-language-link">
+              ES
+            </Link>
+            <Link to="/en" className="home-language-link">
+              EN
+            </Link>
+            <Link to="/pt" className="home-language-link">
+              PT
+            </Link>
+          </div>
         </div>
       </Container>
 

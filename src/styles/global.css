@@ -220,8 +220,8 @@ img {
   position: relative;
 }
 
-/* Keep the profile icon pinned to the right edge on desktop */
-.menu > li:last-child {
+/* Keep user and language controls pinned to the right edge on desktop */
+.menu > li.user-menu {
   margin-left: auto;
   margin-right: 0;
 }
@@ -283,10 +283,48 @@ img {
   animation: slideDown 0.2s ease;
 }
 
-/* Position last submenu from the right to prevent overflow */
-.menu > li:last-child .submenu {
+/* Position right-side control submenus from the right to prevent overflow */
+.menu > li.user-menu .submenu,
+.menu > li.language-selector .submenu {
   left: auto;
   right: 0;
+}
+
+.language-selector {
+  position: relative;
+}
+
+.language-trigger {
+  padding: var(--spacing-3) var(--spacing-3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  font-size: 18px;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-base);
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.language-trigger:hover {
+  color: var(--color-primary);
+  background: var(--color-bg-alt);
+}
+
+.language-submenu {
+  min-width: 112px;
+}
+
+.language-submenu a {
+  text-align: center;
+  font-weight: 700;
+}
+
+.language-submenu a:hover {
+  padding-left: var(--spacing-4);
 }
 
 @keyframes slideDown {
@@ -2095,12 +2133,24 @@ img {
     border-bottom: 1px solid var(--color-border);
   }
 
-  .menu > li:last-child {
+  .menu > li.user-menu {
     margin-left: 0;
+  }
+
+  .menu > li:last-child {
     border-bottom: none;
   }
 
   .menu > li > a {
+    width: 100%;
+    padding: var(--spacing-3);
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .language-trigger {
     width: 100%;
     padding: var(--spacing-3);
     font-size: 16px;
@@ -2569,6 +2619,42 @@ img {
 .home-welcome-subtitle {
   margin: 0;
   color: var(--color-text-secondary);
+}
+
+.home-language-switch {
+  margin-top: var(--spacing-4);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--color-border-light);
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.home-language-label {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  font-weight: 600;
+}
+
+.home-language-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  height: 28px;
+  padding: 0 9px;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.home-language-link:hover {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
 }
 
 .home-quick-actions {
@@ -3756,7 +3842,9 @@ img {
 .board-header,
 .alliances-header,
 .education-header,
-.statutes-header {
+.statutes-header,
+.portal-header,
+.intl-header {
   max-width: 920px;
   margin: 0 auto;
   text-align: center;
@@ -3766,7 +3854,9 @@ img {
 .board-kicker,
 .alliances-kicker,
 .education-kicker,
-.statutes-kicker {
+.statutes-kicker,
+.portal-kicker,
+.intl-kicker {
   display: inline-block;
   margin: 0 0 var(--spacing-3);
   padding: 6px 14px;
@@ -3784,7 +3874,9 @@ img {
 .board-title,
 .alliances-title,
 .education-title,
-.statutes-title {
+.statutes-title,
+.portal-title,
+.intl-title {
   margin: 0 0 var(--spacing-3);
   font-size: clamp(2rem, 3.6vw, 2.9rem);
   line-height: 1.16;
@@ -3794,7 +3886,9 @@ img {
 .board-subtitle,
 .alliances-subtitle,
 .education-subtitle,
-.statutes-subtitle {
+.statutes-subtitle,
+.portal-subtitle,
+.intl-subtitle {
   margin: 0;
   color: var(--color-text-secondary);
 }
@@ -3819,6 +3913,93 @@ img {
   justify-content: center;
   gap: var(--spacing-3);
   flex-wrap: wrap;
+}
+
+.portal-grid {
+  align-items: stretch;
+}
+
+.portal-card {
+  margin: 0;
+  height: 100%;
+}
+
+.portal-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  margin-bottom: var(--spacing-3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  background: var(--color-primary);
+}
+
+.portal-card-title {
+  margin: 0 0 var(--spacing-2);
+  font-size: 1.2rem;
+}
+
+.portal-card-description {
+  margin: 0 0 var(--spacing-4);
+  color: var(--color-text-secondary);
+}
+
+.portal-help-card {
+  margin: 0;
+  text-align: center;
+}
+
+.portal-help-title {
+  margin: 0 0 var(--spacing-2);
+}
+
+.portal-help-text {
+  margin: 0 auto var(--spacing-4);
+  max-width: 760px;
+  color: var(--color-text-secondary);
+}
+
+.portal-help-actions {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-3);
+  flex-wrap: wrap;
+}
+
+.intl-grid {
+  align-items: stretch;
+}
+
+.intl-card {
+  margin: 0;
+  height: 100%;
+}
+
+.intl-card-title {
+  margin: 0 0 var(--spacing-3);
+  font-size: 1.25rem;
+}
+
+.intl-card-text {
+  color: var(--color-text-secondary);
+}
+
+.intl-congress-name {
+  margin: 0 0 var(--spacing-2);
+  font-weight: 700;
+  color: var(--color-primary-dark);
+}
+
+.intl-list {
+  margin: 0 0 var(--spacing-4);
+  padding-left: var(--spacing-5);
+  color: var(--color-text-secondary);
+}
+
+.intl-list li {
+  margin-bottom: var(--spacing-2);
 }
 
 .history-timeline {
@@ -4086,7 +4267,9 @@ img {
   }
 
   .about-society-grid,
-  .history-timeline {
+  .history-timeline,
+  .portal-grid,
+  .intl-grid {
     grid-template-columns: 1fr;
   }
 
@@ -4133,14 +4316,16 @@ img {
 
   .history-cta-actions,
   .education-access-actions,
-  .statutes-actions {
+  .statutes-actions,
+  .portal-help-actions {
     flex-direction: column;
   }
 
   .history-cta-actions .btn,
   .education-access-actions .btn,
   .education-quick-links .btn,
-  .statutes-actions .btn {
+  .statutes-actions .btn,
+  .portal-help-actions .btn {
     width: 100%;
   }
 

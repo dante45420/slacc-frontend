@@ -143,7 +143,7 @@ export default function Educacion() {
               Acceso exclusivo para miembros activos de la sociedad.
             </p>
             <div className="education-access-actions">
-              <Link to="/login" className="btn btn-primary">
+              <Link to="/portal-socios" className="btn btn-primary">
                 Ingresar a Aula Virtual
               </Link>
               <Link to="/solicitar-membresia" className="btn btn-outline">

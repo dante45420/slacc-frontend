@@ -3,7 +3,7 @@ import { useAuth } from "../auth/AuthContext.jsx";
 import PropTypes from "prop-types";
 import { useState, useEffect } from "react";
 
-function MenuItem({ label, to, ariaLabel, children, onClick }) {
+function MenuItem({ label, to, ariaLabel, children, onClick, className }) {
   const [submenuOpen, setSubmenuOpen] = useState(false);
 
   const handleClick = e => {
@@ -16,7 +16,7 @@ function MenuItem({ label, to, ariaLabel, children, onClick }) {
   };
 
   return (
-    <li className={submenuOpen ? "submenu-open" : ""}>
+    <li className={`${submenuOpen ? "submenu-open" : ""} ${className || ""}`}>
       <Link to={to} onClick={handleClick} aria-label={ariaLabel}>
         {label}
         {children && (
@@ -38,6 +38,7 @@ MenuItem.propTypes = {
   ariaLabel: PropTypes.string,
   children: PropTypes.node,
   onClick: PropTypes.func,
+  className: PropTypes.string,
 };
 
 function SubLink({ to, label, onClick }) {
@@ -71,6 +72,7 @@ SubMenuGroup.propTypes = {
 export default function Header() {
   const { user, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [languageOpen, setLanguageOpen] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -137,6 +139,7 @@ export default function Header() {
 
   useEffect(() => {
     setMobileMenuOpen(false);
+    setLanguageOpen(false);
   }, [location.pathname]);
 
   const toggleMobileMenu = () => {
@@ -145,6 +148,16 @@ export default function Header() {
 
   const closeMobileMenu = () => {
     setMobileMenuOpen(false);
+    setLanguageOpen(false);
+  };
+
+  const handleLanguageToggle = () => {
+    setLanguageOpen(prev => !prev);
+  };
+
+  const handleLanguageSelect = () => {
+    setLanguageOpen(false);
+    closeMobileMenu();
   };
 
   return (
@@ -275,6 +288,11 @@ export default function Header() {
               label="Socios Activos"
               onClick={closeMobileMenu}
             />
+            <SubLink
+              to="/portal-socios"
+              label="Portal Privado"
+              onClick={closeMobileMenu}
+            />
           </MenuItem>
           <MenuItem
             label="Noticias"
@@ -310,6 +328,7 @@ export default function Header() {
             ariaLabel={user ? "Perfil" : "Iniciar sesión"}
             to={user ? "/perfil" : "/login"}
             onClick={closeMobileMenu}
+            className="user-menu"
           >
             {user ? (
               <button
@@ -336,6 +355,24 @@ export default function Header() {
               </>
             )}
           </MenuItem>
+          <li
+            className={`language-selector ${languageOpen ? "submenu-open" : ""}`}
+          >
+            <button
+              type="button"
+              className="language-trigger"
+              aria-label="Seleccionar idioma"
+              aria-expanded={languageOpen}
+              onClick={handleLanguageToggle}
+            >
+              <i className="fa-solid fa-earth-americas"></i>
+            </button>
+            <div className="submenu language-submenu">
+              <SubLink to="/" label="ES" onClick={handleLanguageSelect} />
+              <SubLink to="/en" label="EN" onClick={handleLanguageSelect} />
+              <SubLink to="/pt" label="PT" onClick={handleLanguageSelect} />
+            </div>
+          </li>
         </ul>
       </nav>
     </header>

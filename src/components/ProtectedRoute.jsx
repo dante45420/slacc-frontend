@@ -3,7 +3,11 @@ import PropTypes from "prop-types";
 import { useAuth } from "../auth/AuthContext.jsx";
 import { Spinner } from "../components/ui";
 
-export function ProtectedRoute({ children, requireAdmin = false }) {
+export function ProtectedRoute({
+  children,
+  requireAdmin = false,
+  requirePaid = false,
+}) {
   const { user, loading } = useAuth();
 
   // If still loading auth state, show loading spinner
@@ -25,10 +29,16 @@ export function ProtectedRoute({ children, requireAdmin = false }) {
     return <Navigate to="/" replace />;
   }
 
+  // Paid content is available to admins or members with paid status
+  if (requirePaid && user.role !== "admin" && user.payment_status !== "paid") {
+    return <Navigate to="/por-que-ser-socio" replace />;
+  }
+
   return children;
 }
 
 ProtectedRoute.propTypes = {
   children: PropTypes.node.isRequired,
   requireAdmin: PropTypes.bool,
+  requirePaid: PropTypes.bool,
 };

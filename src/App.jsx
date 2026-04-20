@@ -15,6 +15,12 @@ const Historia = lazy(() => import("./pages/public/Historia.jsx"));
 const Directiva = lazy(() => import("./pages/public/Directiva.jsx"));
 const Alianzas = lazy(() => import("./pages/public/Alianzas.jsx"));
 const Educacion = lazy(() => import("./pages/public/Educacion.jsx"));
+const InternationalEN = lazy(
+  () => import("./pages/public/InternationalEN.jsx"),
+);
+const InternationalPT = lazy(
+  () => import("./pages/public/InternationalPT.jsx"),
+);
 const NotFound = lazy(() => import("./pages/public/NotFound.jsx"));
 
 // Auth pages
@@ -42,6 +48,7 @@ const MembersDirectory = lazy(
 );
 const SociosActivos = lazy(() => import("./pages/members/SociosActivos.jsx"));
 const WhyJoin = lazy(() => import("./pages/members/WhyJoin.jsx"));
+const MemberPortal = lazy(() => import("./pages/members/MemberPortal.jsx"));
 
 // Admin pages
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard.jsx"));
@@ -76,6 +83,16 @@ export default function App() {
           >
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/en" element={<InternationalEN />} />
+              <Route path="/pt" element={<InternationalPT />} />
+              <Route
+                path="/en/congress"
+                element={<Navigate to="/eventos/proximos" replace />}
+              />
+              <Route
+                path="/pt/congresso"
+                element={<Navigate to="/eventos/proximos" replace />}
+              />
               <Route path="/noticias" element={<NewsList />} />
               <Route
                 path="/noticias/articulos-cientificos"
@@ -146,6 +163,14 @@ export default function App() {
               <Route
                 path="/miembros/socios-activos"
                 element={<SociosActivos />}
+              />
+              <Route
+                path="/portal-socios"
+                element={
+                  <ProtectedRoute requirePaid>
+                    <MemberPortal />
+                  </ProtectedRoute>
+                }
               />
               <Route path="/por-que-ser-socio" element={<WhyJoin />} />
               <Route path="/contacto" element={<Contact />} />

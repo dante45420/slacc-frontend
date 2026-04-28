@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Section, Card, Grid } from "../../components/ui";
 
 const alliedSocieties = [
@@ -40,29 +41,25 @@ const alliedSocieties = [
 ];
 
 export default function Alianzas() {
+  const { t } = useTranslation();
+
   return (
     <>
       <Section variant="primary" padding="lg" containerSize="lg">
         <div className="alliances-header">
-          <p className="alliances-kicker">Sociedades Nacionales</p>
-          <h1 className="alliances-title">Alianzas Regionales</h1>
-          <p className="alliances-subtitle">
-            Integracion de sociedades de cirugia de cadera para fortalecer la
-            cooperacion academica y el intercambio cientifico en Latinoamerica.
-          </p>
+          <p className="alliances-kicker">{t("alianzas.kicker")}</p>
+          <h1 className="alliances-title">{t("alianzas.title")}</h1>
+          <p className="alliances-subtitle">{t("alianzas.subtitle")}</p>
         </div>
       </Section>
 
       <Section padding="lg" containerSize="lg">
         <Card className="alliances-map-card">
-          <h2 className="alliances-map-title">Red Latinoamericana</h2>
-          <p className="alliances-map-description">
-            Mapa interactivo en desarrollo. Mientras tanto, puedes consultar el
-            listado actualizado de sociedades y puntos de contacto nacionales.
-          </p>
+          <h2 className="alliances-map-title">{t("alianzas.map_title")}</h2>
+          <p className="alliances-map-description">{t("alianzas.map_desc")}</p>
           <div className="alliances-map-placeholder" aria-hidden="true">
             <i className="fa-solid fa-map-location-dot"></i>
-            <span>Latinoamerica</span>
+            <span>{t("alianzas.map_placeholder")}</span>
           </div>
         </Card>
       </Section>
@@ -76,7 +73,9 @@ export default function Alianzas() {
             >
               <div className="alliances-card-header">
                 <h2 className="alliances-card-country">{society.country}</h2>
-                <span className="alliances-status">{society.status}</span>
+                <span className="alliances-status">
+                  {t(`alianzas.status.${society.status}`, society.status)}
+                </span>
               </div>
               <p className="alliances-card-society">{society.society}</p>
               <a

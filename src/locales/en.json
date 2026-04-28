@@ -1,0 +1,229 @@
+{
+  "header": {
+    "admin": "Admin",
+    "society": "The Society",
+    "mission": "Mission, Vision & Values",
+    "board": "Executive Board",
+    "history": "History",
+    "statutes": "Statutes",
+    "committees": "Committees",
+    "alliances": "Alliances",
+    "education": "Education",
+    "certification": "Endorsement & Certification",
+    "scholarships": "Scholarships & Internships",
+    "virtual_classroom": "Virtual Classroom",
+    "events": "Events",
+    "past_events": "Past",
+    "upcoming_events": "Upcoming",
+    "congress": "Latin American Congress",
+    "all_events": "All",
+    "webinars": "Webinars",
+    "members": "Members",
+    "benefits": "Benefits",
+    "directory": "Directory",
+    "join": "Become a member",
+    "active_members": "Active Members",
+    "private_portal": "Private Portal",
+    "news": "News",
+    "scientific_articles": "Scientific Articles",
+    "featured_articles": "Featured Articles",
+    "editorials": "Editorials",
+    "submit_article": "Submit Article",
+    "contact": "Contact",
+    "login": "Login",
+    "logout": "Logout",
+    "request_membership": "Request Membership",
+    "select_language": "Select Language"
+  },
+  "directiva": {
+    "society_kicker": "The Society",
+    "title": "Board of Directors and Executive Committee",
+    "subtitle": "Regional leadership committed to academic, scientific, and healthcare excellence in hip surgery.",
+    "committee_title": "Executive Committee",
+    "committee_subtitle": "Working team coordinating academic programs, regional relations, and society technical guidelines.",
+    "roles": {
+      "Presidente": "President",
+      "1er. Vicepresidente": "1st Vice President",
+      "2do vicepresidente": "2nd Vice President",
+      "Secretario": "Secretary",
+      "Tesorero": "Treasurer",
+      "Director internacional": "International Director",
+      "Directora Next Gen": "Next Gen Director"
+    }
+  },
+  "historia": {
+    "kicker": "The Society",
+    "title": "Our History",
+    "subtitle": "We were born to unite hip surgery specialists in the region with a common vision: excellence in training, ethical practice, and permanent scientific collaboration.",
+    "milestones": [
+      {
+        "year": "2018",
+        "title": "Foundation of the academic network",
+        "description": "A group of Latin American hip surgery specialists initiated a regional working group to standardize training criteria and clinical practice."
+      },
+      {
+        "year": "2020",
+        "title": "First collaborative program",
+        "description": "Joint activities between national societies were formalized with clinical sessions, case conferences, and regional webinars."
+      },
+      {
+        "year": "2023",
+        "title": "Institutional consolidation",
+        "description": "SLACC strengthened its academic and operational structure to coordinate ongoing training, research, and certification programs."
+      },
+      {
+        "year": "Today",
+        "title": "Continental expansion",
+        "description": "The society is actively working to integrate more specialists and consistently raise quality standards throughout Latin America."
+      }
+    ],
+    "cta": {
+      "title": "Also check out",
+      "description": "Explore our institutional organization, guidelines, and leadership team.",
+      "btn_board": "Board of Directors",
+      "btn_statutes": "Statutes and Regulations"
+    }
+  },
+  "home": {
+    "welcome_title": "Uniting excellence in Hip Surgery throughout Latin America",
+    "welcome_subtitle": "Scientific integration, continuous training, and regional collaboration to raise quality standards in patient care.",
+    "language_label": "Language:",
+    "quick_access": "Quick Links",
+    "btn_member": "Become a Member",
+    "btn_congress": "Next Congress / Event",
+    "btn_scholarships": "Scholarship Program",
+    "instagram_title": "Follow us on Instagram",
+    "sponsored_events": "SLACC Sponsored Events",
+    "btn_see_all": "See all",
+    "recent_news": "Recent News",
+    "our_team": "Our Team"
+  },
+  "alianzas": {
+    "kicker": "National Societies",
+    "title": "Regional Alliances",
+    "subtitle": "Integration of hip surgery societies to strengthen academic cooperation and scientific exchange in Latin America.",
+    "map_title": "Latin American Network",
+    "map_desc": "Interactive map under development. Meanwhile, you can check the updated list of societies and national contact points.",
+    "map_placeholder": "Latin America",
+    "status": {
+      "Activa": "Active",
+      "En integracion": "Integrating"
+    }
+  },
+  "estatutos": {
+    "kicker": "Institutional Pillars",
+    "title": "Who We Are",
+    "subtitle": "We are the Latin American Society of Hip Surgery, a scientific network aimed at strengthening the surgical, academic, and ethical practice of our specialty throughout the region.",
+    "mission_title": "Our Mission",
+    "mission_text": "To gather and represent hip surgery specialists from all over Latin America, promoting academic, scientific, and ethical excellence in the treatment of hip pathologies. We are dedicated to driving knowledge exchange, disseminating new surgical techniques, and coordinating, supervising, and guaranteeing the highest quality in the training of new generations of specialists, working in close synergy with the national societies of each country.",
+    "vision_title": "Our Vision",
+    "vision_text": "To be the benchmark scientific institution and the governing body of hip surgery in Latin America. We aim to consolidate an integrated network of specialists that consistently raises quality standards in patient care, leading surgical innovation, scientific research, and the certification of continuous medical education programs continent-wide.",
+    "values_title": "Our Foundations and Values",
+    "values_subtitle": "These principles guide every institutional action, every academic instance, and every scientific decision we promote at SLACC.",
+    "values": [
+      {
+        "title": "Academic and Surgical Excellence",
+        "description": "We promote the standardization and constant updating of the most advanced and safe surgical techniques for the benefit of our patients."
+      },
+      {
+        "title": "Regional Integration",
+        "description": "We believe in the strength of unity. We foster collaborative work and cultural and scientific exchange among the hip societies of all Latin American countries."
+      },
+      {
+        "title": "Teaching Commitment",
+        "description": "We assume the responsibility of guiding, facilitating, and endorsing the training of new surgeons through structured programs, internships, and specialization scholarships."
+      },
+      {
+        "title": "Professional Ethics",
+        "description": "We guide all our actions and research under the strictest principles of integrity, transparency, and scientific rigor."
+      },
+      {
+        "title": "Innovation",
+        "description": "We support and disseminate scientific research and the development of new technologies applied to hip orthopedics and traumatology."
+      }
+    ],
+    "society_board_title": "Board of Directors",
+    "society_board_text": "Meet the executive committee and leaders coordinating SLACC's academic and scientific agenda.",
+    "society_board_btn": "View Board of Directors",
+    "society_history_title": "History",
+    "society_history_text": "Review the institutional evolution of the society and the milestones that marked our regional integration.",
+    "society_history_btn": "View History",
+    "society_statutes_title": "Statutes",
+    "society_statutes_text": "Download the current institutional regulations in PDF format.",
+    "society_statutes_btn": "View Statutes Section"
+  },
+  "estatutos_doc": {
+    "kicker": "The Society",
+    "title": "Statutes and Regulations",
+    "subtitle": "Here you can download the official document of statutes once the final version is published by the board.",
+    "card_title": "Institutional Document",
+    "card_text": "PDF download is temporarily disabled until we have the definitive file validated by the client.",
+    "btn_download": "Download Statutes PDF (Coming soon)",
+    "btn_back": "Back to Who We Are"
+  },
+  "comites": {
+    "title": "SLACC Committees",
+    "subtitle": "Specialized working groups that drive the development of our society",
+    "members_title": "Committee Members",
+    "functions_title": "Functions of the Committees",
+    "functions_p1": "The SLACC committees are working groups made up of prominent members of the society, responsible for specific areas of professional and organizational development.",
+    "functions_p2": "Each committee works autonomously but coordinated with the board, developing initiatives, programs, and activities that contribute to the fulfillment of institutional objectives.",
+    "functions_p3": "If you are interested in participating in any committee or want more information about their activities, please contact the society's secretariat.",
+    "list": [
+      {
+        "name": "Subspecialties Committee",
+        "description": "Coordination and development of specialized areas in cardiovascular surgery",
+        "roles": {
+          "Presidente": "President",
+          "Secretaria": "Secretary",
+          "Vocal": "Vocal"
+        }
+      },
+      {
+        "name": "Ethics Committee",
+        "description": "Supervision of ethical and deontological standards in professional practice",
+        "roles": {
+          "Presidenta": "President",
+          "Secretario": "Secretary",
+          "Vocal": "Vocal"
+        }
+      },
+      {
+        "name": "Scientific Committee",
+        "description": "Promotion of scientific research and publications",
+        "roles": {
+          "Presidente": "President",
+          "Secretaria": "Secretary",
+          "Vocal": "Vocal"
+        }
+      },
+      {
+        "name": "Committee A",
+        "description": "Specialized group for the development of strategic initiatives",
+        "roles": {
+          "Presidente": "President",
+          "Secretaria": "Secretary",
+          "Vocal": "Vocal"
+        }
+      },
+      {
+        "name": "Committee B",
+        "description": "Group focused on the coordination of academic activities",
+        "roles": {
+          "Presidenta": "President",
+          "Secretario": "Secretary",
+          "Vocal": "Vocal"
+        }
+      },
+      {
+        "name": "Committee C",
+        "description": "Group dedicated to the analysis and monitoring of institutional projects",
+        "roles": {
+          "Presidente": "President",
+          "Secretaria": "Secretary",
+          "Vocal": "Vocal"
+        }
+      }
+    ]
+  }
+}

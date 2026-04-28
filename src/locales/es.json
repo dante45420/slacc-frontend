@@ -1,0 +1,229 @@
+{
+  "header": {
+    "admin": "Admin",
+    "society": "La Sociedad",
+    "mission": "Misión, Visión y Valores",
+    "board": "Mesa Directiva",
+    "history": "Historia",
+    "statutes": "Estatutos",
+    "committees": "Comités",
+    "alliances": "Alianzas",
+    "education": "Educación",
+    "certification": "Aval y Certificación",
+    "scholarships": "Becas y Pasantías",
+    "virtual_classroom": "Aula Virtual",
+    "events": "Eventos",
+    "past_events": "Pasados",
+    "upcoming_events": "Próximos",
+    "congress": "Congreso Latinoamericano",
+    "all_events": "Todos",
+    "webinars": "Webinars",
+    "members": "Miembros",
+    "benefits": "Beneficios",
+    "directory": "Directorio",
+    "join": "Hazte socio",
+    "active_members": "Socios Activos",
+    "private_portal": "Portal Privado",
+    "news": "Noticias",
+    "scientific_articles": "Artículos científicos",
+    "featured_articles": "Artículos destacados",
+    "editorials": "Editoriales",
+    "submit_article": "Enviar artículo",
+    "contact": "Contacto",
+    "login": "Iniciar sesión",
+    "logout": "Cerrar sesión",
+    "request_membership": "Solicitar membresía",
+    "select_language": "Seleccionar idioma"
+  },
+  "directiva": {
+    "society_kicker": "La Sociedad",
+    "title": "Mesa Directiva y Comité Ejecutivo",
+    "subtitle": "Liderazgo regional comprometido con la excelencia académica, científica y asistencial en cirugía de cadera.",
+    "committee_title": "Comité Ejecutivo",
+    "committee_subtitle": "Equipo de trabajo que coordina programas académicos, relacionamiento regional y lineamientos técnicos de la sociedad.",
+    "roles": {
+      "Presidente": "Presidente",
+      "1er. Vicepresidente": "1er. Vicepresidente",
+      "2do vicepresidente": "2do Vicepresidente",
+      "Secretario": "Secretario",
+      "Tesorero": "Tesorero",
+      "Director internacional": "Director Internacional",
+      "Directora Next Gen": "Directora Next Gen"
+    }
+  },
+  "historia": {
+    "kicker": "La Sociedad",
+    "title": "Nuestra Historia",
+    "subtitle": "Nacimos para unir a los especialistas en cirugía de cadera de la región, con una visión común: formación de excelencia, práctica ética y colaboración científica permanente.",
+    "milestones": [
+      {
+        "year": "2018",
+        "title": "Fundación de la red académica",
+        "description": "Un grupo de especialistas latinoamericanos en cirugía de cadera inicia una mesa de trabajo regional para estandarizar criterios de formación y práctica clínica."
+      },
+      {
+        "year": "2020",
+        "title": "Primer programa colaborativo",
+        "description": "Se formalizan actividades conjuntas entre sociedades nacionales con sesiones clínicas, ateneos y webinars regionales."
+      },
+      {
+        "year": "2023",
+        "title": "Consolidación institucional",
+        "description": "SLACC fortalece su estructura académica y operativa para coordinar programas de capacitación, investigación y certificación continua."
+      },
+      {
+        "year": "Hoy",
+        "title": "Expansión continental",
+        "description": "La sociedad trabaja activamente para integrar más especialistas y elevar de forma sostenida los estándares de calidad en toda Latinoamérica."
+      }
+    ],
+    "cta": {
+      "title": "Conoce también",
+      "description": "Explora nuestra organización institucional, lineamientos y equipo de liderazgo.",
+      "btn_board": "Mesa Directiva",
+      "btn_statutes": "Estatutos y Reglamento"
+    }
+  },
+  "home": {
+    "welcome_title": "Uniendo la excelencia en Cirugía de Cadera en toda Latinoamérica",
+    "welcome_subtitle": "Integración científica, formación continua y colaboración regional para elevar los estándares de calidad en el cuidado del paciente.",
+    "language_label": "Idioma:",
+    "quick_access": "Accesos rápidos",
+    "btn_member": "Hazte Miembro",
+    "btn_congress": "Próximo Congreso / Evento",
+    "btn_scholarships": "Programa de Becas",
+    "instagram_title": "Síguenos en Instagram",
+    "sponsored_events": "Eventos patrocinados por SLACC",
+    "btn_see_all": "Ver todos",
+    "recent_news": "Noticias recientes",
+    "our_team": "Nuestro equipo"
+  },
+  "alianzas": {
+    "kicker": "Sociedades Nacionales",
+    "title": "Alianzas Regionales",
+    "subtitle": "Integración de sociedades de cirugía de cadera para fortalecer la cooperación académica y el intercambio científico en Latinoamérica.",
+    "map_title": "Red Latinoamericana",
+    "map_desc": "Mapa interactivo en desarrollo. Mientras tanto, puedes consultar el listado actualizado de sociedades y puntos de contacto nacionales.",
+    "map_placeholder": "Latinoamérica",
+    "status": {
+      "Activa": "Activa",
+      "En integracion": "En integración"
+    }
+  },
+  "estatutos": {
+    "kicker": "Pilares Institucionales",
+    "title": "Quiénes Somos",
+    "subtitle": "Somos la Sociedad Latinoamericana de Cirugía de Cadera, una red científica orientada a fortalecer la práctica quirúrgica, académica y ética de nuestra especialidad en toda la región.",
+    "mission_title": "Nuestra Misión",
+    "mission_text": "Congregar y representar a los cirujanos especialistas en cadera de toda Latinoamérica, fomentando la excelencia académica, científica y ética en el tratamiento de las patologías de cadera. Nos dedicamos a impulsar el intercambio de conocimientos, la difusión de nuevas técnicas quirúrgicas y a coordinar, supervisar y ser garantes de la más alta calidad en la formación de las nuevas generaciones de especialistas, trabajando en estrecha sinergia con las sociedades nacionales de cada país.",
+    "vision_title": "Nuestra Visión",
+    "vision_text": "Ser la institución científica de referencia y el ente rector de la cirugía de cadera en Latinoamérica. Aspiramos a consolidar una red integrada de especialistas que eleve de manera constante los estándares de calidad en el cuidado del paciente, liderando la innovación quirúrgica, la investigación científica y la certificación de programas de formación médica continua a nivel continental.",
+    "values_title": "Nuestros Fundamentos y Valores",
+    "values_subtitle": "Estos principios orientan cada acción institucional, cada instancia académica y cada decisión científica que promovemos en SLACC.",
+    "values": [
+      {
+        "title": "Excelencia Académica y Quirúrgica",
+        "description": "Promovemos la estandarización y actualización constante en las técnicas quirúrgicas más avanzadas y seguras para el beneficio de los pacientes."
+      },
+      {
+        "title": "Integración Regional",
+        "description": "Creemos en la fuerza de la unidad. Fomentamos el trabajo colaborativo y el intercambio cultural y científico entre las sociedades de cadera de todos los países latinoamericanos."
+      },
+      {
+        "title": "Compromiso Docente",
+        "description": "Asumimos la responsabilidad de guiar, facilitar y avalar la formación de nuevos cirujanos a través de programas estructurados, pasantías y becas de especialización."
+      },
+      {
+        "title": "Ética Profesional",
+        "description": "Guiamos todas nuestras acciones e investigaciones bajo los más estrictos principios de integridad, transparencia y rigor científico."
+      },
+      {
+        "title": "Innovación",
+        "description": "Apoyamos y difundimos la investigación científica y el desarrollo de nuevas tecnologías aplicadas a la ortopedia y traumatología de cadera."
+      }
+    ],
+    "society_board_title": "Mesa Directiva",
+    "society_board_text": "Conoce al comité ejecutivo y a los líderes que coordinan la agenda académica y científica de SLACC.",
+    "society_board_btn": "Ver Mesa Directiva",
+    "society_history_title": "Historia",
+    "society_history_text": "Revisa la evolución institucional de la sociedad y los hitos que marcaron nuestra integración regional.",
+    "society_history_btn": "Ver Historia",
+    "society_statutes_title": "Estatutos",
+    "society_statutes_text": "Descarga el reglamento institucional vigente en formato PDF.",
+    "society_statutes_btn": "Ver sección de Estatutos"
+  },
+  "estatutos_doc": {
+    "kicker": "La Sociedad",
+    "title": "Estatutos y Reglamento",
+    "subtitle": "Aquí podrás descargar el documento oficial de estatutos una vez que la versión final sea publicada por la directiva.",
+    "card_title": "Documento Institucional",
+    "card_text": "La descarga del PDF se encuentra temporalmente deshabilitada hasta contar con el archivo definitivo validado por el cliente.",
+    "btn_download": "Descargar Estatutos PDF (Próximamente)",
+    "btn_back": "Volver a Quiénes Somos"
+  },
+  "comites": {
+    "title": "Comités SLACC",
+    "subtitle": "Grupos de trabajo especializados que impulsan el desarrollo de nuestra sociedad",
+    "members_title": "Miembros del Comité",
+    "functions_title": "Funciones de los Comités",
+    "functions_p1": "Los comités de la SLACC son grupos de trabajo conformados por miembros destacados de la sociedad, que se encargan de áreas específicas del desarrollo profesional y organizacional.",
+    "functions_p2": "Cada comité trabaja de manera autónoma pero coordinada con la directiva, desarrollando iniciativas, programas y actividades que contribuyen al cumplimiento de los objetivos institucionales.",
+    "functions_p3": "Si está interesado en participar en algún comité o desea más información sobre sus actividades, por favor contacte a la secretaría de la sociedad.",
+    "list": [
+      {
+        "name": "Comité de Subespecialidades",
+        "description": "Coordinación y desarrollo de áreas especializadas en cirugía cardiovascular",
+        "roles": {
+          "Presidente": "Presidente",
+          "Secretaria": "Secretaria",
+          "Vocal": "Vocal"
+        }
+      },
+      {
+        "name": "Comité de Ética",
+        "description": "Supervisión de estándares éticos y deontológicos en la práctica profesional",
+        "roles": {
+          "Presidenta": "Presidenta",
+          "Secretario": "Secretario",
+          "Vocal": "Vocal"
+        }
+      },
+      {
+        "name": "Comité Científico",
+        "description": "Promoción de la investigación y publicaciones científicas",
+        "roles": {
+          "Presidente": "Presidente",
+          "Secretaria": "Secretaria",
+          "Vocal": "Vocal"
+        }
+      },
+      {
+        "name": "Comité A",
+        "description": "Grupo especializado en el desarrollo de iniciativas estratégicas",
+        "roles": {
+          "Presidente": "Presidente",
+          "Secretaria": "Secretaria",
+          "Vocal": "Vocal"
+        }
+      },
+      {
+        "name": "Comité B",
+        "description": "Grupo enfocado en la coordinación de actividades académicas",
+        "roles": {
+          "Presidenta": "Presidenta",
+          "Secretario": "Secretario",
+          "Vocal": "Vocal"
+        }
+      },
+      {
+        "name": "Comité C",
+        "description": "Grupo dedicado al análisis y seguimiento de proyectos institucionales",
+        "roles": {
+          "Presidente": "Presidente",
+          "Secretaria": "Secretaria",
+          "Vocal": "Vocal"
+        }
+      }
+    ]
+  }
+}

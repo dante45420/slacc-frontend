@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext.jsx";
 import PropTypes from "prop-types";
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
 function MenuItem({ label, to, ariaLabel, children, onClick, className }) {
   const [submenuOpen, setSubmenuOpen] = useState(false);
@@ -74,6 +75,7 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [languageOpen, setLanguageOpen] = useState(false);
   const location = useLocation();
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     const updateViewportAndHeader = () => {
@@ -155,7 +157,8 @@ export default function Header() {
     setLanguageOpen(prev => !prev);
   };
 
-  const handleLanguageSelect = () => {
+  const handleLanguageSelect = lang => {
+    i18n.changeLanguage(lang);
     setLanguageOpen(false);
     closeMobileMenu();
   };
@@ -176,7 +179,7 @@ export default function Header() {
         <button
           className="hamburger-menu"
           onClick={toggleMobileMenu}
-          aria-label="Toggle menu"
+          aria-label={t("header.select_language", "Toggle menu")}
           aria-expanded={mobileMenuOpen}
         >
           <i
@@ -197,135 +200,171 @@ export default function Header() {
 
         <ul className={`menu ${mobileMenuOpen ? "menu-open" : ""}`}>
           {user?.role === "admin" && (
-            <MenuItem label="Admin" to="/admin" onClick={closeMobileMenu} />
+            <MenuItem
+              label={t("header.admin", "Admin")}
+              to="/admin"
+              onClick={closeMobileMenu}
+            />
           )}
           <MenuItem
-            label="La Sociedad"
+            label={t("header.society", "La Sociedad")}
             to="/nosotros"
             onClick={closeMobileMenu}
           >
             <SubLink
               to="/nosotros/mision"
-              label="Misión, Visión y Valores"
+              label={t("header.mission", "Misión, Visión y Valores")}
               onClick={closeMobileMenu}
             />
             <SubLink
               to="/nosotros/directiva"
-              label="Mesa Directiva"
+              label={t("header.board", "Mesa Directiva")}
               onClick={closeMobileMenu}
             />
             <SubLink
               to="/nosotros/historia"
-              label="Historia"
+              label={t("header.history", "Historia")}
               onClick={closeMobileMenu}
             />
             <SubLink
               to="/nosotros/estatutos"
-              label="Estatutos"
-              onClick={closeMobileMenu}
-            />
-            <SubLink to="/comites" label="Comités" onClick={closeMobileMenu} />
-          </MenuItem>
-          <MenuItem label="Alianzas" to="/alianzas" onClick={closeMobileMenu} />
-          <MenuItem label="Educación" to="/educacion" onClick={closeMobileMenu}>
-            <SubLink
-              to="/educacion/aval-certificacion"
-              label="Aval y Certificación"
+              label={t("header.statutes", "Estatutos")}
               onClick={closeMobileMenu}
             />
             <SubLink
-              to="/educacion/becas"
-              label="Becas y Pasantías"
-              onClick={closeMobileMenu}
-            />
-            <SubLink
-              to="/educacion/videoteca"
-              label="Aula Virtual"
-              onClick={closeMobileMenu}
-            />
-          </MenuItem>
-          <MenuItem label="Eventos" to="/eventos" onClick={closeMobileMenu}>
-            <SubLink
-              to="/eventos/pasados"
-              label="Pasados"
-              onClick={closeMobileMenu}
-            />
-            <SubLink
-              to="/eventos/proximos"
-              label="Próximos"
-              onClick={closeMobileMenu}
-            />
-            <SubLink
-              to="/eventos/proximos"
-              label="Congreso Latinoamericano"
-              onClick={closeMobileMenu}
-            />
-            <SubLink to="/eventos" label="Todos" onClick={closeMobileMenu} />
-            <SubLink
-              to="/eventos/webinars"
-              label="Webinars"
-              onClick={closeMobileMenu}
-            />
-          </MenuItem>
-          <MenuItem label="Miembros" to="/miembros" onClick={closeMobileMenu}>
-            <SubLink
-              to="/por-que-ser-socio"
-              label="Beneficios"
-              onClick={closeMobileMenu}
-            />
-            <SubLink
-              to="/miembros/directorio"
-              label="Directorio"
-              onClick={closeMobileMenu}
-            />
-            <SubLink
-              to="/por-que-ser-socio"
-              label="Hazte socio"
-              onClick={closeMobileMenu}
-            />
-            <SubLink
-              to="/miembros/socios-activos"
-              label="Socios Activos"
-              onClick={closeMobileMenu}
-            />
-            <SubLink
-              to="/portal-socios"
-              label="Portal Privado"
+              to="/comites"
+              label={t("header.committees", "Comités")}
               onClick={closeMobileMenu}
             />
           </MenuItem>
           <MenuItem
-            label="Noticias"
+            label={t("header.alliances", "Alianzas")}
+            to="/alianzas"
+            onClick={closeMobileMenu}
+          />
+          <MenuItem
+            label={t("header.education", "Educación")}
+            to="/educacion"
+            onClick={closeMobileMenu}
+          >
+            <SubLink
+              to="/educacion/aval-certificacion"
+              label={t("header.certification", "Aval y Certificación")}
+              onClick={closeMobileMenu}
+            />
+            <SubLink
+              to="/educacion/becas"
+              label={t("header.scholarships", "Becas y Pasantías")}
+              onClick={closeMobileMenu}
+            />
+            <SubLink
+              to="/educacion/videoteca"
+              label={t("header.virtual_classroom", "Aula Virtual")}
+              onClick={closeMobileMenu}
+            />
+          </MenuItem>
+          <MenuItem
+            label={t("header.events", "Eventos")}
+            to="/eventos"
+            onClick={closeMobileMenu}
+          >
+            <SubLink
+              to="/eventos/pasados"
+              label={t("header.past_events", "Pasados")}
+              onClick={closeMobileMenu}
+            />
+            <SubLink
+              to="/eventos/proximos"
+              label={t("header.upcoming_events", "Próximos")}
+              onClick={closeMobileMenu}
+            />
+            <SubLink
+              to="/eventos/proximos"
+              label={t("header.congress", "Congreso Latinoamericano")}
+              onClick={closeMobileMenu}
+            />
+            <SubLink
+              to="/eventos"
+              label={t("header.all_events", "Todos")}
+              onClick={closeMobileMenu}
+            />
+            <SubLink
+              to="/eventos/webinars"
+              label={t("header.webinars", "Webinars")}
+              onClick={closeMobileMenu}
+            />
+          </MenuItem>
+          <MenuItem
+            label={t("header.members", "Miembros")}
+            to="/miembros"
+            onClick={closeMobileMenu}
+          >
+            <SubLink
+              to="/por-que-ser-socio"
+              label={t("header.benefits", "Beneficios")}
+              onClick={closeMobileMenu}
+            />
+            <SubLink
+              to="/miembros/directorio"
+              label={t("header.directory", "Directorio")}
+              onClick={closeMobileMenu}
+            />
+            <SubLink
+              to="/por-que-ser-socio"
+              label={t("header.join", "Hazte socio")}
+              onClick={closeMobileMenu}
+            />
+            <SubLink
+              to="/miembros/socios-activos"
+              label={t("header.active_members", "Socios Activos")}
+              onClick={closeMobileMenu}
+            />
+            <SubLink
+              to="/portal-socios"
+              label={t("header.private_portal", "Portal Privado")}
+              onClick={closeMobileMenu}
+            />
+          </MenuItem>
+          <MenuItem
+            label={t("header.news", "Noticias")}
             to="/noticias/articulos-cientificos"
             onClick={closeMobileMenu}
           >
             <SubLink
               to="/noticias/articulos-cientificos"
-              label="Artículos científicos"
+              label={t("header.scientific_articles", "Artículos científicos")}
               onClick={closeMobileMenu}
             />
             <SubLink
               to="/noticias/articulos-destacados"
-              label="Artículos destacados"
+              label={t("header.featured_articles", "Artículos destacados")}
               onClick={closeMobileMenu}
             />
             <SubLink
               to="/noticias/editoriales"
-              label="Editoriales"
+              label={t("header.editorials", "Editoriales")}
               onClick={closeMobileMenu}
             />
             {user && (
               <SubLink
                 to="/subir-noticia"
-                label="Enviar artículo"
+                label={t("header.submit_article", "Enviar artículo")}
                 onClick={closeMobileMenu}
               />
             )}
           </MenuItem>
-          <MenuItem label="Contacto" to="/contacto" onClick={closeMobileMenu} />
+          <MenuItem
+            label={t("header.contact", "Contacto")}
+            to="/contacto"
+            onClick={closeMobileMenu}
+          />
           <MenuItem
             label={<i className="fa-solid fa-user"></i>}
-            ariaLabel={user ? "Perfil" : "Iniciar sesión"}
+            ariaLabel={
+              user
+                ? t("header.profile", "Perfil")
+                : t("header.login", "Iniciar sesión")
+            }
             to={user ? "/perfil" : "/login"}
             onClick={closeMobileMenu}
             className="user-menu"
@@ -338,18 +377,18 @@ export default function Header() {
                   closeMobileMenu();
                 }}
               >
-                Cerrar sesión
+                {t("header.logout", "Cerrar sesión")}
               </button>
             ) : (
               <>
                 <SubLink
                   to="/login"
-                  label="Iniciar sesión"
+                  label={t("header.login", "Iniciar sesión")}
                   onClick={closeMobileMenu}
                 />
                 <SubLink
                   to="/solicitar-membresia"
-                  label="Solicitar membresía"
+                  label={t("header.request_membership", "Solicitar membresía")}
                   onClick={closeMobileMenu}
                 />
               </>
@@ -368,9 +407,48 @@ export default function Header() {
               <i className="fa-solid fa-earth-americas"></i>
             </button>
             <div className="submenu language-submenu">
-              <SubLink to="/" label="ES" onClick={handleLanguageSelect} />
-              <SubLink to="/en" label="EN" onClick={handleLanguageSelect} />
-              <SubLink to="/pt" label="PT" onClick={handleLanguageSelect} />
+              <button
+                type="button"
+                style={{
+                  background: "none",
+                  border: "none",
+                  padding: "0.75rem 1rem",
+                  cursor: "pointer",
+                  textAlign: "left",
+                  width: "100%",
+                }}
+                onClick={() => handleLanguageSelect("es")}
+              >
+                ES
+              </button>
+              <button
+                type="button"
+                style={{
+                  background: "none",
+                  border: "none",
+                  padding: "0.75rem 1rem",
+                  cursor: "pointer",
+                  textAlign: "left",
+                  width: "100%",
+                }}
+                onClick={() => handleLanguageSelect("en")}
+              >
+                EN
+              </button>
+              <button
+                type="button"
+                style={{
+                  background: "none",
+                  border: "none",
+                  padding: "0.75rem 1rem",
+                  cursor: "pointer",
+                  textAlign: "left",
+                  width: "100%",
+                }}
+                onClick={() => handleLanguageSelect("pt")}
+              >
+                PT
+              </button>
             </div>
           </li>
         </ul>

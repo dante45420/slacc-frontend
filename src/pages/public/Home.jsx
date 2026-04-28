@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import Carousel from "../../components/Carousel.jsx";
 import EventsCarousel from "../../components/EventsCarousel.jsx";
 import InstagramFeed from "../../components/InstagramFeed.jsx";
@@ -8,6 +9,13 @@ import Container from "../../components/ui/Container.jsx";
 import Button from "../../components/ui/Button.jsx";
 
 export default function Home() {
+  const { t, i18n } = useTranslation();
+
+  const handleLanguageSelect = (e, lang) => {
+    e.preventDefault();
+    i18n.changeLanguage(lang);
+  };
+
   return (
     <div className="home-page">
       <section className="home-hero-section">
@@ -16,25 +24,37 @@ export default function Home() {
 
       <Container size="lg">
         <div className="home-welcome-banner">
-          <h1 className="home-welcome-title">
-            Uniendo la excelencia en Cirugia de Cadera en toda Latinoamerica
-          </h1>
-          <p className="home-welcome-subtitle">
-            Integracion cientifica, formacion continua y colaboracion regional
-            para elevar los estandares de calidad en el cuidado del paciente.
-          </p>
+          <h1 className="home-welcome-title">{t("home.welcome_title")}</h1>
+          <p className="home-welcome-subtitle">{t("home.welcome_subtitle")}</p>
 
           <div className="home-language-switch">
-            <span className="home-language-label">Idioma:</span>
-            <Link to="/" className="home-language-link">
+            <span className="home-language-label">
+              {t("home.language_label")}
+            </span>
+            <a
+              href="#"
+              onClick={e => handleLanguageSelect(e, "es")}
+              className="home-language-link"
+              style={{ fontWeight: i18n.language === "es" ? "bold" : "normal" }}
+            >
               ES
-            </Link>
-            <Link to="/en" className="home-language-link">
+            </a>
+            <a
+              href="#"
+              onClick={e => handleLanguageSelect(e, "en")}
+              className="home-language-link"
+              style={{ fontWeight: i18n.language === "en" ? "bold" : "normal" }}
+            >
               EN
-            </Link>
-            <Link to="/pt" className="home-language-link">
+            </a>
+            <a
+              href="#"
+              onClick={e => handleLanguageSelect(e, "pt")}
+              className="home-language-link"
+              style={{ fontWeight: i18n.language === "pt" ? "bold" : "normal" }}
+            >
               PT
-            </Link>
+            </a>
           </div>
         </div>
       </Container>
@@ -42,16 +62,16 @@ export default function Home() {
       <Container size="lg">
         <div className="home-main-card">
           <div className="home-section">
-            <h2 className="home-section-title">Accesos rapidos</h2>
+            <h2 className="home-section-title">{t("home.quick_access")}</h2>
             <div className="home-quick-actions">
               <Link to="/solicitar-membresia" className="btn btn-primary">
-                Hazte Miembro
+                {t("home.btn_member")}
               </Link>
               <Link to="/eventos/proximos" className="btn btn-outline">
-                Proximo Congreso / Evento
+                {t("home.btn_congress")}
               </Link>
               <Link to="/educacion/becas" className="btn btn-outline">
-                Programa de Becas
+                {t("home.btn_scholarships")}
               </Link>
             </div>
           </div>
@@ -59,7 +79,7 @@ export default function Home() {
           <hr className="home-divider" />
 
           <div className="home-section">
-            <h2 className="home-section-title">Síguenos en Instagram</h2>
+            <h2 className="home-section-title">{t("home.instagram_title")}</h2>
             <InstagramFeed />
           </div>
 
@@ -68,11 +88,12 @@ export default function Home() {
           <div className="home-section">
             <div className="home-section-header">
               <h2 className="home-section-title-inline">
-                Eventos patrocinados por SLACC
+                {t("home.sponsored_events")}
               </h2>
               <Link to="/eventos/webinars">
                 <Button variant="outline">
-                  Ver todos <i className="fa-solid fa-arrow-right"></i>
+                  {t("home.btn_see_all")}{" "}
+                  <i className="fa-solid fa-arrow-right"></i>
                 </Button>
               </Link>
             </div>
@@ -82,14 +103,14 @@ export default function Home() {
           <hr className="home-divider" />
 
           <div className="home-section">
-            <h2 className="home-section-title">Noticias recientes</h2>
+            <h2 className="home-section-title">{t("home.recent_news")}</h2>
             <NewsCarousel limit={9} />
           </div>
 
           <hr className="home-divider" />
 
           <div className="home-section">
-            <h2 className="home-section-title">Nuestro equipo</h2>
+            <h2 className="home-section-title">{t("home.our_team")}</h2>
             <TeamCarousel />
           </div>
         </div>

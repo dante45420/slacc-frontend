@@ -1,0 +1,229 @@
+{
+  "header": {
+    "admin": "Admin",
+    "society": "A Sociedade",
+    "mission": "Missão, Visão e Valores",
+    "board": "Mesa Diretora",
+    "history": "História",
+    "statutes": "Estatutos",
+    "committees": "Comitês",
+    "alliances": "Alianças",
+    "education": "Educação",
+    "certification": "Endosso e Certificação",
+    "scholarships": "Bolsas e Estágios",
+    "virtual_classroom": "Sala de Aula Virtual",
+    "events": "Eventos",
+    "past_events": "Passados",
+    "upcoming_events": "Próximos",
+    "congress": "Congresso Latino-Americano",
+    "all_events": "Todos",
+    "webinars": "Webinars",
+    "members": "Membros",
+    "benefits": "Benefícios",
+    "directory": "Diretório",
+    "join": "Seja um sócio",
+    "active_members": "Sócios Ativos",
+    "private_portal": "Portal Privado",
+    "news": "Notícias",
+    "scientific_articles": "Artigos Científicos",
+    "featured_articles": "Artigos em Destaque",
+    "editorials": "Editoriais",
+    "submit_article": "Enviar Artigo",
+    "contact": "Contato",
+    "login": "Entrar",
+    "logout": "Sair",
+    "request_membership": "Solicitar Associação",
+    "select_language": "Selecionar Idioma"
+  },
+  "directiva": {
+    "society_kicker": "A Sociedade",
+    "title": "Mesa Diretora e Comitê Executivo",
+    "subtitle": "Liderança regional comprometida com a excelência acadêmica, científica e assistencial na cirurgia do quadril.",
+    "committee_title": "Comitê Executivo",
+    "committee_subtitle": "Equipe de trabalho que coordena programas acadêmicos, relacionamento regional e diretrizes técnicas da sociedade.",
+    "roles": {
+      "Presidente": "Presidente",
+      "1er. Vicepresidente": "1º Vice-presidente",
+      "2do vicepresidente": "2º Vice-presidente",
+      "Secretario": "Secretário",
+      "Tesorero": "Tesoureiro",
+      "Director internacional": "Diretor Internacional",
+      "Directora Next Gen": "Diretora Next Gen"
+    }
+  },
+  "historia": {
+    "kicker": "A Sociedade",
+    "title": "Nossa História",
+    "subtitle": "Nascemos para unir os especialistas em cirurgia do quadril da região, com uma visão comum: formação de excelência, prática ética e colaboração científica permanente.",
+    "milestones": [
+      {
+        "year": "2018",
+        "title": "Fundação da rede acadêmica",
+        "description": "Um grupo de especialistas latino-americanos em cirurgia do quadril inicia um grupo de trabalho regional para padronizar critérios de treinamento e prática clínica."
+      },
+      {
+        "year": "2020",
+        "title": "Primeiro programa colaborativo",
+        "description": "Atividades conjuntas entre sociedades nacionais foram formalizadas com sessões clínicas, mesas-redondas e webinars regionais."
+      },
+      {
+        "year": "2023",
+        "title": "Consolidação institucional",
+        "description": "A SLACC fortaleceu sua estrutura acadêmica e operacional para coordenar programas contínuos de treinamento, pesquisa e certificação."
+      },
+      {
+        "year": "Hoje",
+        "title": "Expansão continental",
+        "description": "A sociedade trabalha ativamente para integrar mais especialistas e elevar consistentemente os padrões de qualidade em toda a América Latina."
+      }
+    ],
+    "cta": {
+      "title": "Conheça também",
+      "description": "Explore nossa organização institucional, diretrizes e equipe de liderança.",
+      "btn_board": "Mesa Diretora",
+      "btn_statutes": "Estatutos e Regulamentos"
+    }
+  },
+  "home": {
+    "welcome_title": "Unindo a excelência em Cirurgia do Quadril em toda a América Latina",
+    "welcome_subtitle": "Integração científica, formação contínua e colaboração regional para elevar os padrões de qualidade no atendimento ao paciente.",
+    "language_label": "Idioma:",
+    "quick_access": "Acessos Rápidos",
+    "btn_member": "Seja um Membro",
+    "btn_congress": "Próximo Congresso / Evento",
+    "btn_scholarships": "Programa de Bolsas",
+    "instagram_title": "Siga-nos no Instagram",
+    "sponsored_events": "Eventos patrocinados pela SLACC",
+    "btn_see_all": "Ver todos",
+    "recent_news": "Notícias Recentes",
+    "our_team": "Nossa Equipe"
+  },
+  "alianzas": {
+    "kicker": "Sociedades Nacionais",
+    "title": "Alianças Regionais",
+    "subtitle": "Integração de sociedades de cirurgia de quadril para fortalecer a cooperação acadêmica e o intercâmbio científico na América Latina.",
+    "map_title": "Rede Latino-Americana",
+    "map_desc": "Mapa interativo em desenvolvimento. Enquanto isso, você pode consultar a lista atualizada de sociedades e pontos de contato nacionais.",
+    "map_placeholder": "América Latina",
+    "status": {
+      "Activa": "Ativa",
+      "En integracion": "Em integração"
+    }
+  },
+  "estatutos": {
+    "kicker": "Pilares Institucionais",
+    "title": "Quem Somos",
+    "subtitle": "Somos a Sociedade Latino-Americana de Cirurgia do Quadril, uma rede científica destinada a fortalecer a prática cirúrgica, acadêmica e ética de nossa especialidade em toda a região.",
+    "mission_title": "Nossa Missão",
+    "mission_text": "Congregar e representar os especialistas em cirurgia do quadril de toda a América Latina, promovendo a excelência acadêmica, científica e ética no tratamento das patologias do quadril. Dedicamo-nos a impulsionar o intercâmbio de conhecimentos, a divulgação de novas técnicas cirúrgicas e a coordenar, supervisionar e garantir a mais alta qualidade na formação das novas gerações de especialistas, trabalhando em estreita sinergia com as sociedades nacionais de cada país.",
+    "vision_title": "Nossa Visão",
+    "vision_text": "Ser a instituição científica de referência e a entidade governante da cirurgia do quadril na América Latina. Aspiramos a consolidar uma rede integrada de especialistas que eleve de maneira constante os padrões de qualidade no atendimento ao paciente, liderando a inovação cirúrgica, a pesquisa científica e a certificação de programas de educação médica contínua no continente.",
+    "values_title": "Nossos Fundamentos e Valores",
+    "values_subtitle": "Estes princípios orientam cada ação institucional, cada instância acadêmica e cada decisão científica que promovemos na SLACC.",
+    "values": [
+      {
+        "title": "Excelência Acadêmica e Cirúrgica",
+        "description": "Promovemos a padronização e atualização constante nas técnicas cirúrgicas mais avançadas e seguras para benefício dos pacientes."
+      },
+      {
+        "title": "Integração Regional",
+        "description": "Acreditamos na força da unidade. Fomentamos o trabalho colaborativo e o intercâmbio cultural e científico entre as sociedades de quadril de todos os países latino-americanos."
+      },
+      {
+        "title": "Compromisso Docente",
+        "description": "Assumimos a responsabilidade de orientar, facilitar e endossar o treinamento de novos cirurgiões através de programas estruturados, estágios e bolsas de especialização."
+      },
+      {
+        "title": "Ética Profissional",
+        "description": "Orientamos todas as nossas ações e pesquisas sob os mais rígidos princípios de integridade, transparência e rigor científico."
+      },
+      {
+        "title": "Inovação",
+        "description": "Apoiamos e divulgamos a pesquisa científica e o desenvolvimento de novas tecnologias aplicadas à ortopedia e traumatologia do quadril."
+      }
+    ],
+    "society_board_title": "Mesa Diretora",
+    "society_board_text": "Conheça o comitê executivo e os líderes que coordenam a agenda acadêmica e científica da SLACC.",
+    "society_board_btn": "Ver Mesa Diretora",
+    "society_history_title": "História",
+    "society_history_text": "Revise a evolução institucional da sociedade e os marcos que definiram nossa integração regional.",
+    "society_history_btn": "Ver História",
+    "society_statutes_title": "Estatutos",
+    "society_statutes_text": "Baixe o regulamento institucional vigente em formato PDF.",
+    "society_statutes_btn": "Ver seção de Estatutos"
+  },
+  "estatutos_doc": {
+    "kicker": "A Sociedade",
+    "title": "Estatutos e Regulamentos",
+    "subtitle": "Aqui você poderá baixar o documento oficial dos estatutos assim que a versão final for publicada pela diretoria.",
+    "card_title": "Documento Institucional",
+    "card_text": "O download do PDF está temporariamente desativado até termos o arquivo definitivo validado pelo cliente.",
+    "btn_download": "Baixar Estatutos em PDF (Em breve)",
+    "btn_back": "Voltar para Quem Somos"
+  },
+  "comites": {
+    "title": "Comitês da SLACC",
+    "subtitle": "Grupos de trabalho especializados que impulsionam o desenvolvimento de nossa sociedade",
+    "members_title": "Membros do Comitê",
+    "functions_title": "Funções dos Comitês",
+    "functions_p1": "Os comitês da SLACC são grupos de trabalho compostos por membros de destaque da sociedade, responsáveis por áreas específicas do desenvolvimento profissional e organizacional.",
+    "functions_p2": "Cada comitê trabalha de forma autônoma, porém coordenada com a diretoria, desenvolvendo iniciativas, programas e atividades que contribuem para o cumprimento dos objetivos institucionais.",
+    "functions_p3": "Se você estiver interessado em participar de algum comitê ou desejar mais informações sobre suas atividades, entre em contato com a secretaria da sociedade.",
+    "list": [
+      {
+        "name": "Comitê de Subespecialidades",
+        "description": "Coordenação e desenvolvimento de áreas especializadas em cirurgia cardiovascular",
+        "roles": {
+          "Presidente": "Presidente",
+          "Secretaria": "Secretária",
+          "Vocal": "Vogal"
+        }
+      },
+      {
+        "name": "Comitê de Ética",
+        "description": "Supervisão de padrões éticos e deontológicos na prática profissional",
+        "roles": {
+          "Presidenta": "Presidente",
+          "Secretario": "Secretário",
+          "Vocal": "Vogal"
+        }
+      },
+      {
+        "name": "Comitê Científico",
+        "description": "Promoção da pesquisa e publicações científicas",
+        "roles": {
+          "Presidente": "Presidente",
+          "Secretaria": "Secretária",
+          "Vocal": "Vogal"
+        }
+      },
+      {
+        "name": "Comitê A",
+        "description": "Grupo especializado no desenvolvimento de iniciativas estratégicas",
+        "roles": {
+          "Presidente": "Presidente",
+          "Secretaria": "Secretária",
+          "Vocal": "Vogal"
+        }
+      },
+      {
+        "name": "Comitê B",
+        "description": "Grupo focado na coordenação de atividades acadêmicas",
+        "roles": {
+          "Presidenta": "Presidente",
+          "Secretario": "Secretário",
+          "Vocal": "Vogal"
+        }
+      },
+      {
+        "name": "Comitê C",
+        "description": "Grupo dedicado à análise e monitoramento de projetos institucionais",
+        "roles": {
+          "Presidente": "Presidente",
+          "Secretaria": "Secretária",
+          "Vocal": "Vogal"
+        }
+      }
+    ]
+  }
+}

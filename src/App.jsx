@@ -13,7 +13,6 @@ const EstatutosDocumento = lazy(
 const Comites = lazy(() => import("./pages/public/Comites.jsx"));
 const Historia = lazy(() => import("./pages/public/Historia.jsx"));
 const Directiva = lazy(() => import("./pages/public/Directiva.jsx"));
-const Alianzas = lazy(() => import("./pages/public/Alianzas.jsx"));
 const Educacion = lazy(() => import("./pages/public/Educacion.jsx"));
 const InternationalEN = lazy(
   () => import("./pages/public/InternationalEN.jsx"),
@@ -42,9 +41,6 @@ const EventDetail = lazy(() => import("./pages/events/EventDetail.jsx"));
 const JoinMembership = lazy(() => import("./pages/members/JoinMembership.jsx"));
 const MembersBenefits = lazy(
   () => import("./pages/members/MembersBenefits.jsx"),
-);
-const MembersDirectory = lazy(
-  () => import("./pages/members/MembersDirectory.jsx"),
 );
 const SociosActivos = lazy(() => import("./pages/members/SociosActivos.jsx"));
 const WhyJoin = lazy(() => import("./pages/members/WhyJoin.jsx"));

@@ -133,8 +133,6 @@ export default function App() {
               />
               <Route path="/nosotros/mision" element={<Estatutos />} />
               <Route path="/comites" element={<Comites />} />
-              <Route path="/alianzas" element={<Alianzas />} />
-              <Route path="/sociedades-nacionales" element={<Alianzas />} />
               <Route path="/educacion" element={<Educacion />} />
               <Route
                 path="/educacion/aval-certificacion"
@@ -150,11 +148,6 @@ export default function App() {
               <Route
                 path="/miembros/beneficios"
                 element={<MembersBenefits />}
-              />
-              <Route path="/miembros/como-unirse" element={<WhyJoin />} />
-              <Route
-                path="/miembros/directorio"
-                element={<MembersDirectory />}
               />
               <Route
                 path="/miembros/socios-activos"

@@ -100,7 +100,7 @@ export default function EventsPage() {
     <section className="section events-page">
       <div className="container events-page-container">
         <div className="events-page-header">
-          <h1 className="events-page-title">Eventos y Educación Continua</h1>
+          <h1 className="events-page-title">Eventos</h1>
           <p className="events-page-subtitle">
             Amplía tus conocimientos con nuestros eventos especializados en
             cirugía de cadera

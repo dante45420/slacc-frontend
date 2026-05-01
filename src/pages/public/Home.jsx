@@ -23,61 +23,7 @@ export default function Home() {
       </section>
 
       <Container size="lg">
-        <div className="home-welcome-banner">
-          <h1 className="home-welcome-title">{t("home.welcome_title")}</h1>
-          <p className="home-welcome-subtitle">{t("home.welcome_subtitle")}</p>
-
-          <div className="home-language-switch">
-            <span className="home-language-label">
-              {t("home.language_label")}
-            </span>
-            <a
-              href="#"
-              onClick={e => handleLanguageSelect(e, "es")}
-              className="home-language-link"
-              style={{ fontWeight: i18n.language === "es" ? "bold" : "normal" }}
-            >
-              ES
-            </a>
-            <a
-              href="#"
-              onClick={e => handleLanguageSelect(e, "en")}
-              className="home-language-link"
-              style={{ fontWeight: i18n.language === "en" ? "bold" : "normal" }}
-            >
-              EN
-            </a>
-            <a
-              href="#"
-              onClick={e => handleLanguageSelect(e, "pt")}
-              className="home-language-link"
-              style={{ fontWeight: i18n.language === "pt" ? "bold" : "normal" }}
-            >
-              PT
-            </a>
-          </div>
-        </div>
-      </Container>
-
-      <Container size="lg">
         <div className="home-main-card">
-          <div className="home-section">
-            <h2 className="home-section-title">{t("home.quick_access")}</h2>
-            <div className="home-quick-actions">
-              <Link to="/solicitar-membresia" className="btn btn-primary">
-                {t("home.btn_member")}
-              </Link>
-              <Link to="/eventos/proximos" className="btn btn-outline">
-                {t("home.btn_congress")}
-              </Link>
-              <Link to="/educacion/becas" className="btn btn-outline">
-                {t("home.btn_scholarships")}
-              </Link>
-            </div>
-          </div>
-
-          <hr className="home-divider" />
-
           <div className="home-section">
             <h2 className="home-section-title">{t("home.instagram_title")}</h2>
             <InstagramFeed />

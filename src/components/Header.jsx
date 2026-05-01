@@ -238,11 +238,6 @@ export default function Header() {
             />
           </MenuItem>
           <MenuItem
-            label={t("header.alliances", "Alianzas")}
-            to="/alianzas"
-            onClick={closeMobileMenu}
-          />
-          <MenuItem
             label={t("header.education", "Educación")}
             to="/educacion"
             onClick={closeMobileMenu}
@@ -305,25 +300,15 @@ export default function Header() {
               onClick={closeMobileMenu}
             />
             <SubLink
-              to="/miembros/directorio"
-              label={t("header.directory", "Directorio")}
-              onClick={closeMobileMenu}
-            />
-            <SubLink
-              to="/por-que-ser-socio"
-              label={t("header.join", "Hazte socio")}
-              onClick={closeMobileMenu}
-            />
-            <SubLink
               to="/miembros/socios-activos"
               label={t("header.active_members", "Socios Activos")}
               onClick={closeMobileMenu}
             />
-            <SubLink
+            {/* <SubLink
               to="/portal-socios"
               label={t("header.private_portal", "Portal Privado")}
               onClick={closeMobileMenu}
-            />
+            /> */}
           </MenuItem>
           <MenuItem
             label={t("header.news", "Noticias")}

@@ -45,7 +45,7 @@ body {
   min-height: var(--app-height);
   margin: 0;
   font-family: var(--font-family-base);
-  font-weight: 600;
+  font-weight: 400;
   color: var(--color-text);
   background: var(--color-page);
   line-height: 1.6;
@@ -125,7 +125,6 @@ h4 {
 p {
   margin-bottom: var(--spacing-3);
   line-height: 1.8;
-  font-weight: 300;
 }
 
 a {
@@ -135,7 +134,7 @@ a {
 }
 
 a:hover {
-  color: white;
+  color: var(--color-primary-hover);
 }
 
 img {
@@ -4936,8 +4935,6 @@ img {
   background: var(--color-bg-alt);
   padding: var(--spacing-2) var(--spacing-3);
   border-radius: var(--radius);
-  font-size: 0.875rem;
-  font-weight: 500;
   color: var(--color-text-secondary);
   white-space: nowrap;
 }
@@ -5005,10 +5002,6 @@ img {
   color: var(--color-muted);
 }
 
-.event-detail-instructor-info strong {
-  font-size: 1.125rem;
-}
-
 /* Sidebar - now below main card */
 .event-detail-sidebar {
   display: grid;
@@ -5052,10 +5045,6 @@ img {
   color: var(--color-muted);
 }
 
-.event-detail-info-value {
-  font-weight: 500;
-}
-
 /* Pricing */
 .event-detail-pricing {
   display: flex;
@@ -5073,11 +5062,6 @@ img {
   color: var(--color-text-secondary);
 }
 
-.event-detail-price-value {
-  font-weight: 600;
-  font-size: 1.125rem;
-}
-
 .event-detail-price-member {
   color: var(--color-success);
 }
@@ -5089,8 +5073,6 @@ img {
 }
 
 .event-detail-capacity-number {
-  font-size: 1.5rem;
-  font-weight: 700;
   color: var(--color-primary);
 }
 
@@ -5844,4 +5826,50 @@ img {
   border-top: 1px solid var(--color-border);
   display: flex;
   justify-content: flex-end;
+}
+
+.language-option {
+  background: none;
+  border: none;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+}
+
+.language-option:hover {
+  background-color: var(--color-bg-alt);
+}
+
+.text-error {
+  color: var(--color-error);
+}
+
+/* Typography Utilities */
+.font-light {
+  font-weight: 300;
+}
+.font-normal {
+  font-weight: 400;
+}
+.font-medium {
+  font-weight: 500;
+}
+.font-semibold {
+  font-weight: 600;
+}
+.font-bold {
+  font-weight: 700;
+}
+.text-sm {
+  font-size: 0.875rem;
+}
+.text-base {
+  font-size: 1rem;
+}
+.text-lg {
+  font-size: 1.125rem;
+}
+.text-xl {
+  font-size: 1.25rem;
 }

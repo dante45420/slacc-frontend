@@ -66,13 +66,7 @@ export default function App() {
         <main>
           <Suspense
             fallback={
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  padding: "4rem",
-                }}
-              >
+              <div className="flex justify-center py-8">
                 <Spinner size="lg" />
               </div>
             }

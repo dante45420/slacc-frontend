@@ -165,7 +165,7 @@ export default function EventDetail() {
                 )}
               </div>
               {hasCapacity && (
-                <div className="event-detail-spots">
+                <div className="event-detail-spots font-medium text-sm">
                   <i className="fa-solid fa-users"></i>
                   <span>
                     {event.enrollment_count === undefined
@@ -209,7 +209,9 @@ export default function EventDetail() {
                   <i className="fa-solid fa-user"></i>
                 </div>
                 <div className="event-detail-instructor-info">
-                  <strong>{event.instructor}</strong>
+                  <span className="font-semibold text-lg">
+                    {event.instructor}
+                  </span>
                 </div>
               </div>
             </div>
@@ -226,14 +228,14 @@ export default function EventDetail() {
             <div className="event-detail-info-list">
               <div className="event-detail-info-item">
                 <span className="event-detail-info-label">Inicio</span>
-                <span className="event-detail-info-value">
+                <span className="event-detail-info-value font-medium">
                   {formatDateTime(event.start_date) || "Por confirmar"}
                 </span>
               </div>
               {event.end_date && (
                 <div className="event-detail-info-item">
                   <span className="event-detail-info-label">Término</span>
-                  <span className="event-detail-info-value">
+                  <span className="event-detail-info-value font-medium">
                     {formatDateTime(event.end_date)}
                   </span>
                 </div>
@@ -241,7 +243,7 @@ export default function EventDetail() {
               {event.duration_hours && (
                 <div className="event-detail-info-item">
                   <span className="event-detail-info-label">Duración</span>
-                  <span className="event-detail-info-value">
+                  <span className="event-detail-info-value font-medium">
                     {event.duration_hours}{" "}
                     {event.duration_hours === 1 ? "hora" : "horas"}
                   </span>
@@ -253,12 +255,9 @@ export default function EventDetail() {
                     Inscripciones hasta
                   </span>
                   <span
-                    className="event-detail-info-value"
-                    style={
-                      isRegistrationClosed
-                        ? { color: "var(--color-error)" }
-                        : {}
-                    }
+                    className={`event-detail-info-value font-medium ${
+                      isRegistrationClosed ? "text-error" : ""
+                    }`}
                   >
                     {formatDate(event.registration_deadline)}
                     {isRegistrationClosed && " (cerrado)"}
@@ -276,14 +275,16 @@ export default function EventDetail() {
             <div className="event-detail-info-list">
               <div className="event-detail-info-item">
                 <span className="event-detail-info-label">Formato</span>
-                <span className="event-detail-info-value">{formatType}</span>
+                <span className="event-detail-info-value font-medium">
+                  {formatType}
+                </span>
               </div>
               {event.location && (
                 <div className="event-detail-info-item">
                   <span className="event-detail-info-label">
                     {event.format === "webinar" ? "Plataforma" : "Dirección"}
                   </span>
-                  <span className="event-detail-info-value">
+                  <span className="event-detail-info-value font-medium">
                     {event.location}
                   </span>
                 </div>
@@ -300,13 +301,13 @@ export default function EventDetail() {
               <div className="event-detail-pricing">
                 <div className="event-detail-price-item">
                   <span className="event-detail-price-label">Socios</span>
-                  <span className="event-detail-price-value event-detail-price-member">
+                  <span className="event-detail-price-value event-detail-price-member font-semibold text-lg">
                     {formatPrice(event.price_member)}
                   </span>
                 </div>
                 <div className="event-detail-price-item">
                   <span className="event-detail-price-label">No socios</span>
-                  <span className="event-detail-price-value">
+                  <span className="event-detail-price-value font-semibold text-lg">
                     {formatPrice(event.price_non_member)}
                   </span>
                 </div>
@@ -315,7 +316,7 @@ export default function EventDetail() {
                     <span className="event-detail-price-label">
                       Socios jóvenes
                     </span>
-                    <span className="event-detail-price-value event-detail-price-member">
+                    <span className="event-detail-price-value event-detail-price-member font-semibold text-lg">
                       {formatPrice(event.price_joven)}
                     </span>
                   </div>

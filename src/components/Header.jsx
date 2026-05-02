@@ -394,42 +394,21 @@ export default function Header() {
             <div className="submenu language-submenu">
               <button
                 type="button"
-                style={{
-                  background: "none",
-                  border: "none",
-                  padding: "0.75rem 1rem",
-                  cursor: "pointer",
-                  textAlign: "left",
-                  width: "100%",
-                }}
+                className="language-option"
                 onClick={() => handleLanguageSelect("es")}
               >
                 ES
               </button>
               <button
                 type="button"
-                style={{
-                  background: "none",
-                  border: "none",
-                  padding: "0.75rem 1rem",
-                  cursor: "pointer",
-                  textAlign: "left",
-                  width: "100%",
-                }}
+                className="language-option"
                 onClick={() => handleLanguageSelect("en")}
               >
                 EN
               </button>
               <button
                 type="button"
-                style={{
-                  background: "none",
-                  border: "none",
-                  padding: "0.75rem 1rem",
-                  cursor: "pointer",
-                  textAlign: "left",
-                  width: "100%",
-                }}
+                className="language-option"
                 onClick={() => handleLanguageSelect("pt")}
               >
                 PT

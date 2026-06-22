@@ -1,7 +1,9 @@
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Section, Button, EmptyState } from "../../components/ui";
 
 export default function NewsList() {
+  const { t } = useTranslation();
   const demo = [
     { id: 1, title: "Primer anuncio", excerpt: "Resumen corto" },
     { id: 2, title: "Lanzamiento", excerpt: "Detalles del lanzamiento" },
@@ -10,20 +12,20 @@ export default function NewsList() {
   return (
     <Section variant="default" padding="lg">
       <div className="news-list-header">
-        <h1 className="news-list-title">Noticias</h1>
+        <h1 className="news-list-title">{t("news.title")}</h1>
         <Link to="/admin/news/new">
-          <Button variant="primary">Nueva Noticia</Button>
+          <Button variant="primary">{t("news.new_article")}</Button>
         </Link>
       </div>
 
       {demo.length === 0 ? (
         <EmptyState
           icon="📰"
-          title="No hay noticias aún"
-          description="Comienza creando tu primera noticia para compartir con la comunidad"
+          title={t("news.empty_title")}
+          description={t("news.empty_description")}
           action={
             <Link to="/admin/news/new">
-              <Button variant="primary">Crear Primera Noticia</Button>
+              <Button variant="primary">{t("news.empty_action")}</Button>
             </Link>
           }
         />
@@ -35,7 +37,8 @@ export default function NewsList() {
               <p className="news-list-excerpt">{n.excerpt}</p>
               <Link to={`/noticias/${n.id}`}>
                 <Button variant="outline" size="sm">
-                  Leer más <i className="fa-solid fa-arrow-right"></i>
+                  {t("news.read_more")}{" "}
+                  <i className="fa-solid fa-arrow-right"></i>
                 </Button>
               </Link>
             </article>

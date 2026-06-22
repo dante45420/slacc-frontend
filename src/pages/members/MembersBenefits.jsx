@@ -1,55 +1,48 @@
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../../auth/AuthContext.jsx";
 
+const BENEFIT_ICONS = [
+  "fa-solid fa-stethoscope",
+  "fa-solid fa-database",
+  "fa-solid fa-handshake",
+  "fa-solid fa-trophy",
+  "fa-solid fa-graduation-cap",
+  "fa-solid fa-shield-halved",
+];
+
 export default function MembersBenefits() {
+  const { t } = useTranslation();
   const { user } = useAuth();
+  const tiles = t("members.benefits_tiles", { returnObjects: true });
+
   return (
     <section className="section">
       <div className="container">
-        <h1 className="members-header">Beneficios para Miembros</h1>
-        <p className="members-subtitle">
-          Ventajas pensadas para especialistas en cadera, con foco clínico y
-          académico.
-        </p>
+        <h1 className="members-header">{t("members.benefits_title")}</h1>
+        <p className="members-subtitle">{t("members.benefits_subtitle")}</p>
 
         <div className="cards members-cards">
-          <Tile
-            icon={<i className="fa-solid fa-stethoscope"></i>}
-            title="Práctica clínica destacada"
-            desc="Difunde tu experiencia y casos con respaldo institucional."
-          />
-          <Tile
-            icon={<i className="fa-solid fa-database"></i>}
-            title="Información centralizada"
-            desc="Casos, documentos y recursos organizados en un solo lugar."
-          />
-          <Tile
-            icon={<i className="fa-solid fa-handshake"></i>}
-            title="Confianza y red"
-            desc="Conecta con especialistas y potencia tu credibilidad."
-          />
-          <Tile
-            icon={<i className="fa-solid fa-trophy"></i>}
-            title="Reconocimiento académico"
-            desc="Comités, publicaciones y ponencias en eventos SLACC."
-          />
-          <Tile
-            icon={<i className="fa-solid fa-graduation-cap"></i>}
-            title="Formación continua"
-            desc="Cursos, talleres y webinars con curaduría experta."
-          />
-          <Tile
-            icon={<i className="fa-solid fa-shield-halved"></i>}
-            title="Independencia digital"
-            desc="Tu presencia profesional sin depender de redes sociales."
-          />
+          {Array.isArray(tiles) &&
+            tiles.map((tile, index) => (
+              <Tile
+                key={tile.title}
+                icon={
+                  <i
+                    className={BENEFIT_ICONS[index] || "fa-solid fa-star"}
+                  ></i>
+                }
+                title={tile.title}
+                desc={tile.desc}
+              />
+            ))}
         </div>
 
         {!user && (
           <div className="members-cta">
             <Link to="/solicitar-membresia" className="btn btn-primary">
-              Solicitar membresía
+              {t("members.btn_apply")}
             </Link>
           </div>
         )}

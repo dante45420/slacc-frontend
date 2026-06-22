@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../../auth/AuthContext.jsx";
 import { apiGet, apiPost } from "../../api/client.js";
 import Section from "../../components/ui/Section.jsx";
@@ -10,36 +11,21 @@ import Spinner from "../../components/ui/Spinner.jsx";
 import Alert from "../../components/ui/Alert.jsx";
 import { useToast } from "../../components/ui/Toast.jsx";
 import { sanitizeHtml } from "../../utils/sanitize.js";
+import {
+  formatDate as formatLocaleDate,
+  formatDateTime as formatLocaleDateTime,
+} from "../../utils/i18nLocale.js";
 
 const API_ORIGIN = import.meta.env.VITE_API_ORIGIN || "http://localhost:5000";
 
-function formatDate(dateString, options = {}) {
-  if (!dateString) return null;
-  const defaultOpts = { year: "numeric", month: "long", day: "numeric" };
-  return new Date(dateString).toLocaleDateString("es-ES", {
-    ...defaultOpts,
-    ...options,
-  });
-}
-
-function formatDateTime(dateString) {
-  if (!dateString) return null;
-  return new Date(dateString).toLocaleDateString("es-ES", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
-
-function formatPrice(price) {
-  if (price === 0) return "Gratis";
+function formatPrice(price, t) {
+  if (price === 0) return t("common.free");
   if (!price) return null;
   return `$${price.toLocaleString("es-CL")}`;
 }
 
 export default function EventDetail() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -56,17 +42,17 @@ export default function EventDetail() {
         const data = await apiGet(`/events/${id}`);
         setEvent(data);
       } catch (e) {
-        setError(e.message || "Error cargando evento");
+        setError(e.message || t("events.detail_load_error"));
       } finally {
         setLoading(false);
       }
     }
     if (id) load();
-  }, [id]);
+  }, [id, t]);
 
   const handleEnroll = async () => {
     if (!user) {
-      toast.error("Debes iniciar sesión para inscribirte");
+      toast.error(t("events.login_required"));
       navigate("/login");
       return;
     }
@@ -80,14 +66,13 @@ export default function EventDetail() {
       });
 
       toast.success(
-        "¡Inscripción exitosa! " +
-          (data.message || "Revisa tu email para más detalles"),
+        `${t("events.enroll_success")} ${data.message || t("events.enroll_success_detail")}`,
       );
 
       const eventData = await apiGet(`/events/${id}`);
       setEvent(eventData);
     } catch (err) {
-      toast.error(err.message || "Error al procesar la inscripción");
+      toast.error(err.message || t("events.enroll_error"));
     } finally {
       setEnrolling(false);
     }
@@ -98,7 +83,9 @@ export default function EventDetail() {
       <Section variant="default">
         <div className="event-detail-loading">
           <Spinner size="lg" />
-          <p className="event-detail-loading-text">Cargando evento...</p>
+          <p className="event-detail-loading-text">
+            {t("events.detail_loading")}
+          </p>
         </div>
       </Section>
     );
@@ -107,12 +94,15 @@ export default function EventDetail() {
   if (error || !event) {
     return (
       <Section variant="default">
-        <Alert variant="error">{error || "Evento no encontrado"}</Alert>
+        <Alert variant="error">{error || t("events.detail_not_found")}</Alert>
       </Section>
     );
   }
 
-  const formatType = event.format === "webinar" ? "Webinar" : "Presencial";
+  const formatType =
+    event.format === "webinar"
+      ? t("events.format_webinar")
+      : t("events.format_in_person");
   const isRegistrationClosed = event.registration_deadline
     ? new Date(event.registration_deadline) < new Date()
     : false;
@@ -123,11 +113,10 @@ export default function EventDetail() {
   return (
     <Section variant="default" padding="lg">
       <Button variant="outline" onClick={() => navigate(-1)} className="mb-4">
-        <i className="fa-solid fa-arrow-left"></i> Volver
+        <i className="fa-solid fa-arrow-left"></i> {t("common.back")}
       </Button>
 
       <div className="event-detail-layout">
-        {/* Main Content */}
         <Card className="event-detail-main">
           {event.image_url && (
             <img
@@ -155,12 +144,14 @@ export default function EventDetail() {
                 </Badge>
                 {isRegistrationClosed && (
                   <Badge variant="error" size="md">
-                    <i className="fa-solid fa-lock"></i> Inscripción cerrada
+                    <i className="fa-solid fa-lock"></i>{" "}
+                    {t("events.registration_closed")}
                   </Badge>
                 )}
                 {event.is_enrolled && (
                   <Badge variant="success" size="md">
-                    <i className="fa-solid fa-check"></i> Inscrito
+                    <i className="fa-solid fa-check"></i>{" "}
+                    {t("events.registered")}
                   </Badge>
                 )}
               </div>
@@ -171,7 +162,7 @@ export default function EventDetail() {
                     {event.enrollment_count === undefined
                       ? event.max_students
                       : `${event.enrollment_count} / ${event.max_students}`}{" "}
-                    cupos
+                    {t("common.spots")}
                   </span>
                 </div>
               )}
@@ -187,8 +178,8 @@ export default function EventDetail() {
           {event.content && (
             <div className="event-detail-content-section">
               <h2 className="event-detail-section-title">
-                <i className="fa-solid fa-info-circle"></i> Descripción del
-                evento
+                <i className="fa-solid fa-info-circle"></i>{" "}
+                {t("events.description_title")}
               </h2>
               <div
                 dangerouslySetInnerHTML={{
@@ -202,7 +193,8 @@ export default function EventDetail() {
           {event.instructor && (
             <div className="event-detail-instructor-section">
               <h2 className="event-detail-section-title">
-                <i className="fa-solid fa-chalkboard-user"></i> Instructor
+                <i className="fa-solid fa-chalkboard-user"></i>{" "}
+                {t("events.instructor_title")}
               </h2>
               <div className="event-detail-instructor">
                 <div className="event-detail-instructor-avatar">
@@ -218,63 +210,72 @@ export default function EventDetail() {
           )}
         </Card>
 
-        {/* Sidebar */}
         <div className="event-detail-sidebar">
-          {/* Date & Time Card */}
           <Card className="event-detail-sidebar-card">
             <h3 className="event-detail-sidebar-title">
-              <i className="fa-solid fa-calendar"></i> Fecha y Hora
+              <i className="fa-solid fa-calendar"></i> {t("events.datetime_title")}
             </h3>
             <div className="event-detail-info-list">
               <div className="event-detail-info-item">
-                <span className="event-detail-info-label">Inicio</span>
+                <span className="event-detail-info-label">
+                  {t("events.start")}
+                </span>
                 <span className="event-detail-info-value font-medium">
-                  {formatDateTime(event.start_date) || "Por confirmar"}
+                  {formatLocaleDateTime(event.start_date) || t("common.tbc")}
                 </span>
               </div>
               {event.end_date && (
                 <div className="event-detail-info-item">
-                  <span className="event-detail-info-label">Término</span>
+                  <span className="event-detail-info-label">
+                    {t("events.end")}
+                  </span>
                   <span className="event-detail-info-value font-medium">
-                    {formatDateTime(event.end_date)}
+                    {formatLocaleDateTime(event.end_date)}
                   </span>
                 </div>
               )}
               {event.duration_hours && (
                 <div className="event-detail-info-item">
-                  <span className="event-detail-info-label">Duración</span>
+                  <span className="event-detail-info-label">
+                    {t("events.duration")}
+                  </span>
                   <span className="event-detail-info-value font-medium">
                     {event.duration_hours}{" "}
-                    {event.duration_hours === 1 ? "hora" : "horas"}
+                    {event.duration_hours === 1
+                      ? t("common.hour_one")
+                      : t("common.hour_other")}
                   </span>
                 </div>
               )}
               {event.registration_deadline && (
                 <div className="event-detail-info-item">
                   <span className="event-detail-info-label">
-                    Inscripciones hasta
+                    {t("events.registration_until")}
                   </span>
                   <span
                     className={`event-detail-info-value font-medium ${
                       isRegistrationClosed ? "text-error" : ""
                     }`}
                   >
-                    {formatDate(event.registration_deadline)}
-                    {isRegistrationClosed && " (cerrado)"}
+                    {formatLocaleDate(event.registration_deadline)}
+                    {isRegistrationClosed &&
+                      ` (${t("common.closed_paren")})`}
                   </span>
                 </div>
               )}
             </div>
           </Card>
 
-          {/* Location Card */}
           <Card className="event-detail-sidebar-card">
             <h3 className="event-detail-sidebar-title">
-              <i className="fa-solid fa-location-dot"></i> Ubicación
+              <i className="fa-solid fa-location-dot"></i>{" "}
+              {t("events.location_title")}
             </h3>
             <div className="event-detail-info-list">
               <div className="event-detail-info-item">
-                <span className="event-detail-info-label">Formato</span>
+                <span className="event-detail-info-label">
+                  {t("events.format_label")}
+                </span>
                 <span className="event-detail-info-value font-medium">
                   {formatType}
                 </span>
@@ -282,7 +283,9 @@ export default function EventDetail() {
               {event.location && (
                 <div className="event-detail-info-item">
                   <span className="event-detail-info-label">
-                    {event.format === "webinar" ? "Plataforma" : "Dirección"}
+                    {event.format === "webinar"
+                      ? t("events.platform")
+                      : t("events.address")}
                   </span>
                   <span className="event-detail-info-value font-medium">
                     {event.location}
@@ -292,32 +295,35 @@ export default function EventDetail() {
             </div>
           </Card>
 
-          {/* Pricing Card */}
           {hasPricing && (
             <Card className="event-detail-sidebar-card">
               <h3 className="event-detail-sidebar-title">
-                <i className="fa-solid fa-ticket"></i> Precios
+                <i className="fa-solid fa-ticket"></i> {t("events.pricing_title")}
               </h3>
               <div className="event-detail-pricing">
                 <div className="event-detail-price-item">
-                  <span className="event-detail-price-label">Socios</span>
+                  <span className="event-detail-price-label">
+                    {t("events.price_members")}
+                  </span>
                   <span className="event-detail-price-value event-detail-price-member font-semibold text-lg">
-                    {formatPrice(event.price_member)}
+                    {formatPrice(event.price_member, t)}
                   </span>
                 </div>
                 <div className="event-detail-price-item">
-                  <span className="event-detail-price-label">No socios</span>
+                  <span className="event-detail-price-label">
+                    {t("events.price_non_members")}
+                  </span>
                   <span className="event-detail-price-value font-semibold text-lg">
-                    {formatPrice(event.price_non_member)}
+                    {formatPrice(event.price_non_member, t)}
                   </span>
                 </div>
                 {event.price_joven > 0 && (
                   <div className="event-detail-price-item">
                     <span className="event-detail-price-label">
-                      Socios jóvenes
+                      {t("events.price_young")}
                     </span>
                     <span className="event-detail-price-value event-detail-price-member font-semibold text-lg">
-                      {formatPrice(event.price_joven)}
+                      {formatPrice(event.price_joven, t)}
                     </span>
                   </div>
                 )}
@@ -326,7 +332,6 @@ export default function EventDetail() {
           )}
         </div>
 
-        {/* Enroll Button - centered below all content */}
         <div className="event-detail-enroll-container">
           <Button
             variant="primary"
@@ -336,23 +341,25 @@ export default function EventDetail() {
           >
             {isRegistrationClosed && (
               <>
-                <i className="fa-solid fa-lock"></i> La inscripción ya cerró
+                <i className="fa-solid fa-lock"></i>{" "}
+                {t("events.registration_ended")}
               </>
             )}
             {!isRegistrationClosed && event.is_enrolled && (
               <>
-                <i className="fa-solid fa-check"></i> Ya estás inscrito
+                <i className="fa-solid fa-check"></i>{" "}
+                {t("events.already_enrolled")}
               </>
             )}
             {!isRegistrationClosed && !event.is_enrolled && enrolling && (
               <>
-                <Spinner size="sm" /> Procesando...
+                <Spinner size="sm" /> {t("common.processing")}
               </>
             )}
             {!isRegistrationClosed && !event.is_enrolled && !enrolling && (
               <>
-                <i className="fa-solid fa-pen-to-square"></i> Inscribirse al
-                evento
+                <i className="fa-solid fa-pen-to-square"></i>{" "}
+                {t("events.enroll_event")}
               </>
             )}
           </Button>

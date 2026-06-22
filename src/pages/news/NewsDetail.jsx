@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../../auth/AuthContext";
 import {
   Section,
@@ -12,6 +13,7 @@ import {
 } from "../../components/ui";
 import NewsCarousel from "../../components/NewsCarousel.jsx";
 import { sanitizeHtml } from "../../utils/sanitize";
+import { formatDate as formatLocaleDate } from "../../utils/i18nLocale";
 
 const BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
@@ -34,10 +36,11 @@ function getStatusColor(status) {
   return "var(--color-muted)";
 }
 
-function getStatusLabel(status) {
-  if (status === "published") return "Publicada";
-  if (status === "pending") return "Pendiente";
-  return "Rechazada";
+function getCategoryLabel(category, t) {
+  if (category === "articulos-cientificos") return t("news.tab_scientific");
+  if (category === "articulos-destacados") return t("news.tab_featured");
+  if (category === "editoriales") return t("news.tab_editorials");
+  return category;
 }
 
 function getCategoryBadgeVariant(category) {
@@ -46,40 +49,36 @@ function getCategoryBadgeVariant(category) {
   return "accent";
 }
 
-function getCategoryLabel(category) {
-  if (category === "articulos-cientificos") return "Artículos científicos";
-  if (category === "articulos-destacados") return "Artículos destacados";
-  if (category === "editoriales") return "Editoriales";
-  return category;
-}
-
 function getStatusBadgeVariant(status) {
   if (status === "published") return "success";
   if (status === "pending") return "warning";
   return "error";
 }
 
-function formatDate(dateString) {
-  if (!dateString) return "Fecha no disponible";
+function getStatusLabel(status, t) {
+  if (status === "published") return t("news.status_published");
+  if (status === "pending") return t("news.status_pending");
+  return t("news.status_rejected");
+}
+
+function formatDate(dateString, t) {
+  if (!dateString) return t("news.date_unavailable");
 
   try {
     const date = new Date(dateString);
     if (Number.isNaN(date.getTime())) {
-      return "Fecha no disponible";
+      return t("news.date_unavailable");
     }
 
-    return date.toLocaleDateString("es-ES", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
+    return formatLocaleDate(dateString) || t("news.date_unavailable");
   } catch (error) {
     console.error("Error formatting date:", error);
-    return "Fecha no disponible";
+    return t("news.date_unavailable");
   }
 }
 
 export default function NewsDetail() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -181,7 +180,7 @@ export default function NewsDetail() {
         <Container size="default">
           <div className="news-detail-loading">
             <Spinner size="lg" />
-            <p className="news-detail-loading-text">Cargando noticia...</p>
+            <p className="news-detail-loading-text">{t("news.detail_loading")}</p>
           </div>
         </Container>
       </Section>
@@ -193,13 +192,13 @@ export default function NewsDetail() {
       <Section variant="default" padding="lg">
         <Container size="default">
           <Card>
-            <h2 className="news-detail-error-title">Error</h2>
+            <h2 className="news-detail-error-title">{t("news.error_title")}</h2>
             <p className="news-detail-error-text">{error}</p>
             <Button
               variant="outline"
               onClick={() => globalThis.location.reload()}
             >
-              Reintentar
+              {t("news.retry")}
             </Button>
           </Card>
         </Container>
@@ -212,12 +211,10 @@ export default function NewsDetail() {
       <Section variant="default" padding="lg">
         <Container size="default">
           <Card>
-            <h2>Noticia no encontrada</h2>
-            <p className="news-detail-error-text">
-              La noticia que buscas no existe o ha sido eliminada.
-            </p>
+            <h2>{t("news.not_found")}</h2>
+            <p className="news-detail-error-text">{t("news.not_found_desc")}</p>
             <Link to="/noticias">
-              <Button variant="primary">Volver a noticias</Button>
+              <Button variant="primary">{t("news.back_to_news")}</Button>
             </Link>
           </Card>
         </Container>
@@ -236,7 +233,7 @@ export default function NewsDetail() {
                 variant="outline"
                 onClick={() => navigate("/admin?tab=news")}
               >
-                <i className="fa-solid fa-arrow-left"></i> Volver al Panel Admin
+                <i className="fa-solid fa-arrow-left"></i> {t("news.back_admin")}
               </Button>
             </div>
           )}
@@ -251,7 +248,7 @@ export default function NewsDetail() {
                     variant={getCategoryBadgeVariant(news.category)}
                     className="mb-3"
                   >
-                    {getCategoryLabel(news.category)}
+                    {getCategoryLabel(news.category, t)}
                   </Badge>
                 )}
 
@@ -261,17 +258,17 @@ export default function NewsDetail() {
                 {/* Meta information */}
                 <div className="flex align-center gap-3 flex-wrap">
                   <Badge variant={getStatusBadgeVariant(news.status)}>
-                    {getStatusLabel(news.status)}
+                    {getStatusLabel(news.status, t)}
                   </Badge>
                   <time
                     dateTime={news.created_at}
                     className="news-detail-meta-text"
                   >
-                    {formatDate(news.created_at)}
+                    {formatDate(news.created_at, t)}
                   </time>
                   {news.author_name && (
                     <span className="news-detail-meta-text">
-                      Por {news.author_name}
+                      {t("news.by_author", { author: news.author_name })}
                     </span>
                   )}
                 </div>
@@ -283,10 +280,10 @@ export default function NewsDetail() {
                   {news.status === "pending" && (
                     <>
                       <Button variant="primary" size="sm" onClick={approveNews}>
-                        Aprobar
+                        {t("news.approve")}
                       </Button>
                       <Button variant="outline" size="sm" onClick={rejectNews}>
-                        Rechazar
+                        {t("news.reject")}
                       </Button>
                     </>
                   )}
@@ -296,7 +293,7 @@ export default function NewsDetail() {
                       size="sm"
                       onClick={() => navigate(`/admin/news/${news.id}/edit`)}
                     >
-                      Editar
+                      {t("news.edit")}
                     </Button>
                   )}
                 </div>
@@ -329,9 +326,7 @@ export default function NewsDetail() {
                 dangerouslySetInnerHTML={{ __html: sanitizeHtml(news.content) }}
               />
             ) : (
-              <p className="text-muted">
-                Contenido de la noticia no disponible.
-              </p>
+              <p className="text-muted">{t("news.content_unavailable")}</p>
             )}
           </div>
 
@@ -366,7 +361,7 @@ export default function NewsDetail() {
           {/* Related news */}
           {more.length > 0 && (
             <div className="news-detail-more">
-              <h2 className="news-detail-more-title">Más noticias</h2>
+              <h2 className="news-detail-more-title">{t("news.related_title")}</h2>
               <NewsCarousel limit={9} excludeId={news?.id} />
             </div>
           )}

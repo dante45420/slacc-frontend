@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { Section, Card, Grid } from "../../components/ui";
+import { Section, Card, Grid, PageHero } from "../../components/ui";
 import { TeamCarousel } from "../../components/TeamCarousel.jsx";
 
 const executiveBoard = [
@@ -53,20 +53,11 @@ export default function Directiva() {
   return (
     <>
       <Section variant="primary" padding="lg" containerSize="lg">
-        <div className="board-header">
-          <p className="board-kicker">
-            {t("directiva.society_kicker", "La Sociedad")}
-          </p>
-          <h1 className="board-title">
-            {t("directiva.title", "Mesa Directiva y Comite Ejecutivo")}
-          </h1>
-          <p className="board-subtitle">
-            {t(
-              "directiva.subtitle",
-              "Liderazgo regional comprometido con la excelencia academica, cientifica y asistencial en cirugia de cadera.",
-            )}
-          </p>
-        </div>
+        <PageHero
+          kicker={t("directiva.society_kicker")}
+          title={t("directiva.title")}
+          subtitle={t("directiva.subtitle")}
+        />
       </Section>
 
       <Section padding="lg" containerSize="lg">
@@ -90,13 +81,10 @@ export default function Directiva() {
 
       <Section variant="alt" padding="lg" containerSize="lg">
         <h2 className="board-carousel-title">
-          {t("directiva.committee_title", "Comite Ejecutivo")}
+          {t("directiva.committee_title")}
         </h2>
         <p className="board-carousel-subtitle">
-          {t(
-            "directiva.committee_subtitle",
-            "Equipo de trabajo que coordina programas academicos, relacionamiento regional y lineamientos tecnicos de la sociedad.",
-          )}
+          {t("directiva.committee_subtitle")}
         </p>
         <TeamCarousel
           members={executiveBoard.map(m => ({

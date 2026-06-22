@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import NewsGrid from "../../components/NewsGrid.jsx";
 import { Section, Container, Tabs, Button } from "../../components/ui";
 
 export default function NewsPage() {
+  const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const [active, setActive] = useState("articulos-cientificos");
@@ -19,9 +21,9 @@ export default function NewsPage() {
   }, [location.pathname]);
 
   const tabs = [
-    { id: "articulos-cientificos", label: "Artículos científicos" },
-    { id: "articulos-destacados", label: "Artículos destacados" },
-    { id: "editoriales", label: "Editoriales" },
+    { id: "articulos-cientificos", label: t("news.tab_scientific") },
+    { id: "articulos-destacados", label: t("news.tab_featured") },
+    { id: "editoriales", label: t("news.tab_editorials") },
   ];
 
   const handleTabChange = tabId => {
@@ -33,9 +35,9 @@ export default function NewsPage() {
     <Section variant="default" padding="lg">
       <Container size="lg">
         <div className="flex justify-between align-center mb-6 flex-wrap gap-3">
-          <h1 className="mb-0">Noticias</h1>
+          <h1 className="mb-0">{t("news.title")}</h1>
           <Link to="/subir-noticia">
-            <Button variant="primary">Enviar artículo</Button>
+            <Button variant="primary">{t("news.submit_article")}</Button>
           </Link>
         </div>
 

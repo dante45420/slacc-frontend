@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import PropTypes from "prop-types";
 import { Card, Badge, Spinner, Grid } from "./ui";
+import { formatDate as formatLocaleDate } from "../utils/i18nLocale";
 
 const BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
@@ -18,19 +20,19 @@ function getImageUrl(imageUrl) {
   return `${BASE_URL.replace("/api", "")}${imageUrl}`;
 }
 
-const categoryLabels = {
-  "articulos-cientificos": "Artículos científicos",
-  "articulos-destacados": "Artículos destacados",
-  editoriales: "Editoriales",
-};
-
 const categoryVariants = {
   "articulos-cientificos": "accent",
   "articulos-destacados": "primary",
   editoriales: "info",
 };
 
-function formatDate(dateString) {
+const categoryKeys = {
+  "articulos-cientificos": "news.tab_scientific",
+  "articulos-destacados": "news.tab_featured",
+  editoriales: "news.tab_editorials",
+};
+
+function formatNewsDate(dateString) {
   if (!dateString) return "";
 
   try {
@@ -39,10 +41,8 @@ function formatDate(dateString) {
       return "";
     }
 
-    return date.toLocaleDateString("es-ES", {
-      year: "numeric",
+    return formatLocaleDate(dateString, {
       month: "short",
-      day: "numeric",
     });
   } catch (error) {
     console.error("Error formatting date:", error);
@@ -51,6 +51,7 @@ function formatDate(dateString) {
 }
 
 export default function NewsGrid({ items = [], category }) {
+  const { t } = useTranslation();
   const [news, setNews] = useState(items);
   const [loading, setLoading] = useState(false);
 
@@ -81,7 +82,7 @@ export default function NewsGrid({ items = [], category }) {
     return (
       <div className="news-grid-status">
         <Spinner size="lg" />
-        <p className="news-grid-status-text">Cargando noticias...</p>
+        <p className="news-grid-status-text">{t("news.loading")}</p>
       </div>
     );
   }
@@ -89,15 +90,13 @@ export default function NewsGrid({ items = [], category }) {
   if (!news || news.length === 0) {
     return (
       <div className="news-grid-empty-state">
-        <p className="news-grid-empty-text">
-          No hay noticias disponibles en esta categoría.
-        </p>
+        <p className="news-grid-empty-text">{t("news.empty_category")}</p>
       </div>
     );
   }
 
   return (
-    <Grid cols={3} gap="5">
+    <Grid columns={3} gap={5}>
       {(news || []).map(n => (
         <Link key={n.id} to={`/noticias/${n.id}`} className="news-grid-link">
           <Card
@@ -106,7 +105,7 @@ export default function NewsGrid({ items = [], category }) {
             badge={
               n.category && (
                 <Badge variant={categoryVariants[n.category] || "neutral"}>
-                  {categoryLabels[n.category] || n.category}
+                  {t(categoryKeys[n.category] || n.category, n.category)}
                 </Badge>
               )
             }
@@ -121,16 +120,17 @@ export default function NewsGrid({ items = [], category }) {
               <div className="news-grid-card-footer">
                 <div className="news-grid-card-meta">
                   <time className="news-grid-card-time">
-                    {formatDate(n.created_at)}
+                    {formatNewsDate(n.created_at)}
                   </time>
                   {n.author_name && (
                     <span className="news-grid-card-author">
-                      Por {n.author_name}
+                      {t("news.by_author", { author: n.author_name })}
                     </span>
                   )}
                 </div>
                 <span className="news-grid-card-cta">
-                  Leer más <i className="fa-solid fa-arrow-right"></i>
+                  {t("news.read_more")}{" "}
+                  <i className="fa-solid fa-arrow-right"></i>
                 </span>
               </div>
             </div>

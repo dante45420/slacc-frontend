@@ -1,7 +1,9 @@
 import { useState } from "react";
-import { Section, Card, Button, Input, Textarea } from "../../components/ui";
+import { useTranslation } from "react-i18next";
+import { Section, Card, Button, Input, Textarea, PageHero } from "../../components/ui";
 
 export default function Contact() {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -15,9 +17,9 @@ export default function Contact() {
 
   const handleSubmit = e => {
     e.preventDefault();
-    const subject = encodeURIComponent("Consulta desde sitio web SLACC");
+    const subject = encodeURIComponent(t("contact.mailto_subject"));
     const body = encodeURIComponent(
-      `Nombre: ${formData.name}\nEmail: ${formData.email}\n\nMensaje:\n${formData.message}`,
+      `${t("contact.mailto_body_name")}: ${formData.name}\n${t("common.email")}: ${formData.email}\n\n${t("contact.mailto_body_message")}:\n${formData.message}`,
     );
 
     globalThis.location.href = `mailto:Slacc@cadera.cl?subject=${subject}&body=${body}`;
@@ -26,12 +28,7 @@ export default function Contact() {
   return (
     <>
       <Section variant="primary" padding="lg" containerSize="sm">
-        <div className="contact-header">
-          <h1 className="contact-title">Contáctanos</h1>
-          <p className="contact-subtitle">
-            Estamos aquí para responder tus preguntas
-          </p>
-        </div>
+        <PageHero title={t("contact.title")} subtitle={t("contact.subtitle")} />
       </Section>
 
       <Section variant="default" padding="lg" containerSize="sm">
@@ -44,13 +41,11 @@ export default function Contact() {
         </div>
 
         <Card className="contact-card contact-card-centered">
-          <h2 className="contact-section-title">Información de Contacto</h2>
-          <p className="contact-description">
-            Correo oficial de la Secretaría SLACC
-          </p>
+          <h2 className="contact-section-title">{t("contact.info_title")}</h2>
+          <p className="contact-description">{t("contact.info_description")}</p>
 
           <div className="contact-email-box contact-email-box-spaced">
-            <p className="contact-email-label">Email</p>
+            <p className="contact-email-label">{t("common.email")}</p>
             <a href="mailto:Slacc@cadera.cl" className="contact-email-link">
               Slacc@cadera.cl
             </a>
@@ -58,12 +53,12 @@ export default function Contact() {
 
           <a href="mailto:Slacc@cadera.cl">
             <Button variant="primary" size="lg">
-              Enviar Email
+              {t("contact.btn_send_email")}
             </Button>
           </a>
 
           <div className="contact-socials">
-            <h3 className="contact-socials-title">Redes sociales</h3>
+            <h3 className="contact-socials-title">{t("contact.socials_title")}</h3>
             <div className="contact-socials-links">
               <a
                 href="https://www.linkedin.com"
@@ -95,22 +90,19 @@ export default function Contact() {
         </Card>
 
         <Card className="contact-card-alt contact-form-card">
-          <h2 className="contact-section-title">Formulario de contacto</h2>
-          <p className="contact-description">
-            Completa el formulario y abriremos tu cliente de correo con el
-            mensaje listo para enviar.
-          </p>
+          <h2 className="contact-section-title">{t("contact.form_title")}</h2>
+          <p className="contact-description">{t("contact.form_description")}</p>
 
           <form onSubmit={handleSubmit} className="contact-form">
             <Input
-              label="Nombre"
+              label={t("contact.name_label")}
               name="name"
               value={formData.name}
               onChange={handleChange}
               required
             />
             <Input
-              label="Email"
+              label={t("common.email")}
               type="email"
               name="email"
               value={formData.email}
@@ -118,7 +110,7 @@ export default function Contact() {
               required
             />
             <Textarea
-              label="Mensaje"
+              label={t("contact.message_label")}
               name="message"
               value={formData.message}
               onChange={handleChange}
@@ -127,7 +119,7 @@ export default function Contact() {
             />
 
             <Button type="submit" variant="primary" size="lg">
-              Enviar consulta
+              {t("contact.btn_submit")}
             </Button>
           </form>
         </Card>

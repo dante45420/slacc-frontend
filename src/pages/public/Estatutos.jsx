@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Section, Card, Grid } from "../../components/ui";
+import { Section, Card, Grid, PageHero } from "../../components/ui";
 
 export default function Estatutos() {
   const { t } = useTranslation();
@@ -17,11 +17,11 @@ export default function Estatutos() {
   return (
     <>
       <Section variant="primary" padding="lg" containerSize="lg">
-        <div className="about-header">
-          <p className="about-kicker">{t("estatutos.kicker")}</p>
-          <h1 className="about-title">{t("estatutos.title")}</h1>
-          <p className="about-subtitle">{t("estatutos.subtitle")}</p>
-        </div>
+        <PageHero
+          kicker={t("estatutos.kicker")}
+          title={t("estatutos.title")}
+          subtitle={t("estatutos.subtitle")}
+        />
       </Section>
 
       <Section padding="lg" containerSize="lg">

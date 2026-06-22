@@ -1,20 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import PropTypes from "prop-types";
 import { apiGet, apiPost } from "../../api/client";
 import { useAuth } from "../../auth/AuthContext";
+import { formatDate as formatLocaleDate } from "../../utils/i18nLocale";
 
 const BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
-
-function formatDate(dateString) {
-  if (!dateString) return "Por definir";
-  return new Date(dateString).toLocaleDateString("es-ES", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-}
 
 function isRegistrationOpen(event) {
   if (!event.registration_deadline) return true;
@@ -22,6 +15,7 @@ function isRegistrationOpen(event) {
 }
 
 export default function EventsPage() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -90,7 +84,7 @@ export default function EventsPage() {
     return (
       <section className="section">
         <div className="container">
-          <p>Cargando eventos...</p>
+          <p>{t("events.loading")}</p>
         </div>
       </section>
     );
@@ -100,20 +94,17 @@ export default function EventsPage() {
     <section className="section events-page">
       <div className="container events-page-container">
         <div className="events-page-header">
-          <h1 className="events-page-title">Eventos</h1>
-          <p className="events-page-subtitle">
-            Amplía tus conocimientos con nuestros eventos especializados en
-            cirugía de cadera
-          </p>
+          <h1 className="events-page-title">{t("events.title")}</h1>
+          <p className="events-page-subtitle">{t("events.subtitle")}</p>
         </div>
 
         {events.length === 0 ? (
           <div className="events-empty-state">
             <div className="events-empty-title">
-              No hay eventos disponibles en este momento
+              {t("events.empty_title")}
             </div>
             <p className="events-empty-description">
-              Pronto tendremos nuevos eventos disponibles. ¡Mantente atento!
+              {t("events.empty_description")}
             </p>
           </div>
         ) : (
@@ -146,29 +137,40 @@ export default function EventsPage() {
 
                   <div className="event-list-meta">
                     <div className="event-list-meta-row">
-                      <span className="event-list-meta-label">Instructor:</span>
+                      <span className="event-list-meta-label">
+                        {t("events.instructor")}:
+                      </span>
                       <span className="event-list-meta-value">
-                        {event.instructor || "Por definir"}
+                        {event.instructor || t("common.tbd")}
                       </span>
                     </div>
                     <div className="event-list-meta-row">
-                      <span className="event-list-meta-label">Duración:</span>
+                      <span className="event-list-meta-label">
+                        {t("events.duration")}:
+                      </span>
                       <span className="event-list-meta-value">
-                        {event.duration_hours || "N/A"} horas
+                        {event.duration_hours || t("common.na")}{" "}
+                        {event.duration_hours === 1
+                          ? t("common.hour_one")
+                          : t("common.hour_other")}
                       </span>
                     </div>
                     <div className="event-list-meta-row">
-                      <span className="event-list-meta-label">Inicio:</span>
+                      <span className="event-list-meta-label">
+                        {t("events.start")}:
+                      </span>
                       <span className="event-list-meta-value">
-                        {formatDate(event.start_date)}
+                        {formatLocaleDate(event.start_date) || t("common.tbd")}
                       </span>
                     </div>
                     <div className="event-list-meta-row">
-                      <span className="event-list-meta-label">Cupos:</span>
+                      <span className="event-list-meta-label">
+                        {t("events.capacity")}:
+                      </span>
                       <span className="event-list-meta-value">
                         {event.max_students
-                          ? `${event.max_students} estudiantes`
-                          : "Sin límite"}
+                          ? `${event.max_students} ${t("common.students")}`
+                          : t("common.unlimited")}
                       </span>
                     </div>
                   </div>
@@ -181,7 +183,7 @@ export default function EventsPage() {
                         </div>
                         {discount > 0 && (
                           <div className="event-list-discount-badge">
-                            {discount}% descuento para socios
+                            {t("events.discount", { percent: discount })}
                           </div>
                         )}
                       </div>
@@ -189,7 +191,7 @@ export default function EventsPage() {
                         {user ? (
                           <div>
                             <div className="event-list-price-context-label">
-                              Valor socio
+                              {t("events.member_price")}
                             </div>
                             <div className="event-list-price-reference">
                               ${event.price_non_member}
@@ -197,7 +199,7 @@ export default function EventsPage() {
                           </div>
                         ) : (
                           <div className="event-list-price-context-label">
-                            Valor general
+                            {t("events.general_price")}
                           </div>
                         )}
                       </div>
@@ -209,7 +211,7 @@ export default function EventsPage() {
                       className="btn btn-outline"
                       onClick={() => navigate(`/eventos/${event.id}`)}
                     >
-                      Ver Detalles
+                      {t("events.view_details")}
                     </button>
                     <button
                       className="btn btn-primary"
@@ -217,15 +219,17 @@ export default function EventsPage() {
                       disabled={!isOpen || event.is_enrolled}
                     >
                       {(() => {
-                        if (event.is_enrolled) return "Ya inscrito";
-                        if (isOpen) return "Inscribirse";
-                        return "Inscripción Cerrada";
+                        if (event.is_enrolled) return t("events.enrolled");
+                        if (isOpen) return t("events.enroll");
+                        return t("events.enrollment_closed");
                       })()}
                     </button>
                   </div>
 
                   {!isOpen && (
-                    <div className="event-list-closed-badge">CERRADO</div>
+                    <div className="event-list-closed-badge">
+                      {t("events.closed_badge")}
+                    </div>
                   )}
                 </div>
               );
@@ -255,6 +259,7 @@ export default function EventsPage() {
 }
 
 function EnrollmentModal({ event, user, onClose, onSuccess }) {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     student_name: user?.name || "",
     student_email: user?.email || "",
@@ -284,7 +289,7 @@ function EnrollmentModal({ event, user, onClose, onSuccess }) {
 
   async function handleEnroll() {
     if (!formData.student_name || !formData.student_email) {
-      setError("Nombre y email son requeridos");
+      setError(t("events.err_name_email"));
       return;
     }
 
@@ -299,7 +304,11 @@ function EnrollmentModal({ event, user, onClose, onSuccess }) {
       await apiPost(`/events/${event.id}/enroll`, payload);
       setStep(2); // Go to success step
     } catch (err) {
-      setError("Error al inscribirse: " + (err.message || "Error desconocido"));
+      setError(
+        t("events.err_enroll", {
+          message: err.message || t("events.err_unknown"),
+        }),
+      );
     } finally {
       setLoading(false);
     }
@@ -309,11 +318,11 @@ function EnrollmentModal({ event, user, onClose, onSuccess }) {
     <div className="enrollment-modal-overlay">
       <div className="enrollment-modal-card">
         <div className="enrollment-modal-header">
-          <h2 className="enrollment-modal-title">Inscribirse al Curso</h2>
+          <h2 className="enrollment-modal-title">{t("events.modal_title")}</h2>
           <button
             onClick={onClose}
             className="enrollment-modal-close"
-            aria-label="Cerrar modal"
+            aria-label={t("events.modal_close")}
           >
             <i className="fa-solid fa-xmark"></i>
           </button>
@@ -331,7 +340,7 @@ function EnrollmentModal({ event, user, onClose, onSuccess }) {
                 htmlFor="enrollment-student-name"
                 className="enrollment-label"
               >
-                Nombre Completo *
+                {t("events.full_name")}
               </label>
               <input
                 id="enrollment-student-name"
@@ -349,7 +358,7 @@ function EnrollmentModal({ event, user, onClose, onSuccess }) {
                 htmlFor="enrollment-student-email"
                 className="enrollment-label"
               >
-                Email *
+                {t("common.email")} *
               </label>
               <input
                 id="enrollment-student-email"
@@ -367,7 +376,7 @@ function EnrollmentModal({ event, user, onClose, onSuccess }) {
                 htmlFor="enrollment-student-phone"
                 className="enrollment-label"
               >
-                Teléfono
+                {t("events.phone")}
               </label>
               <input
                 id="enrollment-student-phone"
@@ -381,12 +390,12 @@ function EnrollmentModal({ event, user, onClose, onSuccess }) {
 
             <div className="enrollment-price-panel">
               <div className="enrollment-price-row">
-                <span>Valor:</span>
+                <span>{t("events.price_label")}</span>
                 <span className="enrollment-price-value">${userPrice}</span>
               </div>
               {user && (
                 <div className="enrollment-price-note">
-                  Descuento para socios aplicado
+                  {t("events.member_discount_note")}
                 </div>
               )}
             </div>
@@ -396,12 +405,13 @@ function EnrollmentModal({ event, user, onClose, onSuccess }) {
         {step === 2 && (
           <div className="enrollment-success">
             <div className="enrollment-success-icon">
-              Inscripción confirmada
+              {t("events.enrollment_confirmed")}
             </div>
-            <h3 className="enrollment-success-title">Inscripción exitosa</h3>
+            <h3 className="enrollment-success-title">
+              {t("events.enrollment_success_title")}
+            </h3>
             <p className="enrollment-success-text">
-              Te has inscrito correctamente al curso. Recibirás un email de
-              confirmación con los detalles.
+              {t("events.enrollment_success_text")}
             </p>
           </div>
         )}
@@ -410,20 +420,20 @@ function EnrollmentModal({ event, user, onClose, onSuccess }) {
           {step === 1 && (
             <>
               <button className="btn btn-outline" onClick={onClose}>
-                Cancelar
+                {t("common.cancel")}
               </button>
               <button
                 className="btn btn-primary"
                 onClick={handleEnroll}
                 disabled={loading}
               >
-                {loading ? "Procesando..." : "Inscribirse"}
+                {loading ? t("common.processing") : t("events.enroll")}
               </button>
             </>
           )}
           {step === 2 && (
             <button className="btn btn-primary" onClick={onSuccess}>
-              Cerrar
+              {t("common.close")}
             </button>
           )}
         </div>

@@ -1,46 +1,47 @@
 import { Link } from "react-router-dom";
-import { Section, Card, Grid } from "../../components/ui";
+import { useTranslation } from "react-i18next";
+import { Section, Card, Grid, PageHero } from "../../components/ui";
 
 export default function InternationalPT() {
+  const { t } = useTranslation();
+  const sections = t("intl_landing.sections_items_pt", { returnObjects: true });
+
   return (
     <>
       <Section variant="primary" padding="lg" containerSize="lg">
-        <div className="intl-header">
-          <p className="intl-kicker">SLACC Internacional</p>
-          <h1 className="intl-title">
-            Sociedade Latino-Americana de Cirurgia do Quadril
-          </h1>
-          <p className="intl-subtitle">
-            Secoes principais e informacoes do congresso em Portugues.
-          </p>
-        </div>
+        <PageHero
+          kicker={t("intl_landing.kicker_pt")}
+          title={t("intl_landing.title_pt")}
+          subtitle={t("intl_landing.subtitle_pt")}
+        />
       </Section>
 
       <Section padding="lg" containerSize="lg">
         <Grid columns={2} gap={4} className="intl-grid">
           <Card className="intl-card">
-            <h2 className="intl-card-title">Secoes Principais</h2>
-            <ul className="intl-list">
-              <li>A Sociedade</li>
-              <li>Aliancas Nacionais</li>
-              <li>Educacao e Fellowships</li>
-              <li>Eventos Cientificos</li>
-              <li>Associacao e Diretorio</li>
-            </ul>
+            <h2 className="intl-card-title">
+              {t("intl_landing.sections_title_pt")}
+            </h2>
+            {Array.isArray(sections) && (
+              <ul className="intl-list">
+                {sections.map(item => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            )}
             <Link to="/" className="btn btn-outline btn-sm">
-              Ir para site em Espanhol
+              {t("intl_landing.go_spanish_pt")}
             </Link>
           </Card>
 
           <Card className="intl-card">
-            <h2 className="intl-card-title">Congresso Principal</h2>
-            <p className="intl-congress-name">SLARD 2026 - Save the Date</p>
-            <p className="intl-card-text">
-              Acompanhe novidades do congresso, envio de trabalhos e cronograma
-              de inscricoes na secao de Eventos.
-            </p>
+            <h2 className="intl-card-title">
+              {t("intl_landing.congress_title_pt")}
+            </h2>
+            <p className="intl-congress-name">{t("intl_landing.congress_name")}</p>
+            <p className="intl-card-text">{t("intl_landing.congress_text_pt")}</p>
             <Link to="/eventos/proximos" className="btn btn-primary btn-sm">
-              Ver informacoes do congresso
+              {t("intl_landing.congress_btn_pt")}
             </Link>
           </Card>
         </Grid>

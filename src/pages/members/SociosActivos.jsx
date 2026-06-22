@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { apiGet } from "../../api/client";
 import {
   Grid,
@@ -11,6 +12,7 @@ import {
 } from "../../components/ui";
 
 export default function SociosActivos() {
+  const { t } = useTranslation();
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -25,7 +27,7 @@ export default function SociosActivos() {
       setMembers(data);
     } catch (err) {
       console.error("Error loading active members:", err);
-      setError("No se pudo cargar la lista de socios activos.");
+      setError(t("members.active_error"));
     } finally {
       setLoading(false);
     }
@@ -38,9 +40,9 @@ export default function SociosActivos() {
       gratuito: "success",
     };
     const labels = {
-      joven: "Nex Gen",
-      normal: "Socio",
-      gratuito: "Emérito",
+      joven: t("members.badge_joven"),
+      normal: t("members.badge_normal"),
+      gratuito: t("members.badge_gratuito"),
     };
     return {
       variant: variants[type] || "neutral",
@@ -71,20 +73,18 @@ export default function SociosActivos() {
     }
 
     if (members.length === 0) {
-      return (
-        <Alert variant="info">
-          No hay socios activos registrados en este momento.
-        </Alert>
-      );
+      return <Alert variant="info">{t("members.active_empty")}</Alert>;
     }
 
     return (
       <>
         <p className="text-muted mb-5">
           {members.length}{" "}
-          {members.length === 1 ? "socio activo" : "socios activos"}
+          {members.length === 1
+            ? t("common.member_singular")
+            : t("common.member_plural")}
         </p>
-        <Grid cols={3} gap={4}>
+        <Grid columns={3} gap={4}>
           {members.map(member => {
             const badge = getMembershipBadge(member.membership_type);
             return (
@@ -101,7 +101,7 @@ export default function SociosActivos() {
                     href={`mailto:${member.email}`}
                     className="btn btn-outline btn-sm"
                   >
-                    Contactar
+                    {t("common.contact")}
                   </a>
                 </div>
               </Card>
@@ -115,9 +115,9 @@ export default function SociosActivos() {
   return (
     <Section>
       <Container>
-        <h1 className="mb-2">Socios Activos</h1>
+        <h1 className="mb-2">{t("members.active_title")}</h1>
         <p className="text-muted mb-6 socios-intro">
-          Cirujanos cardiovasculares activos en nuestra plataforma
+          {t("members.active_subtitle")}
         </p>
 
         {renderContent()}

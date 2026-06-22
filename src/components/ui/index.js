@@ -8,6 +8,7 @@ export { default as EmptyState } from "./EmptyState.jsx";
 export { default as Grid } from "./Grid.jsx";
 export { default as Input } from "./Input.jsx";
 export { default as Modal } from "./Modal.jsx";
+export { default as PageHero } from "./PageHero.jsx";
 export { default as Pagination } from "./Pagination.jsx";
 export { default as Section } from "./Section.jsx";
 export { default as Select } from "./Select.jsx";

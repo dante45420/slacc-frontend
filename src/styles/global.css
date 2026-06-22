@@ -3692,39 +3692,6 @@ img {
 }
 
 /* About / Quienes Somos */
-.about-header {
-  max-width: 920px;
-  margin: 0 auto;
-  text-align: center;
-}
-
-.about-kicker {
-  display: inline-block;
-  margin: 0 0 var(--spacing-3);
-  padding: 6px 14px;
-  border-radius: 999px;
-  background: rgba(23, 73, 120, 0.12);
-  border: 1px solid rgba(23, 73, 120, 0.25);
-  color: var(--color-primary-dark);
-  font-size: 0.82rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
-.about-title {
-  margin: 0 0 var(--spacing-3);
-  font-size: clamp(2rem, 3.8vw, 3rem);
-  line-height: 1.15;
-}
-
-.about-subtitle {
-  margin: 0;
-  color: var(--color-text-secondary);
-  font-size: 1.12rem;
-  line-height: 1.75;
-}
-
 .about-pillars-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -3837,25 +3804,13 @@ img {
   flex: 1;
 }
 
-.history-header,
-.board-header,
-.alliances-header,
-.education-header,
-.statutes-header,
-.portal-header,
-.intl-header {
+.page-hero {
   max-width: 920px;
   margin: 0 auto;
   text-align: center;
 }
 
-.history-kicker,
-.board-kicker,
-.alliances-kicker,
-.education-kicker,
-.statutes-kicker,
-.portal-kicker,
-.intl-kicker {
+.page-hero-kicker {
   display: inline-block;
   margin: 0 0 var(--spacing-3);
   padding: 6px 14px;
@@ -3869,27 +3824,17 @@ img {
   text-transform: uppercase;
 }
 
-.history-title,
-.board-title,
-.alliances-title,
-.education-title,
-.statutes-title,
-.portal-title,
-.intl-title {
+.page-hero-title {
   margin: 0 0 var(--spacing-3);
-  font-size: clamp(2rem, 3.6vw, 2.9rem);
-  line-height: 1.16;
+  font-size: clamp(2rem, 3.8vw, 3rem);
+  line-height: 1.15;
 }
 
-.history-subtitle,
-.board-subtitle,
-.alliances-subtitle,
-.education-subtitle,
-.statutes-subtitle,
-.portal-subtitle,
-.intl-subtitle {
+.page-hero-subtitle {
   margin: 0;
   color: var(--color-text-secondary);
+  font-size: 1.12rem;
+  line-height: 1.75;
 }
 
 .statutes-card {
@@ -4002,48 +3947,93 @@ img {
 }
 
 .history-timeline {
+  list-style: none;
+  margin: 0 auto;
+  padding: 0;
+  max-width: 760px;
+  position: relative;
+}
+
+.history-timeline::before {
+  content: "";
+  position: absolute;
+  left: 72px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(
+    180deg,
+    var(--color-primary) 0%,
+    rgba(23, 73, 120, 0.15) 100%
+  );
+}
+
+.history-item {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 88px 1fr;
   gap: var(--spacing-4);
+  align-items: start;
+  position: relative;
+  padding-bottom: var(--spacing-5);
+}
+
+.history-item:last-child {
+  padding-bottom: 0;
+}
+
+.history-item-year {
+  margin: var(--spacing-4) 0 0;
+  text-align: right;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--color-primary);
+  position: relative;
+}
+
+.history-item-year::after {
+  content: "";
+  position: absolute;
+  right: -22px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  border: 3px solid var(--color-bg, #fff);
+  box-shadow: 0 0 0 2px var(--color-primary);
 }
 
 .history-item-card {
   margin: 0;
-  height: 100%;
 }
 
-.history-item-year {
-  margin: 0 0 var(--spacing-2);
-  font-size: 0.85rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--color-primary);
-}
-
-.history-item-title {
-  margin: 0 0 var(--spacing-2);
+.history-item-card .card-title {
   font-size: 1.3rem;
 }
 
-.history-item-description {
-  margin: 0;
+.history-item-card .card-description {
+  margin-bottom: 0;
   color: var(--color-text-secondary);
 }
 
 .history-cta-card {
   margin: 0;
+  max-width: 760px;
+  margin-inline: auto;
   text-align: center;
 }
 
-.history-cta-title {
-  margin: 0 0 var(--spacing-2);
-}
-
-.history-cta-description {
-  margin: 0 auto var(--spacing-4);
+.history-cta-card .card-description {
+  margin-inline: auto;
   max-width: 700px;
   color: var(--color-text-secondary);
+}
+
+.history-cta-card .card-footer {
+  border-top: none;
+  padding-top: 0;
 }
 
 .history-cta-actions {
@@ -4266,7 +4256,6 @@ img {
   }
 
   .about-society-grid,
-  .history-timeline,
   .portal-grid,
   .intl-grid {
     grid-template-columns: 1fr;
@@ -4294,12 +4283,35 @@ img {
 }
 
 @media (max-width: 768px) {
-  .about-kicker {
+  .page-hero-kicker {
     font-size: 0.75rem;
   }
 
-  .about-subtitle {
+  .page-hero-subtitle {
     font-size: 1rem;
+  }
+
+  .history-timeline::before {
+    left: 11px;
+  }
+
+  .history-item {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-2);
+    padding-left: var(--spacing-6);
+    padding-bottom: var(--spacing-4);
+  }
+
+  .history-item-year {
+    margin: 0;
+    text-align: left;
+    font-size: 0.82rem;
+  }
+
+  .history-item-year::after {
+    right: auto;
+    left: calc(-1 * var(--spacing-6) + 5px);
+    top: 50%;
   }
 
   .about-values-grid {

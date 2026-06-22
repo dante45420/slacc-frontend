@@ -1,17 +1,17 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Section, Card, Button } from "../../components/ui";
+import { Section, Card, Button, PageHero } from "../../components/ui";
 
 export default function EstatutosDocumento() {
   const { t } = useTranslation();
   return (
     <>
       <Section variant="primary" padding="lg" containerSize="lg">
-        <div className="statutes-header">
-          <p className="statutes-kicker">{t("estatutos_doc.kicker")}</p>
-          <h1 className="statutes-title">{t("estatutos_doc.title")}</h1>
-          <p className="statutes-subtitle">{t("estatutos_doc.subtitle")}</p>
-        </div>
+        <PageHero
+          kicker={t("estatutos_doc.kicker")}
+          title={t("estatutos_doc.title")}
+          subtitle={t("estatutos_doc.subtitle")}
+        />
       </Section>
 
       <Section padding="lg" containerSize="lg">

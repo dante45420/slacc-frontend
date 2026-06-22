@@ -1,27 +1,26 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
-import { Section, Input, Button, Alert, Grid } from "../../components/ui";
+import { useTranslation } from "react-i18next";
+import { Section, Input, Button, Alert, Grid, PageHero } from "../../components/ui";
 
 export default function JoinMembership() {
+  const { t } = useTranslation();
   const [appSent, setAppSent] = useState(false);
   const [appMsg, setAppMsg] = useState("");
 
   return (
     <>
       <Section variant="primary" padding="lg">
-        <div className="join-header-container">
-          <h1 className="join-header-title">Únete a SLACC</h1>
-          <p className="join-header-subtitle">
-            Conecta con especialistas en cirugía cardiovascular de toda
-            Latinoamérica y accede a beneficios exclusivos
-          </p>
-        </div>
+        <PageHero
+          title={t("members.join_title")}
+          subtitle={t("members.join_subtitle")}
+        />
       </Section>
 
       <Section variant="default" padding="lg" containerSize="sm">
         <div className="join-form-container">
-          <h2 className="join-form-title">Solicitar Membresía</h2>
+          <h2 className="join-form-title">{t("members.join_form_title")}</h2>
 
           <ApplicationForm
             onResult={(ok, msg) => {
@@ -38,9 +37,9 @@ export default function JoinMembership() {
         </div>
 
         <div className="join-login-section">
-          <p className="join-login-text">¿Ya eres socio?</p>
+          <p className="join-login-text">{t("members.join_already_member")}</p>
           <Link to="/login">
-            <Button variant="outline">Iniciar Sesión</Button>
+            <Button variant="outline">{t("members.join_login")}</Button>
           </Link>
         </div>
       </Section>
@@ -49,21 +48,19 @@ export default function JoinMembership() {
 }
 
 function ApplicationForm({ onResult }) {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
-    // Información Personal
     name: "",
     email: "",
     website: "",
     city: "",
     country: "",
     whatsapp: "",
-    // Información Académica
     specialization: "",
     residency_end_date: "",
     university: "",
     fellowship_date: "",
     fellowship_location: "",
-    // Información Profesional
     current_hospital: "",
     current_position: "",
     teaching_degree: "",
@@ -87,7 +84,7 @@ function ApplicationForm({ onResult }) {
     if (files.length > 3) {
       setErrors(prev => ({
         ...prev,
-        documents: "Máximo 3 archivos PDF permitidos",
+        documents: t("members.join_err_max_files"),
       }));
       return;
     }
@@ -98,7 +95,7 @@ function ApplicationForm({ onResult }) {
     if (invalidFiles.length > 0) {
       setErrors(prev => ({
         ...prev,
-        documents: "Solo se permiten archivos PDF",
+        documents: t("members.join_err_pdf_only"),
       }));
       return;
     }
@@ -115,18 +112,19 @@ function ApplicationForm({ onResult }) {
 
   const validate = () => {
     const newErrors = {};
-    // Required fields
-    if (!formData.name.trim()) newErrors.name = "El nombre es requerido";
-    if (!formData.email.trim()) newErrors.email = "El email es requerido";
-    if (!formData.city.trim()) newErrors.city = "La ciudad es requerida";
-    if (!formData.country.trim()) newErrors.country = "El país es requerido";
-    if (!formData.whatsapp.trim()) newErrors.whatsapp = "WhatsApp es requerido";
+    if (!formData.name.trim()) newErrors.name = t("members.join_err_name");
+    if (!formData.email.trim()) newErrors.email = t("members.join_err_email");
+    if (!formData.city.trim()) newErrors.city = t("members.join_err_city");
+    if (!formData.country.trim())
+      newErrors.country = t("members.join_err_country");
+    if (!formData.whatsapp.trim())
+      newErrors.whatsapp = t("members.join_err_whatsapp");
     if (!formData.specialization.trim())
-      newErrors.specialization = "La especialidad es requerida";
+      newErrors.specialization = t("members.join_err_specialization");
     if (!formData.university.trim())
-      newErrors.university = "La universidad es requerida";
+      newErrors.university = t("members.join_err_university");
     if (documentFiles.length === 0)
-      newErrors.documents = "Al menos un documento PDF es requerido";
+      newErrors.documents = t("members.join_err_documents");
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -136,31 +134,27 @@ function ApplicationForm({ onResult }) {
     e.preventDefault();
 
     if (!validate()) {
-      onResult(false, "Por favor completa todos los campos requeridos");
+      onResult(false, t("members.join_err_required"));
       return;
     }
 
     setLoading(true);
     try {
       const data = new FormData();
-      // Personal
       data.append("name", formData.name);
       data.append("email", formData.email);
       data.append("website", formData.website);
       data.append("city", formData.city);
       data.append("country", formData.country);
       data.append("whatsapp", formData.whatsapp);
-      // Academic
       data.append("specialization", formData.specialization);
       data.append("residency_end_date", formData.residency_end_date);
       data.append("university", formData.university);
       data.append("fellowship_date", formData.fellowship_date);
       data.append("fellowship_location", formData.fellowship_location);
-      // Professional
       data.append("current_hospital", formData.current_hospital);
       data.append("current_position", formData.current_position);
       data.append("teaching_degree", formData.teaching_degree);
-      // Documents
       documentFiles.forEach((file, index) => {
         data.append(`document${index > 0 ? index + 1 : ""}`, file);
       });
@@ -171,15 +165,11 @@ function ApplicationForm({ onResult }) {
       });
 
       if (!res.ok) {
-        throw new Error("Error al enviar solicitud");
+        throw new Error(t("members.join_err_submit"));
       }
 
-      onResult(
-        true,
-        "¡Solicitud enviada exitosamente! Será revisada por nuestro comité y te contactaremos pronto.",
-      );
+      onResult(true, t("members.join_success"));
 
-      // Reset form
       setFormData({
         name: "",
         email: "",
@@ -201,7 +191,7 @@ function ApplicationForm({ onResult }) {
     } catch (error) {
       onResult(
         false,
-        error.message || "Error de red. Por favor intenta nuevamente.",
+        error.message || t("members.join_err_network"),
       );
     } finally {
       setLoading(false);
@@ -210,11 +200,12 @@ function ApplicationForm({ onResult }) {
 
   return (
     <form onSubmit={send}>
-      {/* Información Personal */}
-      <h3 className="join-section-title">Información Personal</h3>
+      <h3 className="join-section-title">
+        {t("members.join_section_personal")}
+      </h3>
 
       <Input
-        label="Nombre Completo"
+        label={t("members.join_name")}
         value={formData.name}
         onChange={handleChange("name")}
         error={errors.name}
@@ -224,7 +215,7 @@ function ApplicationForm({ onResult }) {
 
       <Grid columns="1fr 1fr" gap="var(--spacing-4)">
         <Input
-          label="Correo Electrónico"
+          label={t("members.join_email")}
           type="email"
           value={formData.email}
           onChange={handleChange("email")}
@@ -233,7 +224,7 @@ function ApplicationForm({ onResult }) {
           required
         />
         <Input
-          label="Página Web"
+          label={t("members.join_website")}
           type="url"
           value={formData.website}
           onChange={handleChange("website")}
@@ -244,7 +235,7 @@ function ApplicationForm({ onResult }) {
 
       <Grid columns="1fr 1fr" gap="var(--spacing-4)">
         <Input
-          label="Ciudad"
+          label={t("members.join_city")}
           value={formData.city}
           onChange={handleChange("city")}
           error={errors.city}
@@ -252,7 +243,7 @@ function ApplicationForm({ onResult }) {
           required
         />
         <Input
-          label="País"
+          label={t("members.join_country")}
           value={formData.country}
           onChange={handleChange("country")}
           error={errors.country}
@@ -262,30 +253,31 @@ function ApplicationForm({ onResult }) {
       </Grid>
 
       <Input
-        label="WhatsApp"
+        label={t("members.join_whatsapp")}
         type="tel"
         value={formData.whatsapp}
         onChange={handleChange("whatsapp")}
         error={errors.whatsapp}
         placeholder="+57 300 123 4567"
-        helperText="Incluye código de país"
+        helperText={t("members.join_whatsapp_help")}
         required
       />
 
-      {/* Información Académica */}
-      <h3 className="join-section-title">Información Académica</h3>
+      <h3 className="join-section-title">
+        {t("members.join_section_academic")}
+      </h3>
 
       <Grid columns="1fr 1fr" gap="var(--spacing-4)">
         <Input
-          label="Especialidad"
+          label={t("members.join_specialization")}
           value={formData.specialization}
           onChange={handleChange("specialization")}
           error={errors.specialization}
-          placeholder="Cirugía Cardiovascular"
+          placeholder="Cirugía de Cadera"
           required
         />
         <Input
-          label="Fecha de Término de la Residencia"
+          label={t("members.join_residency_end")}
           type="date"
           value={formData.residency_end_date}
           onChange={handleChange("residency_end_date")}
@@ -294,7 +286,7 @@ function ApplicationForm({ onResult }) {
       </Grid>
 
       <Input
-        label="Universidad"
+        label={t("members.join_university")}
         value={formData.university}
         onChange={handleChange("university")}
         error={errors.university}
@@ -304,14 +296,14 @@ function ApplicationForm({ onResult }) {
 
       <Grid columns="1fr 1fr" gap="var(--spacing-4)">
         <Input
-          label="Fecha de Fellow de Cadera"
+          label={t("members.join_fellowship_date")}
           type="date"
           value={formData.fellowship_date}
           onChange={handleChange("fellowship_date")}
           error={errors.fellowship_date}
         />
         <Input
-          label="Lugar Realización Fellow de Cadera"
+          label={t("members.join_fellowship_location")}
           value={formData.fellowship_location}
           onChange={handleChange("fellowship_location")}
           error={errors.fellowship_location}
@@ -319,40 +311,42 @@ function ApplicationForm({ onResult }) {
         />
       </Grid>
 
-      {/* Información Profesional */}
-      <h3 className="join-section-title">Información Profesional</h3>
+      <h3 className="join-section-title">
+        {t("members.join_section_professional")}
+      </h3>
 
       <Grid columns="1fr 1fr" gap="var(--spacing-4)">
         <Input
-          label="Hospital Actual donde Ejerce"
+          label={t("members.join_hospital")}
           value={formData.current_hospital}
           onChange={handleChange("current_hospital")}
           error={errors.current_hospital}
           placeholder="Hospital Central"
         />
         <Input
-          label="Cargo Actual"
+          label={t("members.join_position")}
           value={formData.current_position}
           onChange={handleChange("current_position")}
           error={errors.current_position}
-          placeholder="Cirujano Cardiovascular"
+          placeholder="Cirujano de Cadera"
         />
       </Grid>
 
       <Input
-        label="Grado Docente"
+        label={t("members.join_teaching_degree")}
         value={formData.teaching_degree}
         onChange={handleChange("teaching_degree")}
         error={errors.teaching_degree}
         placeholder="Profesor Asociado"
       />
 
-      {/* Documento */}
-      <h3 className="join-section-title">Documentación</h3>
+      <h3 className="join-section-title">
+        {t("members.join_section_documents")}
+      </h3>
 
       <div className="file-input-wrapper">
         <label htmlFor="application-document" className="file-input-label">
-          Documentos CV/Certificados (PDF) *
+          {t("members.join_documents_label")}
         </label>
         <input
           id="application-document"
@@ -377,7 +371,7 @@ function ApplicationForm({ onResult }) {
                   type="button"
                   onClick={() => removeFile(index)}
                   className="join-file-remove"
-                  aria-label="Eliminar archivo"
+                  aria-label={t("common.remove_file")}
                 >
                   <i className="fa-solid fa-xmark"></i>
                 </button>
@@ -388,9 +382,7 @@ function ApplicationForm({ onResult }) {
         {errors.documents && (
           <p className="file-error-message">{errors.documents}</p>
         )}
-        <p className="join-file-help">
-          Puedes adjuntar hasta 3 archivos PDF (CV y certificados)
-        </p>
+        <p className="join-file-help">{t("members.join_documents_help")}</p>
       </div>
 
       <Button
@@ -401,7 +393,7 @@ function ApplicationForm({ onResult }) {
         loading={loading}
         disabled={loading}
       >
-        Enviar Solicitud de Membresía
+        {t("members.join_submit")}
       </Button>
     </form>
   );

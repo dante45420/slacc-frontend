@@ -1,12 +1,15 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../../auth/AuthContext.jsx";
 import Section from "../../components/ui/Section.jsx";
 import Input from "../../components/ui/Input.jsx";
 import Button from "../../components/ui/Button.jsx";
 import Alert from "../../components/ui/Alert.jsx";
+import PageHero from "../../components/ui/PageHero.jsx";
 
 export default function Login() {
+  const { t } = useTranslation();
   const { login } = useAuth();
   const nav = useNavigate();
   const [email, setEmail] = useState("");
@@ -20,7 +23,6 @@ export default function Login() {
     setLoading(true);
     try {
       const user = await login(email, password);
-      // Redirect admin users to admin dashboard
       if (user?.role === "admin") {
         nav("/admin");
       } else {
@@ -28,9 +30,7 @@ export default function Login() {
       }
     } catch (err) {
       console.error("Login error:", err);
-      setError(
-        "Credenciales inválidas. Por favor verifica tu email y contraseña.",
-      );
+      setError(t("login.error"));
     } finally {
       setLoading(false);
     }
@@ -38,15 +38,12 @@ export default function Login() {
 
   return (
     <Section variant="primary" padding="lg" containerSize="sm">
-      <div className="login-header">
-        <h1 className="login-title">Iniciar Sesión</h1>
-        <p className="login-subtitle">Accede a tu cuenta de socio SLACC</p>
-      </div>
+      <PageHero title={t("login.title")} subtitle={t("login.subtitle")} />
 
       <div className="login-form-shell">
         <form onSubmit={submit}>
           <Input
-            label="Email"
+            label={t("common.email")}
             type="email"
             value={email}
             onChange={e => setEmail(e.target.value)}
@@ -55,7 +52,7 @@ export default function Login() {
           />
 
           <Input
-            label="Contraseña"
+            label={t("login.password")}
             type="password"
             value={password}
             onChange={e => setPassword(e.target.value)}
@@ -70,7 +67,7 @@ export default function Login() {
           )}
 
           <Button type="submit" fullWidth loading={loading} disabled={loading}>
-            Iniciar Sesión
+            {t("login.submit")}
           </Button>
         </form>
       </div>

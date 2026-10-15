@@ -1,155 +1,82 @@
-import { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { useState } from "react";
 import PropTypes from "prop-types";
+import { useTranslation } from "react-i18next";
 import { Button } from "./ui";
-import useMediaQuery from "../hooks/useMediaQuery.js";
+import Rail from "./home/Rail.jsx";
+import { executiveBoard, initials, countryName, photoStyle } from "../data/board.js";
+import { currentLanguage } from "../i18n.js";
 
-export function TeamCarousel({ members = [] }) {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const trackRef = useRef(null);
-  const isMobile = useMediaQuery("(max-width: 768px)");
-  const itemsPerSlide = isMobile ? 1 : 3;
-
-  const items = members.length
-    ? members
-    : [
-        {
-          name: "Dra. Ana Pérez",
-          role: "Traumatóloga",
-          photo: "https://i.pravatar.cc/200?img=1",
-        },
-        {
-          name: "Dr. Luis Gómez",
-          role: "Ortopedista",
-          photo: "https://i.pravatar.cc/200?img=2",
-        },
-        {
-          name: "Dra. Marta Silva",
-          role: "Residente",
-          photo: "https://i.pravatar.cc/200?img=3",
-        },
-        {
-          name: "Dr. Carlos Ruiz",
-          role: "Cirujano Cardiovascular",
-          photo: "https://i.pravatar.cc/200?img=4",
-        },
-        {
-          name: "Dra. Patricia Torres",
-          role: "Cardióloga",
-          photo: "https://i.pravatar.cc/200?img=5",
-        },
-        {
-          name: "Dr. Miguel Santos",
-          role: "Cirujano Torácico",
-          photo: "https://i.pravatar.cc/200?img=6",
-        },
-      ];
-
-  const totalSlides = Math.ceil(items.length / itemsPerSlide);
-  const slideKeys = Array.from({ length: totalSlides }).map((_, slideIndex) => {
-    const startIdx = slideIndex * itemsPerSlide;
-    const slideMembers = items.slice(startIdx, startIdx + itemsPerSlide);
-    return `team-slide-${slideMembers.map(member => member.name).join("-")}`;
-  });
-
-  useEffect(() => {
-    if (currentIndex >= totalSlides && totalSlides > 0) {
-      setCurrentIndex(0);
-    }
-  }, [currentIndex, totalSlides]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentIndex(prev => (prev + 1) % totalSlides);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [totalSlides]);
-
-  useEffect(() => {
-    if (trackRef.current) {
-      trackRef.current.style.transform = `translateX(-${currentIndex * 100}%)`;
-    }
-  }, [currentIndex]);
-
-  const handlePrev = () => {
-    setCurrentIndex(prev => (prev - 1 + totalSlides) % totalSlides);
-  };
-
-  const handleNext = () => {
-    setCurrentIndex(prev => (prev + 1) % totalSlides);
-  };
+function MemberAvatar({ name, photo }) {
+  const [failed, setFailed] = useState(false);
+  const showPhoto = photo && !failed;
 
   return (
-    <div className="team-carousel">
-      <div className="team-carousel-viewport">
-        <div className="team-carousel-track" ref={trackRef}>
-          {Array.from({ length: totalSlides }).map((_, slideIndex) => {
-            const startIdx = slideIndex * itemsPerSlide;
-            const slideMembers = items.slice(
-              startIdx,
-              startIdx + itemsPerSlide,
-            );
+    <div className={`home-member__avatar${showPhoto ? "" : " home-member__avatar--initials"}`}>
+      {showPhoto ? (
+        <img
+          src={encodeURI(photo)}
+          alt=""
+          style={photoStyle(photo)}
+          loading="lazy"
+          decoding="async"
+          onError={() => setFailed(true)}
+        />
+      ) : (
+        <span aria-hidden="true">{initials(name)}</span>
+      )}
+    </div>
+  );
+}
 
-            return (
-              <div key={slideKeys[slideIndex]} className="team-carousel-slide">
-                {slideMembers.map((member, idx) => (
-                  <div
-                    key={`${member.name}-${idx}`}
-                    className="team-member-card team-carousel-member-card"
-                  >
-                    <img
-                      src={member.photo}
-                      alt={member.name}
-                      className="team-carousel-member-image"
-                    />
-                    <h3 className="team-carousel-member-name">{member.name}</h3>
-                    <p className="team-carousel-member-role">{member.role}</p>
-                  </div>
-                ))}
-              </div>
-            );
-          })}
-        </div>
-      </div>
+MemberAvatar.propTypes = {
+  name: PropTypes.string.isRequired,
+  photo: PropTypes.string,
+};
 
-      {/* Navigation Arrows */}
-      <div className="carousel-nav">
-        <button
-          aria-label="Anterior"
-          className="carousel-btn"
-          onClick={handlePrev}
-        >
-          <i className="fa-solid fa-chevron-left"></i>
-        </button>
-        <button
-          aria-label="Siguiente"
-          className="carousel-btn"
-          onClick={handleNext}
-        >
-          <i className="fa-solid fa-chevron-right"></i>
-        </button>
-      </div>
+/**
+ * Board members as portrait cards in a swipeable rail (up to 4 per view).
+ * Members without a real portrait get an initials avatar — never a stock
+ * photo. `role` may be the Spanish key from src/data/board.js or an already
+ * translated label; both resolve correctly.
+ */
+export function TeamCarousel({ members = executiveBoard, bleed = false, ctaTo, ctaLabel }) {
+  const { t, i18n } = useTranslation();
+  const lang = currentLanguage(i18n);
 
-      {/* Dots */}
-      <div className="carousel-dots team-carousel-dots">
-        {Array.from({ length: totalSlides }).map((_, idx) => (
-          <button
-            key={`dot-${slideKeys[idx]}`}
-            className={`carousel-dot ${idx === currentIndex ? "active" : ""}`}
-            onClick={() => setCurrentIndex(idx)}
-            aria-label={`Ir a slide ${idx + 1}`}
-          />
+  if (!members || members.length === 0) return null;
+
+  return (
+    <div className="home-team">
+      <Rail variant="people" bleed={bleed} label={t("header.board", "Mesa Directiva")}>
+        {members.map(member => (
+          <article key={member.name} className="home-member">
+            <MemberAvatar name={member.name} photo={member.photo} />
+            <div className="home-member__body">
+              <h3 className="home-member__name">{member.name}</h3>
+              {member.role && (
+                <p className="home-member__role">
+                  {t(`directiva.roles.${member.role}`, member.role)}
+                </p>
+              )}
+              {member.country && (
+                <p className="home-member__country">
+                  <i className="fa-solid fa-location-dot" aria-hidden="true"></i>
+                  {countryName(member.country, lang)}
+                </p>
+              )}
+            </div>
+          </article>
         ))}
-      </div>
+      </Rail>
 
-      {/* Directorio Button */}
-      <div className="team-carousel-cta">
-        <Link to="/miembros/directorio">
-          <Button size="lg" variant="primary">
-            Ver Directorio Completo
+      {ctaTo && ctaLabel && (
+        <div className="home-team__cta">
+          <Button variant="outline" to={ctaTo}>
+            {ctaLabel}
+            <i className="fa-solid fa-arrow-right" aria-hidden="true"></i>
           </Button>
-        </Link>
-      </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -157,9 +84,13 @@ export function TeamCarousel({ members = [] }) {
 TeamCarousel.propTypes = {
   members: PropTypes.arrayOf(
     PropTypes.shape({
-      name: PropTypes.string,
+      name: PropTypes.string.isRequired,
       role: PropTypes.string,
+      country: PropTypes.string,
       photo: PropTypes.string,
     }),
   ),
+  bleed: PropTypes.bool,
+  ctaTo: PropTypes.string,
+  ctaLabel: PropTypes.string,
 };

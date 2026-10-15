@@ -1,100 +1,136 @@
 import { useTranslation } from "react-i18next";
-import { Section, Container, Grid, Card } from "../../components/ui";
+import { Section, PageHero, Button, EmptyState } from "../../components/ui";
+import { initials } from "../../data/board.js";
+
+// Icons by position in `comites.list`.
+const COMMITTEE_ICONS = [
+  "fa-solid fa-sitemap",
+  "fa-solid fa-scale-balanced",
+  "fa-solid fa-flask",
+  "fa-solid fa-chess-knight",
+  "fa-solid fa-graduation-cap",
+  "fa-solid fa-diagram-project",
+];
+
+// Locale entries such as "Comité A" / "Committee B" are placeholders, not real
+// committees: they stay hidden until the society provides the real name.
+const isPlaceholderName = name =>
+  /^\S+\s+[A-Z]$/.test(String(name || "").trim());
 
 export default function Comites() {
   const { t } = useTranslation();
-  const committees = t("comites.list", { returnObjects: true });
-
-  // Nombres de los comités originales (para que las fotos/iniciales funcionen bien si lo modifican luego)
-  const originalMembersList = [
-    [
-      { name: "Dr. Juan Pérez", role: "Presidente" },
-      { name: "Dra. María García", role: "Secretaria" },
-      { name: "Dr. Carlos Rodríguez", role: "Vocal" },
-    ],
-    [
-      { name: "Dra. Ana Martínez", role: "Presidenta" },
-      { name: "Dr. Luis Fernández", role: "Secretario" },
-      { name: "Dra. Carmen López", role: "Vocal" },
-    ],
-    [
-      { name: "Dr. Roberto Sánchez", role: "Presidente" },
-      { name: "Dra. Laura Torres", role: "Secretaria" },
-      { name: "Dr. Miguel Ángel Ruiz", role: "Vocal" },
-    ],
-    [
-      { name: "Dr. Pedro Gómez", role: "Presidente" },
-      { name: "Dra. Isabel Moreno", role: "Secretaria" },
-      { name: "Dr. Francisco Navarro", role: "Vocal" },
-    ],
-    [
-      { name: "Dra. Patricia Jiménez", role: "Presidenta" },
-      { name: "Dr. Antonio Castro", role: "Secretario" },
-      { name: "Dra. Silvia Romero", role: "Vocal" },
-    ],
-    [
-      { name: "Dr. Jorge Vargas", role: "Presidente" },
-      { name: "Dra. Teresa Medina", role: "Secretaria" },
-      { name: "Dr. Raúl Ortiz", role: "Vocal" },
-    ],
-  ];
+  const list = t("comites.list", { returnObjects: true });
+  const committees = (Array.isArray(list) ? list : [])
+    .map((committee, index) => ({ ...committee, index }))
+    .filter(committee => committee.name && !isPlaceholderName(committee.name));
 
   return (
-    <Section>
-      <Container size="lg">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-4">{t("comites.title")}</h1>
-          <p className="text-xl text-gray-600">{t("comites.subtitle")}</p>
-        </div>
+    <div className="page society-page society-page--flush">
+      <PageHero
+        kicker={t("header.society")}
+        title={t("comites.title")}
+        subtitle={t("comites.subtitle")}
+      />
 
-        <div className="comites-list">
-          {Array.isArray(committees) &&
-            committees.map((committee, index) => (
-              <div key={index} id={`comite-${index}`}>
-                <Card className="p-6">
-                  <h2 className="text-2xl font-bold mb-3">{committee.name}</h2>
-                  <p className="text-gray-600 mb-6">{committee.description}</p>
+      <Section aria-label={t("comites.title")}>
+        {committees.length === 0 ? (
+          <EmptyState
+            icon={<i className="fa-solid fa-users" />}
+            title={t("comites.empty_title", "Comités en conformación")}
+            description={t(
+              "comites.empty_text",
+              "Pronto publicaremos los comités de trabajo de la sociedad y sus integrantes.",
+            )}
+          />
+        ) : (
+          <ul className="society-committees">
+            {committees.map(committee => {
+              const members = Array.isArray(committee.members)
+                ? committee.members.filter(member => member?.name)
+                : [];
+              return (
+                <li
+                  key={committee.index}
+                  id={`comite-${committee.index}`}
+                  className="society-committee"
+                >
+                  <span className="icon-tile" aria-hidden="true">
+                    <i
+                      className={
+                        COMMITTEE_ICONS[committee.index] || "fa-solid fa-users"
+                      }
+                    />
+                  </span>
+                  <div className="society-committee-body">
+                    <h2 className="society-committee-name">{committee.name}</h2>
+                    {committee.description && (
+                      <p className="society-committee-text">
+                        {committee.description}
+                      </p>
+                    )}
 
-                  <h3 className="text-lg font-semibold mb-4">
-                    {t("comites.members_title")}
-                  </h3>
-                  <Grid cols={3} gap={4}>
-                    {originalMembersList[index].map(member => (
-                      <Card
-                        key={member.name}
-                        className="p-4 comites-member-card"
-                      >
-                        <div className="comites-member-initials">
-                          {member.name
-                            .split(" ")
-                            .map(n => n[0])
-                            .join("")}
-                        </div>
-                        <h4 className="font-semibold text-center mb-1">
-                          {member.name}
-                        </h4>
-                        <p className="text-sm text-center text-gray-600">
-                          {committee.roles[member.role] || member.role}
-                        </p>
-                      </Card>
-                    ))}
-                  </Grid>
-                </Card>
-              </div>
-            ))}
-        </div>
+                    {members.length > 0 && (
+                      <div className="society-committee-members">
+                        <h3 className="society-committee-members-title">
+                          {t("comites.members_title")}
+                        </h3>
+                        <ul className="society-committee-member-list">
+                          {members.map(member => (
+                            <li
+                              key={member.name}
+                              className="society-committee-member"
+                            >
+                              <span
+                                className="society-committee-avatar"
+                                aria-hidden="true"
+                              >
+                                {initials(member.name)}
+                              </span>
+                              <span className="society-committee-member-text">
+                                <span className="society-committee-member-name">
+                                  {member.name}
+                                </span>
+                                {member.role && (
+                                  <span className="society-committee-member-role">
+                                    {committee.roles?.[member.role] ||
+                                      member.role}
+                                  </span>
+                                )}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </Section>
 
-        <div className="mt-12 bg-white rounded-lg shadow-md p-8">
-          <h2 className="text-2xl font-bold mb-4">
-            {t("comites.functions_title")}
-          </h2>
-          <div className="space-y-4 text-gray-700">
+      <Section variant="surface" aria-labelledby="society-committees-functions">
+        <div className="society-functions">
+          <div className="society-functions-head">
+            <p className="eyebrow">{t("header.committees")}</p>
+            <h2 id="society-committees-functions" className="section-title">
+              {t("comites.functions_title")}
+            </h2>
+          </div>
+          <div className="society-functions-body">
             <p>{t("comites.functions_p1")}</p>
             <p>{t("comites.functions_p2")}</p>
             <p>{t("comites.functions_p3")}</p>
+            <div className="society-functions-actions">
+              <Button variant="primary" to="/contacto">
+                <i className="fa-regular fa-envelope" aria-hidden="true" />
+                {t("comites.contact_btn", "Contactar a la secretaría")}
+              </Button>
+            </div>
           </div>
         </div>
-      </Container>
-    </Section>
+      </Section>
+    </div>
   );
 }

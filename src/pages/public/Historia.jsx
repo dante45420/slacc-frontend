@@ -1,55 +1,57 @@
-import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Section, Card, PageHero } from "../../components/ui";
+import { Section, PageHero, Button } from "../../components/ui";
 
 export default function Historia() {
   const { t } = useTranslation();
   const milestones = t("historia.milestones", { returnObjects: true });
+  const items = Array.isArray(milestones) ? milestones : [];
 
   return (
-    <>
-      <Section variant="primary" padding="lg" containerSize="lg">
-        <PageHero
-          kicker={t("historia.kicker")}
-          title={t("historia.title")}
-          subtitle={t("historia.subtitle")}
-        />
-      </Section>
+    <div className="page society-page society-page--flush">
+      <PageHero
+        kicker={t("historia.kicker")}
+        title={t("historia.title")}
+        subtitle={t("historia.subtitle")}
+      />
 
-      <Section padding="lg" containerSize="lg">
-        <ol className="history-timeline" aria-label={t("historia.title")}>
-          {Array.isArray(milestones) &&
-            milestones.map((item, index) => (
-              <li key={`${item.year}-${index}`} className="history-item">
-                <span className="history-item-year">{item.year}</span>
-                <Card
-                  className="history-item-card"
-                  hoverable
-                  title={item.title}
-                  description={item.description}
-                />
-              </li>
-            ))}
+      <Section>
+        <ol className="society-timeline" aria-label={t("historia.title")}>
+          {items.map((item, index) => (
+            <li key={`${item.year}-${index}`} className="society-timeline-item">
+              <span className="society-timeline-dot" aria-hidden="true" />
+              <p className="society-timeline-year">{item.year}</p>
+              <article className="society-timeline-card">
+                <h2 className="society-timeline-title">{item.title}</h2>
+                <p className="society-timeline-text">{item.description}</p>
+              </article>
+            </li>
+          ))}
         </ol>
       </Section>
 
-      <Section variant="alt" padding="lg" containerSize="lg">
-        <Card
-          className="history-cta-card"
-          title={t("historia.cta.title")}
-          description={t("historia.cta.description")}
-          footer={
-            <div className="history-cta-actions">
-              <Link to="/nosotros/directiva" className="btn btn-primary">
-                {t("historia.cta.btn_board")}
-              </Link>
-              <Link to="/nosotros/estatutos" className="btn btn-outline">
-                {t("historia.cta.btn_statutes")}
-              </Link>
-            </div>
-          }
-        />
+      <Section
+        variant="brand"
+        className="society-cta"
+        aria-labelledby="society-history-cta"
+      >
+        <div className="society-cta-inner">
+          <div className="society-cta-text">
+            <p className="eyebrow">{t("historia.kicker")}</p>
+            <h2 id="society-history-cta" className="society-cta-title">
+              {t("historia.cta.title")}
+            </h2>
+            <p className="society-cta-lead">{t("historia.cta.description")}</p>
+          </div>
+          <div className="society-cta-actions">
+            <Button variant="inverse" size="lg" to="/nosotros/directiva">
+              {t("historia.cta.btn_board")}
+            </Button>
+            <Button variant="outline-inverse" size="lg" to="/nosotros/estatutos">
+              {t("historia.cta.btn_statutes")}
+            </Button>
+          </div>
+        </div>
       </Section>
-    </>
+    </div>
   );
 }

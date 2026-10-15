@@ -1,372 +1,455 @@
-import { useEffect, useState } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useCallback, useEffect, useState } from "react";
+import { Link, NavLink, useLocation, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import PropTypes from "prop-types";
 import { useAuth } from "../../auth/AuthContext";
-import {
-  Section,
-  Container,
-  Button,
-  Badge,
-  Card,
-  Spinner,
-  useToast,
-} from "../../components/ui";
+import { Badge, Button, EmptyState, Section, Spinner, useToast } from "../../components/ui";
 import NewsCarousel from "../../components/NewsCarousel.jsx";
+import { ConfirmDialog } from "../../components/admin-detail/AdminDetailParts.jsx";
+import { apiGet, apiPost, assetUrl } from "../../api/client";
 import { sanitizeHtml } from "../../utils/sanitize";
-import { formatDate as formatLocaleDate } from "../../utils/i18nLocale";
+import { formatTimestamp } from "../../utils/i18nLocale";
+import { initials } from "../../data/board";
+import useDocumentTitle from "../../hooks/useDocumentTitle";
+import { newsErrorText, useNewsSession } from "./newsSession";
+import {
+  NEWS_CATEGORIES,
+  categoryBadge,
+  categoryLabel,
+  isHtmlContent,
+  readingMinutes,
+  statusInfo,
+  toParagraphs,
+} from "../../components/news/newsUtils";
 
-const BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
+function StatusBadge({ status }) {
+  const { t } = useTranslation();
+  const info = statusInfo(t, status);
+  // Badge's prop types don't list "danger" yet; the class exists in components.css.
+  return <span className={`badge badge-${info.badge}`}>{info.label}</span>;
+}
 
-function getImageUrl(imageUrl) {
-  if (!imageUrl) {
-    return "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?auto=format&fit=crop&w=800&q=80";
+// Hidden when the file is missing, instead of an empty frame with a broken icon.
+function CoverImage({ src }) {
+  const [failed, setFailed] = useState(false);
+  if (failed) return null;
+  return (
+    <figure className="news-article__cover">
+      <img src={src} alt="" decoding="async" onError={() => setFailed(true)} />
+    </figure>
+  );
+}
+
+function ArticleBody({ content }) {
+  const { t } = useTranslation();
+  if (!content || !content.trim()) {
+    return <p className="news-article__empty">{t("news.content_unavailable")}</p>;
   }
-
-  if (imageUrl.startsWith("http")) {
-    return imageUrl;
+  if (isHtmlContent(content)) {
+    return (
+      <div
+        className="prose news-article__body"
+        dangerouslySetInnerHTML={{ __html: sanitizeHtml(content) }}
+      />
+    );
   }
-
-  return `${BASE_URL.replace("/api", "")}${imageUrl}`;
+  // Plain text from the textarea editors: keep paragraphs and line breaks.
+  return (
+    <div className="prose news-article__body">
+      {toParagraphs(content).map((lines, i) => (
+        <p key={i}>
+          {lines.map((line, j) => (
+            <span key={j}>
+              {j > 0 && <br />}
+              {line}
+            </span>
+          ))}
+        </p>
+      ))}
+    </div>
+  );
 }
 
-function getStatusColor(status) {
-  if (status === "published") return "var(--color-secondary)";
-  if (status === "pending") return "var(--color-accent)";
-  return "var(--color-muted)";
-}
-
-function getCategoryLabel(category, t) {
-  if (category === "articulos-cientificos") return t("news.tab_scientific");
-  if (category === "articulos-destacados") return t("news.tab_featured");
-  if (category === "editoriales") return t("news.tab_editorials");
-  return category;
-}
-
-function getCategoryBadgeVariant(category) {
-  if (category === "articulos-destacados") return "primary";
-  if (category === "editoriales") return "info";
-  return "accent";
-}
-
-function getStatusBadgeVariant(status) {
-  if (status === "published") return "success";
-  if (status === "pending") return "warning";
-  return "error";
-}
-
-function getStatusLabel(status, t) {
-  if (status === "published") return t("news.status_published");
-  if (status === "pending") return t("news.status_pending");
-  return t("news.status_rejected");
-}
-
-function formatDate(dateString, t) {
-  if (!dateString) return t("news.date_unavailable");
-
-  try {
-    const date = new Date(dateString);
-    if (Number.isNaN(date.getTime())) {
-      return t("news.date_unavailable");
-    }
-
-    return formatLocaleDate(dateString) || t("news.date_unavailable");
-  } catch (error) {
-    console.error("Error formatting date:", error);
-    return t("news.date_unavailable");
-  }
+function PagerLink({ article, direction }) {
+  const { t } = useTranslation();
+  const isPrev = direction === "prev";
+  return (
+    <Link
+      to={`/noticias/${article.id}`}
+      className={`news-pager__link news-pager__link--${direction}`}
+      rel={isPrev ? "prev" : "next"}
+    >
+      <span className="news-pager__label">
+        {isPrev && <i className="fa-solid fa-arrow-left" aria-hidden="true"></i>}
+        {isPrev ? t("news.previous", "Anterior") : t("news.next", "Siguiente")}
+        {!isPrev && <i className="fa-solid fa-arrow-right" aria-hidden="true"></i>}
+      </span>
+      <span className="news-pager__title">{article.title}</span>
+    </Link>
+  );
 }
 
 export default function NewsDetail() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { id } = useParams();
-  const navigate = useNavigate();
+  const { pathname } = useLocation();
   const { user } = useAuth();
   const toast = useToast();
+  const isAdmin = user?.role === "admin";
+  const isAdminRoute = pathname.startsWith("/admin/");
+
   const [news, setNews] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [more, setMore] = useState([]);
-  const [prevNext, setPrevNext] = useState({ prev: null, next: null });
+  const [status, setStatus] = useState("loading"); // loading | ready | notfound | error
+  const [list, setList] = useState([]);
+  const [busy, setBusy] = useState(null); // "approve" | "reject" while a moderation call runs
+  const [confirmReject, setConfirmReject] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
+  const handleAuthError = useNewsSession();
 
-  async function loadNews() {
-    try {
-      setLoading(true);
-      const token = localStorage.getItem("access_token");
+  const endpoint = isAdminRoute ? `/admin/news/${id}/view` : `/news/${id}`;
 
-      const headers = {};
-      if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
-      }
-
-      const response = await fetch(`${BASE_URL}/news/${id}`, { headers });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Error response:", errorText);
-        throw new Error(`Error ${response.status}: ${errorText}`);
-      }
-
-      const data = await response.json();
-      setNews(data);
-      // Cargar más noticias y calcular anterior/siguiente
-      try {
-        const listRes = await fetch(`${BASE_URL}/news`);
-        const list = await listRes.json();
-        setMore(list.filter(n => n.id !== data.id).slice(0, 6));
-        const idx = list.findIndex(n => n.id === data.id);
-        setPrevNext({
-          prev: idx > 0 ? list[idx - 1] : null,
-          next: idx >= 0 && idx < list.length - 1 ? list[idx + 1] : null,
-        });
-      } catch (e) {
-        console.error("Error loading news list:", e);
-      }
-    } catch (err) {
-      console.error("Error cargando noticia:", err);
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }
-
+  // Article. Depends on the id/route only (not on the auth object), and ignores
+  // stale responses when the reader jumps to another article.
   useEffect(() => {
-    if (id) {
-      loadNews();
-    }
-  }, [id, user]);
-
-  async function approveNews() {
-    try {
-      const token = localStorage.getItem("access_token");
-      const response = await fetch(`${BASE_URL}/admin/news/${id}/approve`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
+    let cancelled = false;
+    setStatus("loading");
+    setNews(null);
+    apiGet(endpoint)
+      .then(data => {
+        if (cancelled) return;
+        if (!data || typeof data !== "object" || !data.id) {
+          setStatus("notfound");
+          return;
+        }
+        setNews(data);
+        setStatus("ready");
+      })
+      .catch(err => {
+        if (cancelled) return;
+        // Admin view with an expired/invalid session: log in again instead of an error card.
+        if (isAdminRoute && handleAuthError(err)) return;
+        setStatus(err?.status === 404 ? "notfound" : "error");
       });
-      if (response.ok) {
-        toast.success("Noticia aprobada correctamente");
-        await loadNews(); // recargar noticia
-      } else {
-        toast.error("Error al aprobar la noticia");
-      }
-    } catch (err) {
-      console.error("Error al aprobar:", err);
-      toast.error("Error al aprobar la noticia");
-    }
-  }
+    return () => {
+      cancelled = true;
+    };
+  }, [endpoint, isAdminRoute, handleAuthError, reloadKey]);
 
-  async function rejectNews() {
-    try {
-      const token = localStorage.getItem("access_token");
-      const response = await fetch(`${BASE_URL}/admin/news/${id}/reject`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
+  // Published list, for previous/next links and the "more news" block.
+  useEffect(() => {
+    let cancelled = false;
+    apiGet("/news")
+      .then(data => {
+        if (!cancelled) setList(Array.isArray(data) ? data : []);
+      })
+      .catch(() => {
+        if (!cancelled) setList([]);
       });
-      if (response.ok) {
-        toast.success("Noticia rechazada");
-        await loadNews(); // recargar noticia
-      } else {
-        toast.error("Error al rechazar la noticia");
-      }
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const refresh = useCallback(async () => {
+    try {
+      const data = await apiGet(endpoint);
+      if (data && data.id) setNews(data);
+    } catch {
+      // keep the current copy; the toast already reported the action result
+    }
+  }, [endpoint]);
+
+  async function moderate(action) {
+    setBusy(action);
+    try {
+      await apiPost(`/admin/news/${id}/${action}`);
+      toast.success(
+        action === "approve"
+          ? t("news.approved_toast", "Noticia aprobada y publicada.")
+          : t("news.rejected_toast", "Noticia rechazada."),
+      );
+      await refresh();
     } catch (err) {
-      console.error("Error al rechazar:", err);
-      toast.error("Error al rechazar la noticia");
+      if (handleAuthError(err)) return;
+      toast.error(
+        newsErrorText(
+          err,
+          action === "approve"
+            ? t("news.approve_error", "No se pudo aprobar la noticia.")
+            : t("news.reject_error", "No se pudo rechazar la noticia."),
+        ),
+      );
+    } finally {
+      setBusy(null);
+      if (action === "reject") setConfirmReject(false);
     }
   }
 
-  if (loading) {
+  useDocumentTitle(
+    status === "ready" ? news?.title : status === "notfound" ? t("news.not_found") : undefined,
+  );
+
+  const backTo = isAdminRoute ? "/admin?tab=news" : "/noticias";
+  const backLabel = isAdminRoute
+    ? t("news.back_admin_list", "Volver a noticias")
+    : t("news.back_to_news");
+  const backLink = (
+    <Link to={backTo} className="back-link">
+      <i className="fa-solid fa-arrow-left" aria-hidden="true"></i>
+      {backLabel}
+    </Link>
+  );
+
+  if (status === "loading") {
     return (
-      <Section variant="default" padding="lg">
-        <Container size="default">
-          <div className="news-detail-loading">
-            <Spinner size="lg" />
-            <p className="news-detail-loading-text">{t("news.detail_loading")}</p>
-          </div>
-        </Container>
-      </Section>
+      <div className="page news-article-page">
+        <div className="page-loading news-article__loading">
+          <Spinner size="lg" label={t("news.detail_loading")} />
+        </div>
+      </div>
     );
   }
 
-  if (error) {
+  if (status === "notfound" || status === "error") {
+    const notFound = status === "notfound";
     return (
-      <Section variant="default" padding="lg">
-        <Container size="default">
-          <Card>
-            <h2 className="news-detail-error-title">{t("news.error_title")}</h2>
-            <p className="news-detail-error-text">{error}</p>
-            <Button
-              variant="outline"
-              onClick={() => globalThis.location.reload()}
-            >
-              {t("news.retry")}
-            </Button>
-          </Card>
-        </Container>
-      </Section>
+      <div className="page news-article-page">
+        <Section containerSize="sm" className="news-article__state">
+          {backLink}
+          <EmptyState
+            className="news-state"
+            icon={
+              <i
+                className={notFound ? "fa-regular fa-newspaper" : "fa-solid fa-triangle-exclamation"}
+              ></i>
+            }
+            title={notFound ? t("news.not_found") : t("news.load_article_error", "No pudimos cargar la noticia")}
+            description={
+              notFound
+                ? t("news.not_found_desc")
+                : t(
+                    "news.load_error_desc",
+                    "Hubo un problema de conexión con el servidor. Inténtalo nuevamente en unos segundos.",
+                  )
+            }
+            action={
+              notFound ? (
+                <Button to={backTo}>
+                  {isAdminRoute ? backLabel : t("news.see_all", "Ver todas las noticias")}
+                </Button>
+              ) : (
+                <Button variant="outline" onClick={() => setReloadKey(k => k + 1)}>
+                  <i className="fa-solid fa-rotate-right" aria-hidden="true"></i>
+                  {t("news.retry")}
+                </Button>
+              )
+            }
+          />
+        </Section>
+      </div>
     );
   }
 
-  if (!news) {
-    return (
-      <Section variant="default" padding="lg">
-        <Container size="default">
-          <Card>
-            <h2>{t("news.not_found")}</h2>
-            <p className="news-detail-error-text">{t("news.not_found_desc")}</p>
-            <Link to="/noticias">
-              <Button variant="primary">{t("news.back_to_news")}</Button>
-            </Link>
-          </Card>
-        </Container>
-      </Section>
-    );
-  }
+  const index = list.findIndex(n => n.id === news.id);
+  const prev = index > 0 ? list[index - 1] : null;
+  const next = index >= 0 && index < list.length - 1 ? list[index + 1] : null;
+  const hasMore = list.some(n => n.id !== news.id);
+  const date = formatTimestamp(news.created_at, {}, i18n.language);
+  const minutes = readingMinutes(news.content);
 
   return (
-    <Section variant="default" padding="lg">
-      <Container size="lg">
-        <article className="news-detail-article">
-          {/* Back to Admin button for admins */}
-          {user?.role === "admin" && (
-            <div className="mb-4">
-              <Button
-                variant="outline"
-                onClick={() => navigate("/admin?tab=news")}
-              >
-                <i className="fa-solid fa-arrow-left"></i> {t("news.back_admin")}
-              </Button>
-            </div>
-          )}
-
-          {/* Header */}
-          <header className="news-detail-header">
-            <div className="flex justify-between align-start gap-4 mb-5 flex-wrap">
-              <div className="news-detail-title-wrap">
-                {/* Category Badge */}
-                {news.category && (
-                  <Badge
-                    variant={getCategoryBadgeVariant(news.category)}
-                    className="mb-3"
-                  >
-                    {getCategoryLabel(news.category, t)}
-                  </Badge>
+    <div className={`page news-article-page${hasMore ? " news-article-page--flush" : ""}`}>
+      <article className="news-article">
+        <header className="page-hero news-article__hero">
+          <div className="page-hero__inner">
+            {backLink}
+            <div className="news-article__header">
+              {news.category && (
+                <Badge variant={categoryBadge(news.category)}>{categoryLabel(t, news.category)}</Badge>
+              )}
+              <h1 className="news-article__title">{news.title}</h1>
+              {news.excerpt && <p className="news-article__lead">{news.excerpt}</p>}
+              <div className="news-article__meta">
+                {news.author_name && (
+                  <span className="avatar news-article__avatar" aria-hidden="true">
+                    {initials(news.author_name)}
+                  </span>
                 )}
-
-                {/* Title */}
-                <h1 className="news-detail-title">{news.title}</h1>
-
-                {/* Meta information */}
-                <div className="flex align-center gap-3 flex-wrap">
-                  <Badge variant={getStatusBadgeVariant(news.status)}>
-                    {getStatusLabel(news.status, t)}
-                  </Badge>
-                  <time
-                    dateTime={news.created_at}
-                    className="news-detail-meta-text"
-                  >
-                    {formatDate(news.created_at, t)}
-                  </time>
+                <div className="news-article__meta-text">
                   {news.author_name && (
-                    <span className="news-detail-meta-text">
+                    <span className="news-article__author">
                       {t("news.by_author", { author: news.author_name })}
                     </span>
                   )}
+                  <span className="news-article__meta-line">
+                    {date && <time dateTime={news.created_at}>{date}</time>}
+                    {date && <span aria-hidden="true"> · </span>}
+                    <span>{t("news.reading_time", "{{count}} min de lectura", { count: minutes })}</span>
+                  </span>
                 </div>
               </div>
-
-              {/* Admin actions */}
-              {user?.role === "admin" && (
-                <div className="flex gap-2 news-detail-admin-actions">
-                  {news.status === "pending" && (
-                    <>
-                      <Button variant="primary" size="sm" onClick={approveNews}>
-                        {t("news.approve")}
-                      </Button>
-                      <Button variant="outline" size="sm" onClick={rejectNews}>
-                        {t("news.reject")}
-                      </Button>
-                    </>
-                  )}
-                  {news.status === "published" && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => navigate(`/admin/news/${news.id}/edit`)}
-                    >
-                      {t("news.edit")}
-                    </Button>
-                  )}
-                </div>
-              )}
-            </div>
-          </header>
-
-          {/* Featured image */}
-          {news.image_url && (
-            <div className="news-detail-image-wrap">
-              <img
-                src={getImageUrl(news.image_url)}
-                alt={news.title}
-                className="news-detail-image"
-              />
-            </div>
-          )}
-
-          {/* Excerpt */}
-          {news.excerpt && (
-            <div className="news-detail-excerpt-wrap">
-              <p className="news-detail-excerpt">{news.excerpt}</p>
-            </div>
-          )}
-
-          {/* Content */}
-          <div className="news-content-body news-detail-content">
-            {news.content ? (
-              <div
-                dangerouslySetInnerHTML={{ __html: sanitizeHtml(news.content) }}
-              />
-            ) : (
-              <p className="text-muted">{t("news.content_unavailable")}</p>
-            )}
-          </div>
-
-          {/* Navigation */}
-          <div className="flex justify-between gap-4 mb-7 news-detail-nav flex-wrap">
-            <div>
-              {prevNext.prev && (
-                <Link to={`/noticias/${prevNext.prev.id}`}>
-                  <Button variant="outline" size="sm">
-                    <i className="fa-solid fa-arrow-left"></i>{" "}
-                    {prevNext.prev.title.length > 30
-                      ? prevNext.prev.title.substring(0, 30) + "..."
-                      : prevNext.prev.title}
-                  </Button>
-                </Link>
-              )}
-            </div>
-            <div>
-              {prevNext.next && (
-                <Link to={`/noticias/${prevNext.next.id}`}>
-                  <Button variant="outline" size="sm">
-                    {prevNext.next.title.length > 30
-                      ? prevNext.next.title.substring(0, 30) + "..."
-                      : prevNext.next.title}{" "}
-                    <i className="fa-solid fa-arrow-right"></i>
-                  </Button>
-                </Link>
-              )}
             </div>
           </div>
+        </header>
 
-          {/* Related news */}
-          {more.length > 0 && (
-            <div className="news-detail-more">
-              <h2 className="news-detail-more-title">{t("news.related_title")}</h2>
-              <NewsCarousel limit={9} excludeId={news?.id} />
+        <Section className="news-article__section">
+          {isAdmin && (
+            <div className="news-admin-bar" role="region" aria-label={t("news.moderation", "Moderación")}>
+              <div className="news-admin-bar__info">
+                <span className="news-admin-bar__label">
+                  <i className="fa-solid fa-shield-halved" aria-hidden="true"></i>
+                  {t("news.moderation", "Moderación")}
+                </span>
+                <StatusBadge status={news.status} />
+              </div>
+              <div className="news-admin-bar__actions">
+                {news.status !== "published" && (
+                  <Button
+                    size="sm"
+                    variant="primary"
+                    loading={busy === "approve"}
+                    disabled={Boolean(busy)}
+                    onClick={() => moderate("approve")}
+                  >
+                    <i className="fa-solid fa-check" aria-hidden="true"></i>
+                    {t("news.approve")}
+                  </Button>
+                )}
+                {news.status !== "rejected" && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    loading={busy === "reject"}
+                    disabled={Boolean(busy)}
+                    onClick={() => setConfirmReject(true)}
+                  >
+                    <i className="fa-solid fa-xmark" aria-hidden="true"></i>
+                    {t("news.reject")}
+                  </Button>
+                )}
+                <Button size="sm" variant="outline" to={`/admin/news/${news.id}/edit`}>
+                  <i className="fa-solid fa-pen" aria-hidden="true"></i>
+                  {t("news.edit")}
+                </Button>
+              </div>
             </div>
           )}
-        </article>
-      </Container>
-    </Section>
+
+          <div className="news-article__layout">
+            <div className="news-article__main">
+              {news.image_url && <CoverImage key={news.image_url} src={assetUrl(news.image_url)} />}
+
+              <ArticleBody content={news.content} />
+
+              {(prev || next) && (
+                <nav className="news-pager" aria-label={t("news.pager_label", "Más artículos")}>
+                  {prev && <PagerLink article={prev} direction="prev" />}
+                  {next && <PagerLink article={next} direction="next" />}
+                </nav>
+              )}
+            </div>
+
+            <aside className="news-article__aside">
+              <div className="news-aside-card">
+                <h2 className="news-aside-card__title">{t("news.categories_title", "Categorías")}</h2>
+                <ul className="news-aside-card__list" role="list">
+                  {NEWS_CATEGORIES.map(cat => (
+                    <li key={cat.id}>
+                      <NavLink
+                        to={`/noticias/${cat.id}`}
+                        className={`news-aside-card__link${news.category === cat.id ? " is-current" : ""}`}
+                      >
+                        <i className={`fa-solid ${cat.icon}`} aria-hidden="true"></i>
+                        <span>{t(cat.labelKey, cat.label)}</span>
+                        <i className="fa-solid fa-chevron-right news-aside-card__chevron" aria-hidden="true"></i>
+                      </NavLink>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="news-aside-card news-aside-card--cta">
+                <span className="icon-tile" aria-hidden="true">
+                  <i className="fa-solid fa-pen-to-square"></i>
+                </span>
+                <h2 className="news-aside-card__title">
+                  {t("news.cta_title", "¿Tienes un artículo para compartir?")}
+                </h2>
+                <p className="news-aside-card__text">
+                  {t(
+                    "news.cta_text",
+                    "Los socios pueden enviar artículos científicos y editoriales. El equipo editorial los revisa antes de publicarlos.",
+                  )}
+                </p>
+                <Button variant="outline" to="/subir-noticia" fullWidth>
+                  {t("news.submit_article")}
+                </Button>
+              </div>
+            </aside>
+          </div>
+        </Section>
+      </article>
+
+      {isAdmin && (
+        <ConfirmDialog
+          isOpen={confirmReject}
+          title={t("news.reject_confirm_title", "¿Rechazar esta noticia?")}
+          confirmLabel={t("news.reject_confirm", "Rechazar noticia")}
+          confirmVariant="danger"
+          loading={busy === "reject"}
+          onConfirm={() => moderate("reject")}
+          onCancel={() => setConfirmReject(false)}
+        >
+          <p>
+            {news.status === "published"
+              ? t(
+                  "news.reject_confirm_published",
+                  "«{{title}}» dejará de mostrarse en la sección pública de noticias. Podrás volver a publicarla con «Aprobar».",
+                  { title: news.title },
+                )
+              : t(
+                  "news.reject_confirm_pending",
+                  "«{{title}}» quedará rechazada y no se publicará. Podrás aprobarla más adelante desde esta vista.",
+                  { title: news.title },
+                )}
+          </p>
+        </ConfirmDialog>
+      )}
+
+      {hasMore && (
+        <Section variant="muted" className="news-article__more">
+          <div className="section-head">
+            <div className="section-head__text">
+              <p className="eyebrow">{t("news.kicker", "Publicaciones SLACC")}</p>
+              <h2 className="section-title">{t("news.related_title")}</h2>
+            </div>
+            <Button variant="outline" to="/noticias">
+              {t("news.see_all", "Ver todas las noticias")}
+            </Button>
+          </div>
+          <NewsCarousel limit={9} excludeId={news.id} />
+        </Section>
+      )}
+    </div>
   );
 }
+
+StatusBadge.propTypes = {
+  status: PropTypes.string,
+};
+
+CoverImage.propTypes = {
+  src: PropTypes.string.isRequired,
+};
+
+ArticleBody.propTypes = {
+  content: PropTypes.string,
+};
+
+PagerLink.propTypes = {
+  article: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+    title: PropTypes.string,
+  }).isRequired,
+  direction: PropTypes.oneOf(["prev", "next"]).isRequired,
+};

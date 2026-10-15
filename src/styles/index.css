@@ -5,6 +5,7 @@
 @import "./layout.css";
 @import "./components.css";
 
+@import "./pages/news.css";
 @import "./pages/events.css";
 @import "./pages/members.css";
 @import "./pages/admin.css";

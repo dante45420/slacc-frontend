@@ -1,127 +1,245 @@
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { apiGet } from "../../api/client";
 import {
-  Grid,
-  Card,
   Badge,
-  Spinner,
-  Alert,
+  Button,
+  EmptyState,
+  PageHero,
   Section,
-  Container,
+  Spinner,
 } from "../../components/ui";
+import MembershipCtaBand from "../../components/members/MembershipCtaBand.jsx";
+import {
+  MEMBERSHIP_BADGE_VARIANTS,
+  compareBySurname,
+  memberInitials,
+  membershipLabel,
+  normalizeText,
+  stripHonorific,
+} from "../../components/members/memberUtils.js";
 
 export default function SociosActivos() {
   const { t } = useTranslation();
   const [members, setMembers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [status, setStatus] = useState("loading"); // loading | ready | error
+  const [query, setQuery] = useState("");
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
-    loadMembers();
-  }, []);
-
-  async function loadMembers() {
-    try {
-      const data = await apiGet("/members");
-      setMembers(data);
-    } catch (err) {
-      console.error("Error loading active members:", err);
-      setError(t("members.active_error"));
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  const getMembershipBadge = type => {
-    const variants = {
-      joven: "info",
-      normal: "primary",
-      gratuito: "success",
+    let ignore = false;
+    setStatus("loading");
+    apiGet("/members")
+      .then(data => {
+        if (ignore) return;
+        setMembers(Array.isArray(data) ? data : []);
+        setStatus("ready");
+      })
+      .catch(err => {
+        if (ignore) return;
+        console.error("Error loading active members:", err);
+        setStatus("error");
+      });
+    return () => {
+      ignore = true;
     };
-    const labels = {
-      joven: t("members.badge_joven"),
-      normal: t("members.badge_normal"),
-      gratuito: t("members.badge_gratuito"),
-    };
-    return {
-      variant: variants[type] || "neutral",
-      label: labels[type] || type,
-    };
-  };
+  }, [reloadKey]);
 
-  const getInitials = name => {
-    return name
-      .split(" ")
-      .map(n => n[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
-  };
+  const sorted = useMemo(() => [...members].sort(compareBySurname), [members]);
 
-  const renderContent = () => {
-    if (loading) {
+  const filtered = useMemo(() => {
+    const q = normalizeText(query);
+    if (!q) return sorted;
+    return sorted.filter(member =>
+      normalizeText(
+        [member.name, stripHonorific(member.name), member.country, member.city]
+          .filter(Boolean)
+          .join(" "),
+      ).includes(q),
+    );
+  }, [sorted, query]);
+
+  const total = sorted.length;
+  // GET /members currently returns no location: only promise what search can match.
+  const hasPlaces = useMemo(
+    () => members.some(member => member.country || member.city),
+    [members],
+  );
+  const countLabel = query.trim()
+    ? t("members.search_results", {
+        count: filtered.length,
+        total,
+        defaultValue: "Mostrando {{count}} de {{total}} socios",
+      })
+    : `${total} ${
+        total === 1 ? t("common.member_singular") : t("common.member_plural")
+      }`;
+
+  const renderBody = () => {
+    if (status === "loading") {
       return (
-        <div className="flex-center min-h-300px">
+        <div className="members-directory-status">
           <Spinner size="lg" />
         </div>
       );
     }
 
-    if (error) {
-      return <Alert variant="error">{error}</Alert>;
+    if (status === "error") {
+      return (
+        <EmptyState
+          role="alert"
+          icon={<i className="fa-solid fa-triangle-exclamation"></i>}
+          title={t(
+            "members.active_error_title",
+            "No pudimos cargar los socios activos",
+          )}
+          description={t(
+            "members.active_error_text",
+            "Revisa tu conexión a internet e inténtalo nuevamente en unos segundos.",
+          )}
+          action={
+            <Button
+              variant="outline"
+              onClick={() => setReloadKey(key => key + 1)}
+            >
+              <i className="fa-solid fa-rotate-right" aria-hidden="true"></i>
+              {t("members.retry", "Reintentar")}
+            </Button>
+          }
+        />
+      );
     }
 
-    if (members.length === 0) {
-      return <Alert variant="info">{t("members.active_empty")}</Alert>;
+    if (total === 0) {
+      return (
+        <EmptyState
+          icon={<i className="fa-solid fa-users"></i>}
+          description={t("members.active_empty")}
+        />
+      );
     }
 
     return (
       <>
-        <p className="text-muted mb-5">
-          {members.length}{" "}
-          {members.length === 1
-            ? t("common.member_singular")
-            : t("common.member_plural")}
-        </p>
-        <Grid columns={3} gap={4}>
-          {members.map(member => {
-            const badge = getMembershipBadge(member.membership_type);
-            return (
-              <Card key={member.id} hoverable>
-                <div className="flex flex-col align-center text-center gap-3">
-                  <div className="flex-center socios-avatar">
-                    {getInitials(member.name)}
+        <div className="members-directory-toolbar">
+          <div className="members-search">
+            <label htmlFor="members-search-input" className="sr-only">
+              {t("members.search_label", "Buscar socio")}
+            </label>
+            <i
+              className="fa-solid fa-magnifying-glass members-search__icon"
+              aria-hidden="true"
+            ></i>
+            <input
+              id="members-search-input"
+              type="search"
+              className="form-input members-search__input"
+              placeholder={
+                hasPlaces
+                  ? t("members.search_placeholder", "Buscar por nombre o país")
+                  : t("members.search_placeholder_name", "Buscar por nombre")
+              }
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              autoComplete="off"
+            />
+          </div>
+          <p className="members-directory-count" aria-live="polite">
+            {countLabel}
+          </p>
+        </div>
+
+        {filtered.length === 0 ? (
+          <EmptyState
+            icon={<i className="fa-solid fa-magnifying-glass"></i>}
+            title={t("members.search_empty_title", "Sin resultados")}
+            description={t("members.search_empty_text", {
+              query: query.trim(),
+              defaultValue: "No encontramos socios que coincidan con «{{query}}».",
+            })}
+            action={
+              <Button variant="outline" onClick={() => setQuery("")}>
+                {t("members.search_clear", "Limpiar búsqueda")}
+              </Button>
+            }
+          />
+        ) : (
+          <ul className="members-directory-grid">
+            {filtered.map(member => {
+              const type = String(member.membership_type || "").toLowerCase();
+              const label = membershipLabel(t, type);
+              return (
+                <li key={member.id} className="members-directory-card">
+                  <div className="members-directory-card__top">
+                    <span
+                      className="avatar members-directory-card__avatar"
+                      aria-hidden="true"
+                    >
+                      {memberInitials(member.name)}
+                    </span>
+                    <div className="members-directory-card__info">
+                      <h2 className="members-directory-card__name">
+                        {member.name}
+                      </h2>
+                      {(member.country || member.city) && (
+                        <p className="members-directory-card__place">
+                          <i
+                            className="fa-solid fa-location-dot"
+                            aria-hidden="true"
+                          ></i>
+                          {[member.city, member.country]
+                            .filter(Boolean)
+                            .join(", ")}
+                        </p>
+                      )}
+                      {label && (
+                        <Badge
+                          variant={MEMBERSHIP_BADGE_VARIANTS[type] || "neutral"}
+                          size="sm"
+                        >
+                          {label}
+                        </Badge>
+                      )}
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="mb-2">{member.name}</h4>
-                    <Badge variant={badge.variant}>{badge.label}</Badge>
-                  </div>
-                  <a
-                    href={`mailto:${member.email}`}
-                    className="btn btn-outline btn-sm"
-                  >
-                    {t("common.contact")}
-                  </a>
-                </div>
-              </Card>
-            );
-          })}
-        </Grid>
+                  {member.email && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      href={`mailto:${member.email}`}
+                      className="members-directory-card__contact"
+                      aria-label={t("members.contact_member", {
+                        name: member.name,
+                        defaultValue: "Contactar a {{name}}",
+                      })}
+                    >
+                      <i className="fa-regular fa-envelope" aria-hidden="true"></i>
+                      {t("common.contact")}
+                    </Button>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        )}
       </>
     );
   };
 
   return (
-    <Section>
-      <Container>
-        <h1 className="mb-2">{t("members.active_title")}</h1>
-        <p className="text-muted mb-6 socios-intro">
-          {t("members.active_subtitle")}
-        </p>
+    <div className="page members-page">
+      <PageHero
+        kicker={t("header.directory")}
+        title={t("members.active_title")}
+        subtitle={t("members.active_subtitle")}
+      />
 
-        {renderContent()}
-      </Container>
-    </Section>
+      <Section>{renderBody()}</Section>
+
+      <MembershipCtaBand
+        secondaryTo="/por-que-ser-socio"
+        secondaryLabel={t("members.btn_why", "¿Por qué ser socio?")}
+      />
+    </div>
   );
 }

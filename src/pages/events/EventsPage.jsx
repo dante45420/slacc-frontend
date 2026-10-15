@@ -1,463 +1,329 @@
-import { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { useTranslation } from "react-i18next";
+import { useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
-import { apiGet, apiPost } from "../../api/client";
+import { NavLink, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { apiGet } from "../../api/client";
 import { useAuth } from "../../auth/AuthContext";
-import { formatDate as formatLocaleDate } from "../../utils/i18nLocale";
+import { Button, PageHero, Section, Spinner } from "../../components/ui";
+import EventCard from "../../components/events/EventCard.jsx";
+import EnrollmentModal from "../../components/events/EnrollmentModal.jsx";
+import { isCourseLike } from "../../components/events/eventUtils";
+import useDocumentTitle from "../../hooks/useDocumentTitle";
 
-const BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
+/**
+ * One page, five views. "upcoming" and "past" are separate API scopes, so the
+ * views that show both ("all", webinars, courses) request each scope.
+ */
+const VIEWS = [
+  { key: "all", path: "/eventos", scopes: ["upcoming", "past"] },
+  { key: "upcoming", path: "/eventos/proximos", scopes: ["upcoming"] },
+  { key: "webinars", path: "/eventos/webinars", scopes: ["upcoming", "past"], type: "webinar" },
+  {
+    key: "courses",
+    path: "/cursos",
+    scopes: ["upcoming", "past"],
+    type: "presencial",
+    match: isCourseLike,
+  },
+  { key: "past", path: "/eventos/pasados", scopes: ["past"] },
+];
 
-function isRegistrationOpen(event) {
-  if (!event.registration_deadline) return true;
-  return new Date() <= new Date(event.registration_deadline);
+function resolveView(pathname) {
+  const path = pathname.replace(/\/+$/, "") || "/";
+  return VIEWS.find(v => v.path === path) || VIEWS[0];
+}
+
+function viewCopy(key, t) {
+  switch (key) {
+    case "upcoming":
+      return {
+        label: t("header.upcoming_events"),
+        title: t("events.view_upcoming_title", "Próximos eventos"),
+        subtitle: t(
+          "events.view_upcoming_subtitle",
+          "Webinars, cursos y congresos con inscripciones abiertas para socios y profesionales de la región.",
+        ),
+      };
+    case "webinars":
+      return {
+        label: t("header.webinars"),
+        title: t("header.webinars"),
+        subtitle: t(
+          "events.view_webinars_subtitle",
+          "Sesiones en línea con especialistas latinoamericanos en cirugía de cadera.",
+        ),
+      };
+    case "courses":
+      return {
+        label: t("events.filter_courses", "Cursos y talleres"),
+        title: t("events.filter_courses", "Cursos y talleres"),
+        subtitle: t(
+          "events.view_courses_subtitle",
+          "Formación presencial y práctica quirúrgica guiada por expertos de la región.",
+        ),
+      };
+    case "past":
+      return {
+        label: t("header.past_events"),
+        title: t("events.view_past_title", "Eventos realizados"),
+        subtitle: t(
+          "events.view_past_subtitle",
+          "Archivo de las actividades académicas que SLACC ha organizado.",
+        ),
+      };
+    default:
+      return {
+        label: t("header.all_events"),
+        title: t("events.title"),
+        subtitle: t("events.subtitle"),
+      };
+  }
+}
+
+/**
+ * Same look as the shared EmptyState, but with an h2 title: these messages sit
+ * right under the page's h1 (EmptyState always renders an h3).
+ */
+function StateMessage({ icon, title, description, action }) {
+  return (
+    <div className="empty-state events-state">
+      <div className="empty-state-icon" aria-hidden="true">
+        <i className={icon}></i>
+      </div>
+      <h2 className="empty-state-title events-state__title">{title}</h2>
+      {description && <p className="empty-state-description">{description}</p>}
+      {action && <div className="empty-state-action">{action}</div>}
+    </div>
+  );
+}
+
+StateMessage.propTypes = {
+  icon: PropTypes.string.isRequired,
+  title: PropTypes.node.isRequired,
+  description: PropTypes.node,
+  action: PropTypes.node,
+};
+
+function fetchScope(scope, type) {
+  const params = new URLSearchParams();
+  if (scope === "past") params.set("past", "true");
+  if (type) params.set("type", type);
+  const query = params.toString();
+  return apiGet(`/events${query ? `?${query}` : ""}`);
 }
 
 export default function EventsPage() {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const navigate = useNavigate();
   const location = useLocation();
-  const [events, setEvents] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedEvent, setSelectedEvent] = useState(null);
-  const [showEnrollmentForm, setShowEnrollmentForm] = useState(false);
+  const view = resolveView(location.pathname);
+  const copy = viewCopy(view.key, t);
+  useDocumentTitle(copy.title);
 
-  // Determine filter from URL path
-  const getFilterParams = () => {
-    const path = location.pathname;
-    if (path.includes("/pasados")) return "?past=true";
-    if (path.includes("/proximos")) return "?past=false";
-    if (path.includes("/webinars")) return "?type=webinar";
-    return "";
-  };
+  const [data, setData] = useState({ viewKey: null, status: "loading", upcoming: [], past: [] });
+  const [reloadKey, setReloadKey] = useState(0);
+  const [enrollEvent, setEnrollEvent] = useState(null);
+
+  // Refetch when the signed-in identity changes (enrollment flags depend on it),
+  // but not when auth merely finishes loading on first render.
+  const authKey = user === undefined ? undefined : user?.id ?? null;
+  const lastAuthKey = useRef(authKey);
+  useEffect(() => {
+    if (lastAuthKey.current !== undefined && lastAuthKey.current !== authKey) {
+      setReloadKey(k => k + 1);
+    }
+    lastAuthKey.current = authKey;
+  }, [authKey]);
 
   useEffect(() => {
-    loadEvents();
-  }, [location.pathname]);
+    let cancelled = false;
+    // Keep the current cards on screen while refreshing the same view.
+    setData(prev =>
+      prev.viewKey === view.key && prev.status === "ready"
+        ? prev
+        : { viewKey: view.key, status: "loading", upcoming: [], past: [] },
+    );
 
-  async function loadEvents() {
-    try {
-      setLoading(true);
-      const filterParams = getFilterParams();
-      const data = await apiGet(`/events${filterParams}`);
-      setEvents(data);
-    } catch (err) {
-      console.error("Error loading events:", err);
-    } finally {
-      setLoading(false);
-    }
-  }
+    Promise.all(view.scopes.map(scope => fetchScope(scope, view.type)))
+      .then(results => {
+        if (cancelled) return;
+        const byScope = {};
+        view.scopes.forEach((scope, i) => {
+          byScope[scope] = Array.isArray(results[i]) ? results[i] : [];
+        });
+        const keep = event => (view.match ? view.match(event) : true);
+        setData({
+          viewKey: view.key,
+          status: "ready",
+          upcoming: (byScope.upcoming || []).filter(keep),
+          // Deactivated events are hidden from the public archive too.
+          past: (byScope.past || []).filter(e => e.is_active !== false).filter(keep),
+        });
+      })
+      .catch(() => {
+        if (!cancelled) setData({ viewKey: view.key, status: "error", upcoming: [], past: [] });
+      });
 
-  function handleEnrollClick(event) {
-    setSelectedEvent(event);
-    setShowEnrollmentForm(true);
-  }
+    return () => {
+      cancelled = true;
+    };
+  }, [view.key, reloadKey]);
 
-  function getPriceForUser(event) {
-    if (!user) {
-      return event.price_non_member;
-    }
+  const detailBase = view.key === "courses" ? "/cursos" : "/eventos";
+  const status = data.viewKey === view.key ? data.status : "loading";
+  const showBoth = view.scopes.length > 1;
+  const isEmpty = status === "ready" && data.upcoming.length === 0 && data.past.length === 0;
 
-    let price;
-    if (user.membership_type === "joven") {
-      price = event.price_joven > 0 ? event.price_joven : event.price_member;
-    } else if (user.membership_type === "gratuito") {
-      price = Math.max(event.price_gratuito, 0);
-    } else {
-      price = event.price_member;
-    }
-    return price;
-  }
+  const renderGrid = events => (
+    <div className="events-grid">
+      {events.map(event => (
+        <EventCard
+          key={event.id}
+          event={event}
+          detailPath={`${detailBase}/${event.id}`}
+          onEnroll={setEnrollEvent}
+        />
+      ))}
+    </div>
+  );
 
-  function getDiscountPercentage(event) {
-    const fullPrice = event.price_non_member;
-    const userPrice = getPriceForUser(event);
-    if (fullPrice > 0 && userPrice < fullPrice) {
-      return Math.round(((fullPrice - userPrice) / fullPrice) * 100);
-    }
-    return 0;
-  }
+  // Views with a single group still get an h2 (for screen readers only: the
+  // page title already names the group), so the h3 card titles never follow
+  // the h1 directly.
+  const groupHead = (eyebrow, title) =>
+    showBoth ? (
+      <div className="section-head">
+        <div className="section-head__text">
+          <p className="eyebrow">{eyebrow}</p>
+          <h2 className="section-title">{title}</h2>
+        </div>
+      </div>
+    ) : (
+      <h2 className="sr-only">{title}</h2>
+    );
 
-  if (loading) {
-    return (
-      <section className="section">
-        <div className="container">
+  let body;
+  if (status === "loading") {
+    body = (
+      <Section>
+        <div className="events-loading">
+          <Spinner size="lg" label={t("events.loading")} />
           <p>{t("events.loading")}</p>
         </div>
-      </section>
+      </Section>
+    );
+  } else if (status === "error") {
+    body = (
+      <Section>
+        <StateMessage
+          icon="fa-solid fa-triangle-exclamation"
+          title={t("events.load_error_title", "No pudimos cargar los eventos")}
+          description={t(
+            "events.load_error_text",
+            "Revisa tu conexión a internet e inténtalo nuevamente en unos segundos.",
+          )}
+          action={
+            <Button variant="outline" onClick={() => setReloadKey(k => k + 1)}>
+              <i className="fa-solid fa-rotate-right" aria-hidden="true"></i>
+              {t("events.retry", "Reintentar")}
+            </Button>
+          }
+        />
+      </Section>
+    );
+  } else if (isEmpty) {
+    const pastOnly = view.key === "past";
+    body = (
+      <Section>
+        <StateMessage
+          icon="fa-regular fa-calendar"
+          title={
+            pastOnly
+              ? t("events.empty_past_title", "Aún no hay eventos realizados")
+              : t("events.empty_title")
+          }
+          description={
+            pastOnly
+              ? t("events.empty_past_text", "Cuando finalice una actividad aparecerá en este archivo.")
+              : t("events.empty_description")
+          }
+          action={
+            view.key !== "all" ? (
+              <Button variant="outline" to="/eventos">
+                {t("events.see_all", "Ver todos los eventos")}
+              </Button>
+            ) : undefined
+          }
+        />
+      </Section>
+    );
+  } else {
+    body = (
+      <>
+        {view.scopes.includes("upcoming") && (
+          <Section className="events-group">
+            {groupHead(
+              t("events.group_upcoming_kicker", "Agenda"),
+              t("events.group_upcoming_title", "Próximas actividades"),
+            )}
+            {data.upcoming.length > 0 ? (
+              renderGrid(data.upcoming)
+            ) : (
+              <div className="events-inline-empty">
+                <i className="fa-regular fa-calendar" aria-hidden="true"></i>
+                <p>
+                  {t(
+                    "events.empty_upcoming_text",
+                    "No hay actividades programadas por ahora. Publicaremos nuevas fechas pronto.",
+                  )}
+                </p>
+              </div>
+            )}
+          </Section>
+        )}
+        {view.scopes.includes("past") && data.past.length > 0 && (
+          <Section variant={showBoth ? "muted" : "default"} className="events-group events-group--past">
+            {groupHead(
+              t("events.group_past_kicker", "Archivo"),
+              t("events.group_past_title", "Actividades realizadas"),
+            )}
+            {renderGrid(data.past)}
+          </Section>
+        )}
+      </>
     );
   }
 
   return (
-    <section className="section events-page">
-      <div className="container events-page-container">
-        <div className="events-page-header">
-          <h1 className="events-page-title">{t("events.title")}</h1>
-          <p className="events-page-subtitle">{t("events.subtitle")}</p>
-        </div>
+    <div className="page events-page">
+      <PageHero
+        kicker={t("events.kicker", "Formación continua")}
+        title={copy.title}
+        subtitle={copy.subtitle}
+      >
+        <nav className="events-filters" aria-label={t("events.filters_label", "Filtrar eventos")}>
+          <ul className="filter-bar">
+            {VIEWS.map(v => (
+              <li key={v.key}>
+                <NavLink to={v.path} end className="filter-pill">
+                  {viewCopy(v.key, t).label}
+                </NavLink>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </PageHero>
 
-        {events.length === 0 ? (
-          <div className="events-empty-state">
-            <div className="events-empty-title">
-              {t("events.empty_title")}
-            </div>
-            <p className="events-empty-description">
-              {t("events.empty_description")}
-            </p>
-          </div>
-        ) : (
-          <div className="cards events-grid">
-            {events.map(event => {
-              const userPrice = getPriceForUser(event);
-              const discount = getDiscountPercentage(event);
-              const isOpen = isRegistrationOpen(event);
+      {body}
 
-              return (
-                <div key={event.id} className="card event-list-card">
-                  {event.image_url && (
-                    <img
-                      src={
-                        event.image_url.startsWith("http")
-                          ? event.image_url
-                          : `${BASE_URL.replace("/api", "")}${event.image_url}`
-                      }
-                      alt={event.title}
-                      className="event-list-card-image"
-                    />
-                  )}
-
-                  <div className="event-list-card-body">
-                    <h3 className="event-list-card-title">{event.title}</h3>
-                    <p className="event-list-card-description">
-                      {event.description}
-                    </p>
-                  </div>
-
-                  <div className="event-list-meta">
-                    <div className="event-list-meta-row">
-                      <span className="event-list-meta-label">
-                        {t("events.instructor")}:
-                      </span>
-                      <span className="event-list-meta-value">
-                        {event.instructor || t("common.tbd")}
-                      </span>
-                    </div>
-                    <div className="event-list-meta-row">
-                      <span className="event-list-meta-label">
-                        {t("events.duration")}:
-                      </span>
-                      <span className="event-list-meta-value">
-                        {event.duration_hours || t("common.na")}{" "}
-                        {event.duration_hours === 1
-                          ? t("common.hour_one")
-                          : t("common.hour_other")}
-                      </span>
-                    </div>
-                    <div className="event-list-meta-row">
-                      <span className="event-list-meta-label">
-                        {t("events.start")}:
-                      </span>
-                      <span className="event-list-meta-value">
-                        {formatLocaleDate(event.start_date) || t("common.tbd")}
-                      </span>
-                    </div>
-                    <div className="event-list-meta-row">
-                      <span className="event-list-meta-label">
-                        {t("events.capacity")}:
-                      </span>
-                      <span className="event-list-meta-value">
-                        {event.max_students
-                          ? `${event.max_students} ${t("common.students")}`
-                          : t("common.unlimited")}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="event-list-pricing-box">
-                    <div className="event-list-pricing-row">
-                      <div className="event-list-price-main-block">
-                        <div className="event-list-price-main">
-                          ${userPrice}
-                        </div>
-                        {discount > 0 && (
-                          <div className="event-list-discount-badge">
-                            {t("events.discount", { percent: discount })}
-                          </div>
-                        )}
-                      </div>
-                      <div className="event-list-price-context">
-                        {user ? (
-                          <div>
-                            <div className="event-list-price-context-label">
-                              {t("events.member_price")}
-                            </div>
-                            <div className="event-list-price-reference">
-                              ${event.price_non_member}
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="event-list-price-context-label">
-                            {t("events.general_price")}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="event-list-actions">
-                    <button
-                      className="btn btn-outline"
-                      onClick={() => navigate(`/eventos/${event.id}`)}
-                    >
-                      {t("events.view_details")}
-                    </button>
-                    <button
-                      className="btn btn-primary"
-                      onClick={() => handleEnrollClick(event)}
-                      disabled={!isOpen || event.is_enrolled}
-                    >
-                      {(() => {
-                        if (event.is_enrolled) return t("events.enrolled");
-                        if (isOpen) return t("events.enroll");
-                        return t("events.enrollment_closed");
-                      })()}
-                    </button>
-                  </div>
-
-                  {!isOpen && (
-                    <div className="event-list-closed-badge">
-                      {t("events.closed_badge")}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        {/* Modal de inscripción */}
-        {showEnrollmentForm && selectedEvent && (
-          <EnrollmentModal
-            event={selectedEvent}
-            user={user}
-            onClose={() => {
-              setShowEnrollmentForm(false);
-              setSelectedEvent(null);
-            }}
-            onSuccess={() => {
-              setShowEnrollmentForm(false);
-              setSelectedEvent(null);
-              loadEvents();
-            }}
-          />
-        )}
-      </div>
-    </section>
-  );
-}
-
-function EnrollmentModal({ event, user, onClose, onSuccess }) {
-  const { t } = useTranslation();
-  const [formData, setFormData] = useState({
-    student_name: user?.name || "",
-    student_email: user?.email || "",
-    student_phone: "",
-  });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [step, setStep] = useState(1); // 1: formulario, 2: confirmación
-
-  let userPrice;
-  if (user) {
-    if (user.membership_type === "joven") {
-      userPrice = event.price_joven || event.price_member;
-    } else if (user.membership_type === "gratuito") {
-      userPrice = event.price_gratuito || 0;
-    } else {
-      userPrice = event.price_member;
-    }
-  } else {
-    userPrice = event.price_non_member;
-  }
-
-  function handleInputChange(e) {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  }
-
-  async function handleEnroll() {
-    if (!formData.student_name || !formData.student_email) {
-      setError(t("events.err_name_email"));
-      return;
-    }
-
-    try {
-      setLoading(true);
-      // Transform field names to match backend expectations
-      const payload = {
-        name: formData.student_name,
-        email: formData.student_email,
-        phone: formData.student_phone,
-      };
-      await apiPost(`/events/${event.id}/enroll`, payload);
-      setStep(2); // Go to success step
-    } catch (err) {
-      setError(
-        t("events.err_enroll", {
-          message: err.message || t("events.err_unknown"),
-        }),
-      );
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  return (
-    <div className="enrollment-modal-overlay">
-      <div className="enrollment-modal-card">
-        <div className="enrollment-modal-header">
-          <h2 className="enrollment-modal-title">{t("events.modal_title")}</h2>
-          <button
-            onClick={onClose}
-            className="enrollment-modal-close"
-            aria-label={t("events.modal_close")}
-          >
-            <i className="fa-solid fa-xmark"></i>
-          </button>
-        </div>
-
-        {error && <div className="enrollment-modal-error">{error}</div>}
-
-        {step === 1 && (
-          <div className="enrollment-modal-content">
-            <h3 className="enrollment-event-title">{event.title}</h3>
-            <p className="enrollment-event-description">{event.description}</p>
-
-            <div className="enrollment-field">
-              <label
-                htmlFor="enrollment-student-name"
-                className="enrollment-label"
-              >
-                {t("events.full_name")}
-              </label>
-              <input
-                id="enrollment-student-name"
-                type="text"
-                name="student_name"
-                value={formData.student_name}
-                onChange={handleInputChange}
-                required
-                className="enrollment-input"
-              />
-            </div>
-
-            <div className="enrollment-field">
-              <label
-                htmlFor="enrollment-student-email"
-                className="enrollment-label"
-              >
-                {t("common.email")} *
-              </label>
-              <input
-                id="enrollment-student-email"
-                type="email"
-                name="student_email"
-                value={formData.student_email}
-                onChange={handleInputChange}
-                required
-                className="enrollment-input"
-              />
-            </div>
-
-            <div className="enrollment-field">
-              <label
-                htmlFor="enrollment-student-phone"
-                className="enrollment-label"
-              >
-                {t("events.phone")}
-              </label>
-              <input
-                id="enrollment-student-phone"
-                type="tel"
-                name="student_phone"
-                value={formData.student_phone}
-                onChange={handleInputChange}
-                className="enrollment-input"
-              />
-            </div>
-
-            <div className="enrollment-price-panel">
-              <div className="enrollment-price-row">
-                <span>{t("events.price_label")}</span>
-                <span className="enrollment-price-value">${userPrice}</span>
-              </div>
-              {user && (
-                <div className="enrollment-price-note">
-                  {t("events.member_discount_note")}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {step === 2 && (
-          <div className="enrollment-success">
-            <div className="enrollment-success-icon">
-              {t("events.enrollment_confirmed")}
-            </div>
-            <h3 className="enrollment-success-title">
-              {t("events.enrollment_success_title")}
-            </h3>
-            <p className="enrollment-success-text">
-              {t("events.enrollment_success_text")}
-            </p>
-          </div>
-        )}
-
-        <div className="enrollment-actions">
-          {step === 1 && (
-            <>
-              <button className="btn btn-outline" onClick={onClose}>
-                {t("common.cancel")}
-              </button>
-              <button
-                className="btn btn-primary"
-                onClick={handleEnroll}
-                disabled={loading}
-              >
-                {loading ? t("common.processing") : t("events.enroll")}
-              </button>
-            </>
-          )}
-          {step === 2 && (
-            <button className="btn btn-primary" onClick={onSuccess}>
-              {t("common.close")}
-            </button>
-          )}
-        </div>
-      </div>
+      {enrollEvent && (
+        <EnrollmentModal
+          key={enrollEvent.id}
+          event={enrollEvent}
+          onClose={() => setEnrollEvent(null)}
+          onEnrolled={() => setReloadKey(k => k + 1)}
+        />
+      )}
     </div>
   );
 }
-
-EnrollmentModal.propTypes = {
-  event: PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    title: PropTypes.string.isRequired,
-    description: PropTypes.string,
-    price_member: PropTypes.number,
-    price_non_member: PropTypes.number,
-    price_joven: PropTypes.number,
-    price_gratuito: PropTypes.number,
-    enrollment_id: PropTypes.number,
-  }).isRequired,
-  user: PropTypes.shape({
-    name: PropTypes.string,
-    email: PropTypes.string,
-    membership_type: PropTypes.string,
-  }),
-  onClose: PropTypes.func.isRequired,
-  onSuccess: PropTypes.func.isRequired,
-};

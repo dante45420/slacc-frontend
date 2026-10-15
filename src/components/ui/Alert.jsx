@@ -1,4 +1,12 @@
 import PropTypes from "prop-types";
+import { useTranslation } from "react-i18next";
+
+const ICONS = {
+  info: "fa-circle-info",
+  success: "fa-circle-check",
+  warning: "fa-triangle-exclamation",
+  error: "fa-circle-exclamation",
+};
 
 export default function Alert({
   children,
@@ -7,14 +15,25 @@ export default function Alert({
   className,
   ...props
 }) {
-  const variantClass = `alert-${variant}`;
+  const { t } = useTranslation();
+  const urgent = variant === "error" || variant === "warning";
 
   return (
-    <div className={`alert ${variantClass} ${className || ""}`} {...props}>
+    <div
+      className={`alert alert-${variant} ${className || ""}`.trim()}
+      role={urgent ? "alert" : "status"}
+      {...props}
+    >
+      <i className={`fa-solid ${ICONS[variant] || ICONS.info} alert-icon`} aria-hidden="true"></i>
       <div className="alert-content">{children}</div>
       {onClose && (
-        <button onClick={onClose} className="alert-close">
-          <i className="fa-solid fa-xmark"></i>
+        <button
+          type="button"
+          onClick={onClose}
+          className="alert-close"
+          aria-label={t("common.close", "Cerrar")}
+        >
+          <i className="fa-solid fa-xmark" aria-hidden="true"></i>
         </button>
       )}
     </div>

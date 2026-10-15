@@ -30,6 +30,8 @@ Badge.propTypes = {
     "warning",
     "info",
     "neutral",
+    "danger",
+    "error",
   ]),
   size: PropTypes.oneOf(["sm", "md"]),
   className: PropTypes.string,

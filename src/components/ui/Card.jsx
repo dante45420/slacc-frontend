@@ -13,11 +13,16 @@ export default function Card({
   className = "",
   ...props
 }) {
-  const cardClass = `card ${hoverable ? "card-hoverable" : ""} ${
-    onClick ? "card-clickable" : ""
-  } ${className}`.trim();
+  const cardClass = [
+    "card",
+    hoverable && "card-hoverable",
+    onClick && "card-clickable",
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ");
 
-  const handleKeyPress = e => {
+  const handleKeyDown = e => {
     if (onClick && (e.key === "Enter" || e.key === " ")) {
       e.preventDefault();
       onClick(e);
@@ -28,7 +33,7 @@ export default function Card({
   const interactiveProps = onClick
     ? {
         onClick,
-        onKeyPress: handleKeyPress,
+        onKeyDown: handleKeyDown,
         role: "button",
         tabIndex: 0,
       }
@@ -39,8 +44,9 @@ export default function Card({
       {image && (
         <img
           src={image}
-          alt={imageAlt || title || "Card image"}
+          alt={imageAlt ?? ""}
           className="card-image"
+          loading="lazy"
         />
       )}
       {(title || badge) && (
@@ -57,8 +63,8 @@ export default function Card({
 }
 
 Card.propTypes = {
-  title: PropTypes.string,
-  description: PropTypes.string,
+  title: PropTypes.node,
+  description: PropTypes.node,
   image: PropTypes.string,
   imageAlt: PropTypes.string,
   badge: PropTypes.node,

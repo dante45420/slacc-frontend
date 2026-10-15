@@ -1,6 +1,15 @@
-import { lazy, Suspense } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { lazy, Suspense, useEffect, useRef } from "react";
+import {
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+  useNavigationType,
+} from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import Header from "./components/Header.jsx";
+import Footer from "./components/Footer.jsx";
+import ErrorBoundary from "./components/ErrorBoundary.jsx";
 import { ProtectedRoute } from "./components/ProtectedRoute.jsx";
 
 // Public pages
@@ -27,7 +36,6 @@ const Login = lazy(() => import("./pages/auth/Login.jsx"));
 const UserProfile = lazy(() => import("./pages/auth/UserProfile.jsx"));
 
 // News pages
-const NewsList = lazy(() => import("./pages/news/NewsList.jsx"));
 const NewsPage = lazy(() => import("./pages/news/NewsPage.jsx"));
 const NewsDetail = lazy(() => import("./pages/news/NewsDetail.jsx"));
 const NewsEditor = lazy(() => import("./pages/news/NewsEditor.jsx"));
@@ -50,7 +58,6 @@ const MemberPortal = lazy(() => import("./pages/members/MemberPortal.jsx"));
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard.jsx"));
 const AdminUserView = lazy(() => import("./pages/admin/AdminUserView.jsx"));
 const AdminUserEdit = lazy(() => import("./pages/admin/AdminUserEdit.jsx"));
-const AdminUserNew = lazy(() => import("./pages/admin/AdminUserNew.jsx"));
 const ApplicationDetail = lazy(
   () => import("./pages/admin/ApplicationDetail.jsx"),
 );
@@ -58,15 +65,144 @@ const ApplicationDetail = lazy(
 import { AuthProvider } from "./auth/AuthContext.jsx";
 import { ToastProvider, Spinner } from "./components/ui";
 
+// Default <title> per section; detail pages refine it with useDocumentTitle().
+const ROUTE_TITLES = [
+  ["/nosotros/directiva", "header.board"],
+  ["/nosotros/historia", "header.history"],
+  ["/nosotros/estatutos", "header.statutes"],
+  ["/nosotros", "header.society"],
+  ["/comites", "header.committees"],
+  ["/educacion", "header.education"],
+  ["/eventos", "header.events"],
+  ["/cursos", "header.events"],
+  ["/noticias", "header.news"],
+  ["/subir-noticia", "header.submit_article"],
+  ["/miembros/socios-activos", "header.active_members"],
+  ["/miembros", "header.members"],
+  ["/por-que-ser-socio", "header.benefits"],
+  ["/portal-socios", "header.private_portal"],
+  ["/solicitar-membresia", "header.request_membership"],
+  ["/contacto", "header.contact"],
+  ["/login", "header.login"],
+  ["/perfil", "header.profile"],
+  ["/admin", "header.admin"],
+];
+
+// Scroll offset per history entry, so Back/Forward returns to where you were.
+const scrollPositions = new Map();
+
+if (typeof window !== "undefined" && "scrollRestoration" in window.history) {
+  window.history.scrollRestoration = "manual";
+}
+
+/** Runs fn every frame until it returns true or ~2s pass (lazy pages and data). */
+function retryFrames(fn, maxFrames = 120) {
+  let frame = 0;
+  let tries = 0;
+  const tick = () => {
+    if (fn(tries >= maxFrames) || tries++ >= maxFrames) return;
+    frame = requestAnimationFrame(tick);
+  };
+  tick();
+  return () => cancelAnimationFrame(frame);
+}
+
+/**
+ * Navigation side effects: scroll (top, #hash, or the saved offset on Back),
+ * move focus to the new page, and set the section title / meta description.
+ */
+function RouteEffects() {
+  const { pathname, hash, key } = useLocation();
+  const navigationType = useNavigationType();
+  const { t, i18n } = useTranslation();
+  const isFirstRender = useRef(true);
+
+  useEffect(() => {
+    // history.state.key changes as soon as a navigation starts, before React
+    // renders the next page; ignore scroll events from then on (the browser
+    // clamps the offset while the next page is shorter).
+    const save = () => {
+      const current = window.history.state?.key ?? "default";
+      if (current === key) scrollPositions.set(key, window.scrollY);
+    };
+    window.addEventListener("scroll", save, { passive: true });
+    return () => window.removeEventListener("scroll", save);
+  }, [key]);
+
+  useEffect(() => {
+    const first = isFirstRender.current;
+    isFirstRender.current = false;
+    const instant = top => window.scrollTo({ top, left: 0, behavior: "instant" });
+
+    if (hash) {
+      const id = decodeURIComponent(hash.slice(1));
+      return retryFrames(giveUp => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.scrollIntoView({ behavior: "instant" });
+          return true;
+        }
+        if (giveUp) instant(0);
+        return false;
+      });
+    }
+
+    if (navigationType === "POP" && !first && scrollPositions.has(key)) {
+      const y = scrollPositions.get(key);
+      return retryFrames(giveUp => {
+        const reachable =
+          document.documentElement.scrollHeight - window.innerHeight >= y - 1;
+        if (reachable || giveUp) {
+          instant(y);
+          return true;
+        }
+        return false;
+      });
+    }
+
+    instant(0);
+
+    // Move keyboard/screen-reader focus to the new page (unless the page
+    // already focused something itself, e.g. an autofocus field).
+    if (!first) {
+      const active = document.activeElement;
+      const main = document.getElementById("main-content");
+      if (main && (!active || active === document.body || !main.contains(active))) {
+        main.focus({ preventScroll: true });
+      }
+    }
+    return undefined;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname, hash, key]);
+
+  useEffect(() => {
+    const match = ROUTE_TITLES.find(
+      ([prefix]) => pathname === prefix || pathname.startsWith(`${prefix}/`),
+    );
+    document.title = match ? `${t(match[1])} · SLACC` : "SLACC";
+  }, [pathname, t, i18n.language]);
+
+  useEffect(() => {
+    const meta = document.querySelector('meta[name="description"]');
+    if (meta) meta.setAttribute("content", t("meta.description"));
+  }, [t, i18n.language]);
+
+  return null;
+}
+
 export default function App() {
+  const { pathname } = useLocation();
+
   return (
     <AuthProvider>
       <ToastProvider>
+        <RouteEffects />
         <Header />
-        <main>
+        <main id="main-content" tabIndex={-1}>
+          <ErrorBoundary resetKey={pathname}>
           <Suspense
             fallback={
-              <div className="flex justify-center py-8">
+              <div className="page-loading">
                 <Spinner size="lg" />
               </div>
             }
@@ -83,7 +219,7 @@ export default function App() {
                 path="/pt/congresso"
                 element={<Navigate to="/eventos/proximos" replace />}
               />
-              <Route path="/noticias" element={<NewsList />} />
+              <Route path="/noticias" element={<NewsPage />} />
               <Route
                 path="/noticias/articulos-cientificos"
                 element={<NewsPage />}
@@ -141,7 +277,7 @@ export default function App() {
               <Route path="/miembros" element={<MembersBenefits />} />
               <Route
                 path="/miembros/beneficios"
-                element={<MembersBenefits />}
+                element={<Navigate to="/por-que-ser-socio" replace />}
               />
               <Route
                 path="/miembros/socios-activos"
@@ -186,11 +322,7 @@ export default function App() {
               />
               <Route
                 path="/admin/users/new"
-                element={
-                  <ProtectedRoute requireAdmin>
-                    <AdminUserNew />
-                  </ProtectedRoute>
-                }
+                element={<Navigate to="/admin?tab=users" replace />}
               />
               <Route
                 path="/admin/users/:id"
@@ -235,7 +367,9 @@ export default function App() {
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
+          </ErrorBoundary>
         </main>
+        <Footer />
       </ToastProvider>
     </AuthProvider>
   );

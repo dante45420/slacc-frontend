@@ -1,0 +1,206 @@
+/* ==========================================================================
+   SLACC design tokens
+   Brand colours are sampled from the official logos:
+   red  #BD2712  (LOGO SLACC_ROJO_HORIZONTAL.png)
+   navy #0A1E5B  (Logo_SLACC_vertical azul.png)
+   ========================================================================== */
+
+:root {
+  /* Brand */
+  --navy-50: #f3f5fb;
+  --navy-100: #e5e9f4;
+  --navy-200: #c8d0e8;
+  --navy-300: #9dabd3;
+  --navy-400: #6b7db8;
+  --navy-500: #45589c;
+  --navy-600: #2e4285;
+  --navy-700: #1e3273;
+  --navy-800: #132667;
+  --navy-900: #0a1e5b;
+  --navy-950: #071443;
+
+  --red-50: #fdf3f1;
+  --red-100: #fbe3de;
+  --red-200: #f5c2b8;
+  --red-300: #ec9383;
+  --red-500: #d3381f;
+  --red-600: #bd2712;
+  --red-700: #9b1f0e;
+  --red-800: #7e1b0e;
+
+  /* Neutrals (cool, slightly blue to sit with the navy) */
+  --gray-0: #ffffff;
+  --gray-25: #fbfcfe;
+  --gray-50: #f6f7fa;
+  --gray-100: #eef0f5;
+  --gray-200: #e1e5ee;
+  --gray-300: #cbd2df;
+  --gray-400: #98a2b6;
+  --gray-500: #6b7489;
+  --gray-600: #4e576b;
+  --gray-700: #363e51;
+  --gray-800: #222938;
+  --gray-900: #121826;
+
+  /* Semantic */
+  --color-brand: var(--navy-900);
+  --color-accent: var(--red-600);
+  --color-accent-hover: var(--red-700);
+  --color-accent-soft: var(--red-50);
+
+  --color-ink: var(--navy-950);          /* headings */
+  --color-text: var(--gray-800);         /* body copy */
+  --color-text-muted: var(--gray-600);   /* secondary copy */
+  --color-text-subtle: var(--gray-500);  /* meta, captions */
+  --color-text-inverse: #ffffff;
+  --color-link: var(--navy-700);
+  --color-link-hover: var(--red-600);
+
+  --color-page: #ffffff;                 /* page canvas under the logo watermark */
+  --color-surface: #ffffff;              /* cards, panels */
+  --color-surface-muted: var(--gray-50); /* wells, table heads */
+  --color-surface-sunken: var(--gray-100);
+  --color-surface-brand: var(--navy-900);
+  --color-surface-brand-soft: var(--navy-50);
+
+  --color-border: var(--gray-200);
+  --color-border-strong: var(--gray-300);
+  --color-border-brand: var(--navy-200);
+  --color-focus: #3b5bdb;
+
+  --color-success: #13795b;
+  --color-success-soft: #e7f6f0;
+  --color-success-border: #b6e3d2;
+  --color-warning: #a35a00;
+  --color-warning-soft: #fdf4e3;
+  --color-warning-border: #f3d9a6;
+  --color-danger: #b42318;
+  --color-danger-soft: #fef1f0;
+  --color-danger-border: #f7c4bf;
+  --color-info: var(--navy-600);
+  --color-info-soft: var(--navy-50);
+  --color-info-border: var(--navy-200);
+
+  /* Typography */
+  --font-sans: "Figtree", system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  --font-serif: "Source Serif 4", "Source Serif Pro", Georgia, Cambria,
+    "Times New Roman", serif;
+
+  --text-xs: 0.875rem;    /* 14 */
+  --text-sm: 1rem;        /* 16 */
+  --text-base: 1.125rem;  /* 18 */
+  --text-md: 1.1875rem;   /* 19 */
+  --text-lg: 1.3125rem;   /* 21 */
+  --text-xl: 1.5rem;      /* 24 */
+  --text-2xl: clamp(1.625rem, 1.35rem + 1vw, 2rem);      /* 26 → 32 */
+  --text-3xl: clamp(1.875rem, 1.5rem + 1.6vw, 2.5rem);   /* 30 → 40 */
+  --text-4xl: clamp(2.25rem, 1.7rem + 2.4vw, 3.375rem);  /* 36 → 54 */
+  --text-5xl: clamp(2.625rem, 1.9rem + 3.4vw, 4.125rem); /* 42 → 66 */
+
+  --leading-tight: 1.15;
+  --leading-snug: 1.3;
+  --leading-normal: 1.55;
+  --leading-relaxed: 1.7;
+
+  /* Spacing (4px base) */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  /* Section rhythm */
+  --section-y: clamp(3rem, 2rem + 4vw, 5.5rem);
+  --section-y-sm: clamp(2rem, 1.5rem + 2vw, 3.25rem);
+  --gutter: clamp(1rem, 0.5rem + 2.5vw, 2rem);
+
+  /* Layout widths */
+  --w-prose: 44rem;   /* ~700px reading measure */
+  --w-sm: 48rem;      /* 768 */
+  --w-md: 64rem;      /* 1024 */
+  --w-lg: 76rem;      /* 1216 */
+  --w-xl: 86rem;      /* 1376 */
+
+  /* Radius */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-pill: 999px;
+
+  /* Elevation */
+  --shadow-xs: 0 1px 2px rgba(7, 20, 67, 0.06);
+  --shadow-sm: 0 1px 2px rgba(7, 20, 67, 0.05), 0 2px 6px rgba(7, 20, 67, 0.05);
+  --shadow-md: 0 2px 4px rgba(7, 20, 67, 0.04), 0 8px 20px rgba(7, 20, 67, 0.08);
+  --shadow-lg: 0 4px 8px rgba(7, 20, 67, 0.05), 0 18px 40px rgba(7, 20, 67, 0.12);
+  --shadow-focus: 0 0 0 3px rgba(59, 91, 219, 0.28);
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-fast: 140ms;
+  --duration-base: 220ms;
+  --duration-slow: 380ms;
+
+  /* Chrome */
+  --header-height: 72px;
+  --app-height: 100vh;
+  --z-header: 1000;
+  --z-drawer: 1100;
+  --z-modal: 1200;
+  --z-toast: 1300;
+
+  /* ------------------------------------------------------------------
+     Legacy aliases — older class names and inline vars still resolve.
+     ------------------------------------------------------------------ */
+  --color-primary: var(--navy-900);
+  --color-primary-hover: var(--navy-800);
+  --color-primary-light: var(--navy-600);
+  --color-primary-dark: var(--navy-950);
+  --color-primary-contrast: #ffffff;
+  --color-secondary: var(--navy-600);
+  --color-secondary-hover: var(--navy-700);
+  --color-error: var(--color-danger);
+  --color-muted: var(--color-text-muted);
+  --color-text-secondary: var(--color-text-muted);
+  --color-text-light: var(--color-text-subtle);
+  --color-bg: var(--color-surface);
+  --color-bg-alt: var(--color-surface-muted);
+  --color-bg-secondary: var(--navy-50);
+  --color-border-light: var(--gray-100);
+  --font-family-base: var(--font-sans);
+  --font-family-heading: var(--font-serif);
+  --radius: var(--radius-md);
+  --shadow: var(--shadow-sm);
+  --spacing-1: var(--space-1);
+  --spacing-2: var(--space-2);
+  --spacing-3: var(--space-3);
+  --spacing-4: var(--space-4);
+  --spacing-5: var(--space-6);
+  --spacing-6: var(--space-8);
+  --spacing-7: var(--space-10);
+  --spacing-8: var(--space-12);
+  --max-width: var(--w-lg);
+  --transition-fast: var(--duration-fast) ease;
+  --transition-base: var(--duration-base) ease;
+}
+
+@supports (height: 100dvh) {
+  :root {
+    --app-height: 100dvh;
+  }
+}
+
+@media (max-width: 1080px) {
+  :root {
+    --header-height: 64px;
+  }
+}

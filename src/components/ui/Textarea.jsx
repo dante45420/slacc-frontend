@@ -1,41 +1,65 @@
+import { forwardRef, useId } from "react";
 import PropTypes from "prop-types";
 
-export default function Textarea({
+const Textarea = forwardRef(function Textarea({
   label,
   id,
   error,
   helperText,
   rows = 4,
   className,
+  required,
   ...props
-}) {
-  const textareaId =
-    id || `textarea-${label?.toLowerCase().replaceAll(/\s+/g, "-")}`;
+}, ref) {
+  const autoId = useId();
+  const textareaId = id || `textarea-${autoId}`;
+  const messageId = `${textareaId}-msg`;
+  const message = error || helperText;
 
   return (
-    <div className={`form-field ${className || ""}`}>
+    <div className={`form-field ${className || ""}`.trim()}>
       {label && (
         <label htmlFor={textareaId} className="form-label">
           {label}
+          {required && (
+            <span className="form-required" aria-hidden="true">
+              {" "}*
+            </span>
+          )}
         </label>
       )}
       <textarea
+        ref={ref}
         id={textareaId}
         rows={rows}
-        className={`form-textarea ${error ? "error" : ""}`}
+        required={required}
+        className={`form-textarea ${error ? "error" : ""}`.trim()}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={message ? messageId : undefined}
         {...props}
       />
-      {error && <p className="form-error">{error}</p>}
-      {helperText && !error && <p className="form-helper">{helperText}</p>}
+      {error && (
+        <p className="form-error" id={messageId} role="alert">
+          {error}
+        </p>
+      )}
+      {helperText && !error && (
+        <p className="form-helper" id={messageId}>
+          {helperText}
+        </p>
+      )}
     </div>
   );
-}
+});
 
 Textarea.propTypes = {
-  label: PropTypes.string,
+  label: PropTypes.node,
   id: PropTypes.string,
   error: PropTypes.string,
-  helperText: PropTypes.string,
+  helperText: PropTypes.node,
   rows: PropTypes.number,
   className: PropTypes.string,
+  required: PropTypes.bool,
 };
+
+export default Textarea;

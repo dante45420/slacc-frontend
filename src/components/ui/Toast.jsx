@@ -6,6 +6,7 @@ import {
   useMemo,
 } from "react";
 import PropTypes from "prop-types";
+import { useTranslation } from "react-i18next";
 
 const ToastContext = createContext(null);
 
@@ -18,6 +19,7 @@ export function useToast() {
 }
 
 export function ToastProvider({ children }) {
+  const { t } = useTranslation();
   const [toasts, setToasts] = useState([]);
 
   const removeToast = useCallback(id => {
@@ -25,7 +27,7 @@ export function ToastProvider({ children }) {
   }, []);
 
   const addToast = useCallback(
-    (message, variant = "info", duration = 3000) => {
+    (message, variant = "info", duration = 5000) => {
       const id = Date.now() + Math.random();
       setToasts(prev => [...prev, { id, message, variant }]);
 
@@ -72,7 +74,7 @@ export function ToastProvider({ children }) {
   return (
     <ToastContext.Provider value={value}>
       {children}
-      <div className="toast-container">
+      <div className="toast-container" role="region" aria-live="polite" aria-label={t("common.notifications", "Notificaciones")}>
         {toasts.map(toast => (
           <Toast
             key={toast.id}
@@ -91,6 +93,7 @@ ToastProvider.propTypes = {
 };
 
 function Toast({ message, variant, onClose }) {
+  const { t } = useTranslation();
   const icons = {
     success: <i className="fa-solid fa-circle-check"></i>,
     error: <i className="fa-solid fa-circle-xmark"></i>,
@@ -99,18 +102,28 @@ function Toast({ message, variant, onClose }) {
   };
 
   return (
-    <div className={`toast toast-${variant}`}>
-      <span className="toast-icon">{icons[variant]}</span>
+    <div
+      className={`toast toast-${variant}`}
+      role={variant === "error" ? "alert" : "status"}
+    >
+      <span className="toast-icon" aria-hidden="true">
+        {icons[variant]}
+      </span>
       <span className="toast-message">{message}</span>
-      <button className="toast-close" onClick={onClose} type="button">
-        <i className="fa-solid fa-xmark"></i>
+      <button
+        className="toast-close"
+        onClick={onClose}
+        type="button"
+        aria-label={t("common.close", "Cerrar")}
+      >
+        <i className="fa-solid fa-xmark" aria-hidden="true"></i>
       </button>
     </div>
   );
 }
 
 Toast.propTypes = {
-  message: PropTypes.string.isRequired,
+  message: PropTypes.node.isRequired,
   variant: PropTypes.oneOf(["success", "error", "warning", "info"]).isRequired,
   onClose: PropTypes.func.isRequired,
 };

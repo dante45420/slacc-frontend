@@ -1,4 +1,5 @@
 import PropTypes from "prop-types";
+import { useTranslation } from "react-i18next";
 
 /**
  * Pagination component for navigating through pages
@@ -19,6 +20,7 @@ export default function Pagination({
   siblingCount = 1,
   className = "",
 }) {
+  const { t } = useTranslation();
   if (totalPages <= 1) return null;
 
   const range = (start, end) => {
@@ -67,14 +69,17 @@ export default function Pagination({
   const pages = paginationRange();
 
   return (
-    <div className={`pagination ${className}`}>
+    <nav
+      className={`pagination ${className}`.trim()}
+      aria-label={t("common.pagination", "Paginación")}
+    >
       {showFirstLast && (
         <button
           className="pagination-button"
           onClick={() => onPageChange(1)}
           disabled={currentPage === 1}
           type="button"
-          aria-label="First page"
+          aria-label={t("common.first_page", "Primera página")}
         >
           «
         </button>
@@ -85,7 +90,7 @@ export default function Pagination({
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
         type="button"
-        aria-label="Previous page"
+        aria-label={t("common.previous_page", "Página anterior")}
       >
         ‹
       </button>
@@ -110,7 +115,7 @@ export default function Pagination({
             }`}
             onClick={() => onPageChange(pageNumber)}
             type="button"
-            aria-label={`Page ${pageNumber}`}
+            aria-label={t("common.page_n", { n: pageNumber, defaultValue: "Página {{n}}" })}
             aria-current={pageNumber === currentPage ? "page" : undefined}
           >
             {pageNumber}
@@ -123,7 +128,7 @@ export default function Pagination({
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
         type="button"
-        aria-label="Next page"
+        aria-label={t("common.next_page", "Página siguiente")}
       >
         ›
       </button>
@@ -134,12 +139,12 @@ export default function Pagination({
           onClick={() => onPageChange(totalPages)}
           disabled={currentPage === totalPages}
           type="button"
-          aria-label="Last page"
+          aria-label={t("common.last_page", "Última página")}
         >
           »
         </button>
       )}
-    </div>
+    </nav>
   );
 }
 

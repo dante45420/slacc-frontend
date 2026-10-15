@@ -1,4 +1,5 @@
 import PropTypes from "prop-types";
+import { useTranslation } from "react-i18next";
 
 /**
  * Table component for displaying tabular data
@@ -24,7 +25,10 @@ export default function Table({
   striped = false,
   responsive = true,
   className = "",
+  emptyText,
 }) {
+  const { t } = useTranslation();
+  const emptyMessage = emptyText || t("common.no_data", "No hay datos para mostrar");
   const tableClasses = [
     "table",
     hoverable && "table-hoverable",
@@ -55,14 +59,22 @@ export default function Table({
           {data.length === 0 ? (
             <tr>
               <td colSpan={columns.length} className="table-empty">
-                No hay datos para mostrar
+                {emptyMessage}
               </td>
             </tr>
           ) : (
             data.map((row, idx) => (
               <tr
-                key={row.id || idx}
+                key={row.id ?? idx}
                 onClick={onRowClick ? () => onRowClick(row) : undefined}
+                onKeyDown={
+                  onRowClick
+                    ? e => {
+                        if (e.key === "Enter") onRowClick(row);
+                      }
+                    : undefined
+                }
+                tabIndex={onRowClick ? 0 : undefined}
                 className={onRowClick ? "clickable" : ""}
               >
                 {columns.map(col => (
@@ -80,11 +92,11 @@ export default function Table({
       {responsive && (
         <div className="table-mobile-cards">
           {data.length === 0 ? (
-            <div className="table-empty-mobile">No hay datos para mostrar</div>
+            <div className="table-empty-mobile">{emptyMessage}</div>
           ) : (
             data.map((row, idx) => (
               <div
-                key={row.id || idx}
+                key={row.id ?? idx}
                 className={`table-card ${
                   onRowClick ? "table-card-clickable" : ""
                 }`}
@@ -134,4 +146,5 @@ Table.propTypes = {
   striped: PropTypes.bool,
   responsive: PropTypes.bool,
   className: PropTypes.string,
+  emptyText: PropTypes.string,
 };

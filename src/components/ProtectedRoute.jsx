@@ -1,4 +1,4 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import PropTypes from "prop-types";
 import { useAuth } from "../auth/AuthContext.jsx";
 import { Spinner } from "../components/ui";
@@ -9,19 +9,20 @@ export function ProtectedRoute({
   requirePaid = false,
 }) {
   const { user, loading } = useAuth();
+  const location = useLocation();
 
   // If still loading auth state, show loading spinner
   if (loading || user === undefined) {
     return (
-      <div className="flex-center min-h-60vh">
-        <Spinner />
+      <div className="page-loading">
+        <Spinner size="lg" />
       </div>
     );
   }
 
-  // If not logged in, redirect to login
+  // Not logged in: go to login and come back here afterwards
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
   // If admin is required and user is not admin, redirect to home
@@ -31,7 +32,13 @@ export function ProtectedRoute({
 
   // Paid content is available to admins or members with paid status
   if (requirePaid && user.role !== "admin" && user.payment_status !== "paid") {
-    return <Navigate to="/por-que-ser-socio" replace />;
+    return (
+      <Navigate
+        to="/perfil"
+        replace
+        state={{ from: location, reason: "payment_required" }}
+      />
+    );
   }
 
   return children;

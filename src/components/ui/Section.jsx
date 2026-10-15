@@ -9,11 +9,15 @@ const PADDING_CLASSES = {
   xl: "section-padding-xl",
 };
 
+// Legacy variant names map onto the new band styles.
 const VARIANT_CLASSES = {
-  default: "section-container",
-  alt: "section-container-alt",
-  primary: "section-container-primary",
-  transparent: "section-container-transparent",
+  default: "",
+  transparent: "",
+  surface: "section--surface",
+  alt: "section--muted",
+  muted: "section--muted",
+  primary: "section--brand",
+  brand: "section--brand",
 };
 
 export default function Section({
@@ -25,18 +29,18 @@ export default function Section({
   containerClassName,
   ...props
 }) {
-  const paddingClass = PADDING_CLASSES[padding] || "";
-  const variantClass = VARIANT_CLASSES[variant] || "section-container";
+  const classes = [
+    "section",
+    VARIANT_CLASSES[variant],
+    PADDING_CLASSES[padding],
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
-    <section
-      className={`section ${paddingClass} ${className || ""}`}
-      {...props}
-    >
-      <Container
-        size={containerSize}
-        className={`${variantClass} ${containerClassName || ""}`}
-      >
+    <section className={classes} {...props}>
+      <Container size={containerSize} className={containerClassName || ""}>
         {children}
       </Container>
     </section>
@@ -45,7 +49,7 @@ export default function Section({
 
 Section.propTypes = {
   children: PropTypes.node.isRequired,
-  variant: PropTypes.oneOf(["default", "alt", "primary", "transparent"]),
+  variant: PropTypes.oneOf(Object.keys(VARIANT_CLASSES)),
   padding: PropTypes.oneOf(["none", "sm", "default", "lg", "xl"]),
   containerSize: PropTypes.oneOf(["sm", "default", "lg", "xl", "full"]),
   className: PropTypes.string,

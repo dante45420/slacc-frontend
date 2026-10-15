@@ -1,175 +1,229 @@
-import { Link, useLocation } from "react-router-dom";
-import { useAuth } from "../auth/AuthContext.jsx";
+import { Link, NavLink, useLocation } from "react-router-dom";
 import PropTypes from "prop-types";
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "../auth/AuthContext.jsx";
+import useMediaQuery from "../hooks/useMediaQuery.js";
+import { SUPPORTED_LANGUAGES, currentLanguage } from "../i18n";
 
-function MenuItem({ label, to, ariaLabel, children, onClick, className }) {
-  const [submenuOpen, setSubmenuOpen] = useState(false);
+// Keep in sync with the drawer breakpoint in src/styles/layout.css
+const DRAWER_QUERY = "(max-width: 1099.98px)";
 
-  const handleClick = e => {
-    if (children && window.innerWidth <= 1200) {
-      e.preventDefault();
-      setSubmenuOpen(!submenuOpen);
-    } else if (onClick) {
-      onClick();
-    }
-  };
+const LANGUAGE_NAMES = { es: "Español", en: "English", pt: "Português" };
+
+function isSectionActive(pathname, prefixes) {
+  return prefixes.some(p => pathname === p || pathname.startsWith(`${p}/`));
+}
+
+function NavItem({ id, label, to, match, children, openId, setOpenId, onNavigate, closeOnBlur }) {
+  const { pathname } = useLocation();
+  const hasSubmenu = Boolean(children);
+  const isOpen = openId === id;
+  const active = isSectionActive(pathname, match || [to]);
+  const submenuId = `submenu-${id}`;
 
   return (
-    <li className={`${submenuOpen ? "submenu-open" : ""} ${className || ""}`}>
-      <Link to={to} onClick={handleClick} aria-label={ariaLabel}>
-        {label}
-        {children && (
-          <i
-            className={`fa-solid ${
-              submenuOpen ? "fa-chevron-down" : "fa-chevron-right"
-            } submenu-chevron`}
-          ></i>
+    <li
+      className={`menu-item${hasSubmenu ? " has-submenu" : ""}${
+        isOpen ? " submenu-open" : ""
+      }`}
+      onMouseLeave={() => {
+        if (isOpen && globalThis.matchMedia?.("(hover: hover)").matches) {
+          setOpenId(null);
+        }
+      }}
+      onBlur={e => {
+        if (closeOnBlur && isOpen && !e.currentTarget.contains(e.relatedTarget)) {
+          setOpenId(null);
+        }
+      }}
+    >
+      <div className="menu-row">
+        <Link
+          to={to}
+          className={`menu-link${active ? " active" : ""}`}
+          aria-current={pathname === to ? "page" : undefined}
+          onClick={onNavigate}
+        >
+          {label}
+        </Link>
+        {hasSubmenu && (
+          <button
+            type="button"
+            className="submenu-toggle"
+            aria-expanded={isOpen}
+            aria-controls={submenuId}
+            aria-label={label}
+            onClick={() => setOpenId(isOpen ? null : id)}
+          >
+            <i className="fa-solid fa-chevron-down" aria-hidden="true"></i>
+          </button>
         )}
-      </Link>
-      {children ? <div className="submenu">{children}</div> : null}
+      </div>
+      {hasSubmenu && (
+        <div className="submenu" id={submenuId}>
+          {children}
+        </div>
+      )}
     </li>
   );
 }
 
-MenuItem.propTypes = {
-  label: PropTypes.node.isRequired,
+NavItem.propTypes = {
+  id: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
   to: PropTypes.string.isRequired,
-  ariaLabel: PropTypes.string,
+  match: PropTypes.arrayOf(PropTypes.string),
   children: PropTypes.node,
-  onClick: PropTypes.func,
-  className: PropTypes.string,
+  openId: PropTypes.string,
+  setOpenId: PropTypes.func.isRequired,
+  onNavigate: PropTypes.func.isRequired,
+  closeOnBlur: PropTypes.bool,
 };
 
-function SubLink({ to, label, onClick }) {
+function SubLink({ to, label, onNavigate }) {
   return (
-    <Link to={to} onClick={onClick}>
+    <NavLink to={to} end onClick={onNavigate}>
       {label}
-    </Link>
+    </NavLink>
   );
 }
 
 SubLink.propTypes = {
   to: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
-  onClick: PropTypes.func,
-};
-
-function SubMenuGroup({ label, children }) {
-  return (
-    <div className="submenu-item">
-      <span className="submenu-label">{label}</span>
-      <div className="submenu-nested">{children}</div>
-    </div>
-  );
-}
-
-SubMenuGroup.propTypes = {
-  label: PropTypes.string.isRequired,
-  children: PropTypes.node.isRequired,
+  onNavigate: PropTypes.func.isRequired,
 };
 
 export default function Header() {
   const { user, logout } = useAuth();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [languageOpen, setLanguageOpen] = useState(false);
-  const location = useLocation();
   const { t, i18n } = useTranslation();
+  const location = useLocation();
+  const isDrawer = useMediaQuery(DRAWER_QUERY);
+  const lang = currentLanguage(i18n);
+  const authReady = user !== undefined; // undefined while /me is loading
 
-  useEffect(() => {
-    const updateViewportAndHeader = () => {
-      const header = document.getElementById("site-header");
-      const viewportHeight = window.visualViewport
-        ? window.visualViewport.height
-        : window.innerHeight;
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [openId, setOpenId] = useState(null); // open nav submenu or header dropdown
+  const [scrolled, setScrolled] = useState(false);
+  const headerRef = useRef(null);
+  const hamburgerRef = useRef(null);
+  const drawerRef = useRef(null);
 
-      document.documentElement.style.setProperty(
-        "--app-height",
-        `${viewportHeight}px`,
-      );
-
-      if (header) {
-        const height = header.offsetHeight;
-        document.documentElement.style.setProperty(
-          "--header-height",
-          `${height}px`,
-        );
-      }
-    };
-
-    updateViewportAndHeader();
-
-    window.addEventListener("resize", updateViewportAndHeader);
-    globalThis.addEventListener("orientationchange", updateViewportAndHeader);
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener("resize", updateViewportAndHeader);
-    }
-
-    return () => {
-      window.removeEventListener("resize", updateViewportAndHeader);
-      globalThis.removeEventListener(
-        "orientationchange",
-        updateViewportAndHeader,
-      );
-      if (window.visualViewport) {
-        window.visualViewport.removeEventListener(
-          "resize",
-          updateViewportAndHeader,
-        );
-      }
-    };
+  const closeAll = useCallback(() => {
+    setDrawerOpen(false);
+    setOpenId(null);
   }, []);
 
+  // Close menus on navigation
   useEffect(() => {
-    const body = document.body;
-    const html = document.documentElement;
+    closeAll();
+  }, [location.pathname, closeAll]);
 
-    if (mobileMenuOpen) {
-      body.style.overflow = "hidden";
-      html.style.overflow = "hidden";
-    } else {
-      body.style.overflow = "";
-      html.style.overflow = "";
-    }
+  // Leaving the drawer breakpoint closes the drawer
+  useEffect(() => {
+    if (!isDrawer) setDrawerOpen(false);
+    setOpenId(null);
+  }, [isDrawer]);
 
+  // Shadow once the page is scrolled
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 4);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Lock page scroll while the drawer is open
+  useEffect(() => {
+    if (!drawerOpen) return undefined;
+    const { overflow } = document.body.style;
+    document.body.style.overflow = "hidden";
     return () => {
-      body.style.overflow = "";
-      html.style.overflow = "";
+      document.body.style.overflow = overflow;
     };
-  }, [mobileMenuOpen]);
+  }, [drawerOpen]);
 
+  // Move focus into the drawer when it opens, back to the trigger when it closes
+  const wasOpen = useRef(false);
   useEffect(() => {
-    setMobileMenuOpen(false);
-    setLanguageOpen(false);
-  }, [location.pathname]);
+    if (drawerOpen) {
+      drawerRef.current?.querySelector(".drawer-close")?.focus({ preventScroll: true });
+    } else if (wasOpen.current) {
+      hamburgerRef.current?.focus({ preventScroll: true });
+    }
+    wasOpen.current = drawerOpen;
+  }, [drawerOpen]);
 
-  const toggleMobileMenu = () => {
-    setMobileMenuOpen(!mobileMenuOpen);
+  // Escape closes; clicking outside closes desktop dropdowns
+  useEffect(() => {
+    const onKey = e => {
+      if (e.key === "Escape") {
+        if (!drawerOpen && openId) {
+          headerRef.current
+            ?.querySelector('[aria-expanded="true"]')
+            ?.focus({ preventScroll: true });
+        }
+        closeAll();
+        return;
+      }
+      if (e.key === "Tab" && drawerOpen && drawerRef.current) {
+        const items = [
+          ...drawerRef.current.querySelectorAll(
+            'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+          ),
+        ].filter(el => el.offsetParent !== null);
+        if (items.length === 0) return;
+        const first = items[0];
+        const last = items[items.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && (document.activeElement === last || !drawerRef.current.contains(document.activeElement))) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+    const onPointer = e => {
+      if (!isDrawer && openId && headerRef.current && !headerRef.current.contains(e.target)) {
+        setOpenId(null);
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("pointerdown", onPointer);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("pointerdown", onPointer);
+    };
+  }, [closeAll, isDrawer, openId, drawerOpen]);
+
+  const changeLanguage = code => {
+    i18n.changeLanguage(code);
+    setOpenId(null);
   };
 
-  const closeMobileMenu = () => {
-    setMobileMenuOpen(false);
-    setLanguageOpen(false);
+  const handleLogout = () => {
+    logout();
+    closeAll();
   };
 
-  const handleLanguageToggle = () => {
-    setLanguageOpen(prev => !prev);
-  };
-
-  const handleLanguageSelect = lang => {
-    i18n.changeLanguage(lang);
-    setLanguageOpen(false);
-    closeMobileMenu();
-  };
+  const navProps = { openId, setOpenId, onNavigate: closeAll, closeOnBlur: !isDrawer };
 
   return (
-    <header className="site-header" id="site-header">
-      <nav className="nav">
-        <Link to="/" className="brand">
+    <header
+      className={`site-header${scrolled ? " is-scrolled" : ""}`}
+      id="site-header"
+      ref={headerRef}
+    >
+      <a className="skip-link" href="#main-content">
+        {t("header.skip_to_content", "Saltar al contenido")}
+      </a>
+      <div className="nav">
+        <Link to="/" className="brand" aria-label={t("header.home_label", "SLACC — Inicio")}>
           <img
             src="/LOGO SLACC_ROJO_HORIZONTAL.png"
-            alt="SLACC Logo"
+            alt={t("header.logo_alt", "Logo de SLACC")}
             className="logo-image header-logo-image"
             width="149"
             height="60"
@@ -177,246 +231,259 @@ export default function Header() {
         </Link>
 
         <button
-          className="hamburger-menu"
-          onClick={toggleMobileMenu}
-          aria-label={t("header.select_language", "Toggle menu")}
-          aria-expanded={mobileMenuOpen}
+          type="button"
+          className={`menu-backdrop${drawerOpen ? " is-open" : ""}`}
+          aria-hidden="true"
+          tabIndex={-1}
+          onClick={closeAll}
+        />
+
+        <nav
+          className={`primary-nav${drawerOpen ? " is-open" : ""}`}
+          aria-label={t("header.main_navigation", "Navegación principal")}
+          ref={drawerRef}
+          {...(isDrawer && !drawerOpen ? { inert: "" } : {})}
         >
-          <i
-            className={
-              mobileMenuOpen ? "fa-solid fa-xmark" : "fa-solid fa-bars"
-            }
-          ></i>
-        </button>
+          <div className="drawer-head">
+            <img
+              src="/LOGO SLACC_ROJO_HORIZONTAL.png"
+              alt=""
+              className="logo-image"
+              width="90"
+              height="36"
+            />
+            <button
+              type="button"
+              className="drawer-close"
+              aria-label={t("common.close", "Cerrar")}
+              onClick={closeAll}
+            >
+              <i className="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
+          </div>
 
-        {mobileMenuOpen ? (
-          <button
-            type="button"
-            className="menu-backdrop"
-            aria-label="Cerrar menu"
-            onClick={closeMobileMenu}
-          />
-        ) : null}
-
-        <ul className={`menu ${mobileMenuOpen ? "menu-open" : ""}`}>
-          {user?.role === "admin" && (
-            <MenuItem
-              label={t("header.admin", "Admin")}
-              to="/admin"
-              onClick={closeMobileMenu}
-            />
-          )}
-          <MenuItem
-            label={t("header.society", "La Sociedad")}
-            to="/nosotros"
-            onClick={closeMobileMenu}
-          >
-            <SubLink
-              to="/nosotros/mision"
-              label={t("header.mission", "Misión, Visión y Valores")}
-              onClick={closeMobileMenu}
-            />
-            <SubLink
-              to="/nosotros/directiva"
-              label={t("header.board", "Mesa Directiva")}
-              onClick={closeMobileMenu}
-            />
-            <SubLink
-              to="/nosotros/historia"
-              label={t("header.history", "Historia")}
-              onClick={closeMobileMenu}
-            />
-            <SubLink
-              to="/nosotros/estatutos"
-              label={t("header.statutes", "Estatutos")}
-              onClick={closeMobileMenu}
-            />
-            <SubLink
-              to="/comites"
-              label={t("header.committees", "Comités")}
-              onClick={closeMobileMenu}
-            />
-          </MenuItem>
-          <MenuItem
-            label={t("header.education", "Educación")}
-            to="/educacion"
-            onClick={closeMobileMenu}
-          >
-            <SubLink
-              to="/educacion/aval-certificacion"
-              label={t("header.certification", "Aval y Certificación")}
-              onClick={closeMobileMenu}
-            />
-            <SubLink
-              to="/educacion/becas"
-              label={t("header.scholarships", "Becas y Pasantías")}
-              onClick={closeMobileMenu}
-            />
-            <SubLink
-              to="/educacion/videoteca"
-              label={t("header.virtual_classroom", "Aula Virtual")}
-              onClick={closeMobileMenu}
-            />
-          </MenuItem>
-          <MenuItem
-            label={t("header.events", "Eventos")}
-            to="/eventos"
-            onClick={closeMobileMenu}
-          >
-            <SubLink
-              to="/eventos/pasados"
-              label={t("header.past_events", "Pasados")}
-              onClick={closeMobileMenu}
-            />
-            <SubLink
-              to="/eventos/proximos"
-              label={t("header.upcoming_events", "Próximos")}
-              onClick={closeMobileMenu}
-            />
-            <SubLink
-              to="/eventos/proximos"
-              label={t("header.congress", "Congreso Latinoamericano")}
-              onClick={closeMobileMenu}
-            />
-            <SubLink
+          <ul className="menu" id="primary-menu">
+            {user?.role === "admin" && (
+              <NavItem id="admin" label={t("header.admin", "Admin")} to="/admin" {...navProps} />
+            )}
+            <NavItem
+              id="society"
+              label={t("header.society", "La Sociedad")}
+              to="/nosotros"
+              match={["/nosotros", "/comites"]}
+              {...navProps}
+            >
+              <SubLink to="/nosotros/mision" label={t("header.mission", "Misión, Visión y Valores")} onNavigate={closeAll} />
+              <SubLink to="/nosotros/directiva" label={t("header.board", "Mesa Directiva")} onNavigate={closeAll} />
+              <SubLink to="/nosotros/historia" label={t("header.history", "Historia")} onNavigate={closeAll} />
+              <SubLink to="/nosotros/estatutos" label={t("header.statutes", "Estatutos")} onNavigate={closeAll} />
+              <SubLink to="/comites" label={t("header.committees", "Comités")} onNavigate={closeAll} />
+            </NavItem>
+            <NavItem
+              id="education"
+              label={t("header.education", "Educación")}
+              to="/educacion"
+              {...navProps}
+            >
+              <SubLink to="/educacion/aval-certificacion" label={t("header.certification", "Aval y Certificación")} onNavigate={closeAll} />
+              <SubLink to="/educacion/becas" label={t("header.scholarships", "Becas y Pasantías")} onNavigate={closeAll} />
+              <SubLink to="/educacion/videoteca" label={t("header.virtual_classroom", "Aula Virtual")} onNavigate={closeAll} />
+            </NavItem>
+            <NavItem
+              id="events"
+              label={t("header.events", "Eventos")}
               to="/eventos"
-              label={t("header.all_events", "Todos")}
-              onClick={closeMobileMenu}
-            />
-            <SubLink
-              to="/eventos/webinars"
-              label={t("header.webinars", "Webinars")}
-              onClick={closeMobileMenu}
-            />
-          </MenuItem>
-          <MenuItem
-            label={t("header.members", "Miembros")}
-            to="/miembros"
-            onClick={closeMobileMenu}
-          >
-            <SubLink
-              to="/por-que-ser-socio"
-              label={t("header.benefits", "Beneficios")}
-              onClick={closeMobileMenu}
-            />
-            <SubLink
-              to="/miembros/socios-activos"
-              label={t("header.active_members", "Socios Activos")}
-              onClick={closeMobileMenu}
-            />
-            {/* <SubLink
-              to="/portal-socios"
-              label={t("header.private_portal", "Portal Privado")}
-              onClick={closeMobileMenu}
-            /> */}
-          </MenuItem>
-          <MenuItem
-            label={t("header.news", "Noticias")}
-            to="/noticias/articulos-cientificos"
-            onClick={closeMobileMenu}
-          >
-            <SubLink
-              to="/noticias/articulos-cientificos"
-              label={t("header.scientific_articles", "Artículos científicos")}
-              onClick={closeMobileMenu}
-            />
-            <SubLink
-              to="/noticias/articulos-destacados"
-              label={t("header.featured_articles", "Artículos destacados")}
-              onClick={closeMobileMenu}
-            />
-            <SubLink
-              to="/noticias/editoriales"
-              label={t("header.editorials", "Editoriales")}
-              onClick={closeMobileMenu}
-            />
-            {user && (
-              <SubLink
-                to="/subir-noticia"
-                label={t("header.submit_article", "Enviar artículo")}
-                onClick={closeMobileMenu}
-              />
-            )}
-          </MenuItem>
-          <MenuItem
-            label={t("header.contact", "Contacto")}
-            to="/contacto"
-            onClick={closeMobileMenu}
-          />
-          <MenuItem
-            label={<i className="fa-solid fa-user"></i>}
-            ariaLabel={
-              user
-                ? t("header.profile", "Perfil")
-                : t("header.login", "Iniciar sesión")
-            }
-            to={user ? "/perfil" : "/login"}
-            onClick={closeMobileMenu}
-            className="user-menu"
-          >
-            {user ? (
-              <button
-                onClick={e => {
-                  e.preventDefault();
-                  logout();
-                  closeMobileMenu();
-                }}
-              >
-                {t("header.logout", "Cerrar sesión")}
-              </button>
-            ) : (
-              <>
-                <SubLink
-                  to="/login"
-                  label={t("header.login", "Iniciar sesión")}
-                  onClick={closeMobileMenu}
-                />
-                <SubLink
-                  to="/solicitar-membresia"
-                  label={t("header.request_membership", "Solicitar membresía")}
-                  onClick={closeMobileMenu}
-                />
-              </>
-            )}
-          </MenuItem>
-          <li
-            className={`language-selector ${languageOpen ? "submenu-open" : ""}`}
+              match={["/eventos", "/cursos"]}
+              {...navProps}
+            >
+              <SubLink to="/eventos/proximos" label={t("header.upcoming_events", "Próximos")} onNavigate={closeAll} />
+              <SubLink to="/eventos/pasados" label={t("header.past_events", "Pasados")} onNavigate={closeAll} />
+              <SubLink to="/eventos/webinars" label={t("header.webinars", "Webinars")} onNavigate={closeAll} />
+              <SubLink to="/cursos" label={t("events.filter_courses", "Cursos y talleres")} onNavigate={closeAll} />
+              <SubLink to="/eventos" label={t("header.all_events", "Todos")} onNavigate={closeAll} />
+            </NavItem>
+            <NavItem
+              id="members"
+              label={t("header.members", "Miembros")}
+              to="/miembros"
+              match={["/miembros", "/por-que-ser-socio", "/solicitar-membresia", "/portal-socios"]}
+              {...navProps}
+            >
+              <SubLink to="/por-que-ser-socio" label={t("header.benefits", "Beneficios")} onNavigate={closeAll} />
+              <SubLink to="/miembros/socios-activos" label={t("header.active_members", "Socios Activos")} onNavigate={closeAll} />
+              <SubLink to="/solicitar-membresia" label={t("header.request_membership", "Solicitar membresía")} onNavigate={closeAll} />
+            </NavItem>
+            <NavItem
+              id="news"
+              label={t("header.news", "Noticias")}
+              to="/noticias"
+              match={["/noticias", "/subir-noticia"]}
+              {...navProps}
+            >
+              <SubLink to="/noticias/articulos-cientificos" label={t("header.scientific_articles", "Artículos científicos")} onNavigate={closeAll} />
+              <SubLink to="/noticias/articulos-destacados" label={t("header.featured_articles", "Artículos destacados")} onNavigate={closeAll} />
+              <SubLink to="/noticias/editoriales" label={t("header.editorials", "Editoriales")} onNavigate={closeAll} />
+              {user && (
+                <SubLink to="/subir-noticia" label={t("header.submit_article", "Enviar artículo")} onNavigate={closeAll} />
+              )}
+            </NavItem>
+            <NavItem id="contact" label={t("header.contact", "Contacto")} to="/contacto" {...navProps} />
+          </ul>
+
+          <div className="drawer-foot">
+            <div className="drawer-account" aria-busy={!authReady}>
+              {!authReady ? null : user ? (
+                <>
+                  <p className="drawer-user">
+                    <strong>{user.name || user.email}</strong>
+                  </p>
+                  <Link to="/perfil" className="btn btn-outline" onClick={closeAll}>
+                    {t("header.profile", "Mi perfil")}
+                  </Link>
+                  <button type="button" className="btn btn-ghost" onClick={handleLogout}>
+                    {t("header.logout", "Cerrar sesión")}
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link to="/login" className="btn btn-outline" onClick={closeAll}>
+                    {t("header.login", "Iniciar sesión")}
+                  </Link>
+                  <Link to="/solicitar-membresia" className="btn btn-accent" onClick={closeAll}>
+                    {t("header.join", "Hazte socio")}
+                  </Link>
+                </>
+              )}
+            </div>
+            <div
+              className="drawer-lang"
+              role="group"
+              aria-label={t("header.select_language", "Seleccionar idioma")}
+            >
+              <span className="drawer-lang-label">
+                <i className="fa-solid fa-earth-americas" aria-hidden="true"></i>{" "}
+                {LANGUAGE_NAMES[lang]}
+              </span>
+              {SUPPORTED_LANGUAGES.map(code => (
+                <button
+                  key={code}
+                  type="button"
+                  aria-current={lang === code ? "true" : undefined}
+                  aria-label={LANGUAGE_NAMES[code]}
+                  onClick={() => changeLanguage(code)}
+                >
+                  {code.toUpperCase()}
+                </button>
+              ))}
+            </div>
+          </div>
+        </nav>
+
+        <div className="header-actions">
+          <div
+            className={`header-dropdown${openId === "lang" ? " submenu-open" : ""}`}
+            onBlur={e => {
+              if (openId === "lang" && !e.currentTarget.contains(e.relatedTarget)) setOpenId(null);
+            }}
           >
             <button
               type="button"
-              className="language-trigger"
-              aria-label="Seleccionar idioma"
-              aria-expanded={languageOpen}
-              onClick={handleLanguageToggle}
+              className="header-icon-btn"
+              aria-haspopup="true"
+              aria-expanded={openId === "lang"}
+              aria-controls="language-menu"
+              aria-label={t("header.select_language", "Seleccionar idioma")}
+              onClick={() => setOpenId(openId === "lang" ? null : "lang")}
             >
-              <i className="fa-solid fa-earth-americas"></i>
+              <i className="fa-solid fa-earth-americas" aria-hidden="true"></i>
+              <span>{lang.toUpperCase()}</span>
+              <i className="fa-solid fa-chevron-down" aria-hidden="true"></i>
             </button>
-            <div className="submenu language-submenu">
-              <button
-                type="button"
-                className="language-option"
-                onClick={() => handleLanguageSelect("es")}
-              >
-                ES
-              </button>
-              <button
-                type="button"
-                className="language-option"
-                onClick={() => handleLanguageSelect("en")}
-              >
-                EN
-              </button>
-              <button
-                type="button"
-                className="language-option"
-                onClick={() => handleLanguageSelect("pt")}
-              >
-                PT
-              </button>
+            <div className="submenu language-submenu" id="language-menu">
+              {SUPPORTED_LANGUAGES.map(code => (
+                <button
+                  key={code}
+                  type="button"
+                  className="language-option"
+                  aria-current={lang === code ? "true" : undefined}
+                  onClick={() => changeLanguage(code)}
+                >
+                  <span className="lang-code">{code.toUpperCase()}</span>
+                  {LANGUAGE_NAMES[code]}
+                </button>
+              ))}
             </div>
-          </li>
-        </ul>
-      </nav>
+          </div>
+
+          <div
+            className={`header-dropdown user-menu${openId === "account" ? " submenu-open" : ""}`}
+            onBlur={e => {
+              if (openId === "account" && !e.currentTarget.contains(e.relatedTarget)) setOpenId(null);
+            }}
+          >
+            <button
+              type="button"
+              className="header-icon-btn"
+              aria-haspopup="true"
+              aria-expanded={openId === "account"}
+              aria-controls="account-menu"
+              aria-label={user ? t("header.profile", "Mi perfil") : t("header.login", "Iniciar sesión")}
+              onClick={() => setOpenId(openId === "account" ? null : "account")}
+            >
+              <i className="fa-regular fa-circle-user" aria-hidden="true"></i>
+              <i className="fa-solid fa-chevron-down" aria-hidden="true"></i>
+            </button>
+            <div className="submenu" id="account-menu">
+              {user ? (
+                <>
+                  <div className="submenu-meta">
+                    <strong>{user.name || user.email}</strong>
+                    {user.name ? user.email : null}
+                  </div>
+                  <Link to="/perfil" onClick={closeAll}>
+                    {t("header.profile", "Mi perfil")}
+                  </Link>
+                  {user.role === "admin" && (
+                    <Link to="/admin" onClick={closeAll}>
+                      {t("header.admin", "Admin")}
+                    </Link>
+                  )}
+                  <button type="button" onClick={handleLogout}>
+                    {t("header.logout", "Cerrar sesión")}
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link to="/login" onClick={closeAll}>
+                    {t("header.login", "Iniciar sesión")}
+                  </Link>
+                  <Link to="/solicitar-membresia" onClick={closeAll}>
+                    {t("header.request_membership", "Solicitar membresía")}
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
+
+          {user === null && (
+            <Link to="/solicitar-membresia" className="btn btn-accent btn-sm header-cta">
+              {t("header.join", "Hazte socio")}
+            </Link>
+          )}
+
+          <button
+            type="button"
+            ref={hamburgerRef}
+            className="hamburger-menu"
+            onClick={() => setDrawerOpen(true)}
+            aria-label={t("header.open_menu", "Abrir menú")}
+            aria-expanded={drawerOpen}
+            aria-controls="primary-menu"
+          >
+            <i className="fa-solid fa-bars" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
     </header>
   );
 }
